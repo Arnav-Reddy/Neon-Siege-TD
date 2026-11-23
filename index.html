@@ -114,6 +114,48 @@ html.overlay .pills{-webkit-app-region:drag;cursor:grab}
 #oTxt{text-align:center;color:#cbd5e1;font-size:10.5px;line-height:1.55}
 #over .btn{width:150px}
 
+/* ---------- Prestige ---------- */
+.ib.star{color:#fde68a}
+.ib.star.ready{color:#1c1203;background:linear-gradient(#fef3c7,#f59e0b);border-color:transparent;animation:readyPulse 1.6s ease-in-out infinite}
+@keyframes readyPulse{0%,100%{box-shadow:0 0 6px rgba(251,191,36,.45)}50%{box-shadow:0 0 16px rgba(251,191,36,.95)}}
+#pres{inset:0;display:flex;flex-direction:column;gap:7px;padding:9px 10px;color:var(--text);
+  background:radial-gradient(260px 160px at 50% 0%,rgba(251,191,36,.2),transparent 70%),radial-gradient(300px 200px at 50% 120%,rgba(168,85,247,.18),transparent 70%),rgba(7,9,14,.86);
+  -webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%)}
+.pr-head{display:flex;align-items:center;gap:9px}
+.emblem{position:relative;width:38px;height:38px;flex:none;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(from 0deg,#fde68a,#f59e0b,#a855f7,#22d3ee,#fde68a);animation:spin 6s linear infinite}
+.emblem::before{content:"";position:absolute;inset:2px;border-radius:50%;background:radial-gradient(circle at 50% 35%,#2a1f08,#0b0d14 70%)}
+.emblem svg{position:relative;width:20px;height:20px;fill:#fbbf24;filter:drop-shadow(0 0 5px rgba(251,191,36,.9));animation:spin 6s linear infinite reverse}
+.emblem.ready{box-shadow:0 0 18px rgba(251,191,36,.75)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pr-ttl{flex:1;min-width:0}
+.pr-t{font-weight:900;font-size:13px;letter-spacing:4px;background:linear-gradient(90deg,#fef3c7,#fbbf24 45%,#f0abfc);-webkit-background-clip:text;background-clip:text;color:transparent}
+.pr-s{display:flex;align-items:center;gap:5px;margin-top:2px;font-size:10px;font-weight:750}
+.pr-star{color:#cbd5e1}.pr-star.to{color:#fde68a;text-shadow:0 0 8px rgba(251,191,36,.6)}
+.pr-arrow{color:var(--dim)}
+.pr-bonus{margin-left:3px;font-size:8.5px;font-weight:650;color:#c7d2e2;padding:1px 6px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08)}
+.pr-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1}
+.rq{display:flex;align-items:center;gap:7px;padding:6px 7px;border-radius:9px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);transition:border-color .3s,background .3s,box-shadow .3s}
+.rq-i{width:24px;height:24px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fde68a;
+  background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.35);transition:all .3s}
+.rq-b{flex:1;min-width:0}
+.rq-l{font-size:8px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--dim)}
+.rq-v{font-size:11px;font-weight:800;margin:1px 0 3px;white-space:nowrap}
+.rq-v .n{color:var(--dim);font-weight:650}
+.rq-bar{height:4px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.rq-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#f59e0b,#fde68a);transition:width .35s ease}
+.rq.done{border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 0 10px rgba(52,211,153,.12)}
+.rq.done .rq-i{color:#04130d;background:linear-gradient(#6ee7b7,#10b981);border-color:transparent;box-shadow:0 0 8px rgba(52,211,153,.6)}
+.rq.done .rq-bar i{background:linear-gradient(90deg,#10b981,#6ee7b7)}
+.pr-foot{display:flex;gap:6px}
+.pr-foot .btn.sm{flex:0 0 112px}
+.btn.asc{position:relative;overflow:hidden;color:#1c1203;background:linear-gradient(#fef3c7,#f59e0b);border-color:transparent;box-shadow:0 0 14px rgba(251,191,36,.45)}
+.btn.asc::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-20deg);animation:shine 2.4s ease-in-out infinite}
+@keyframes shine{0%{left:-60%}60%,100%{left:130%}}
+.btn.asc:disabled{color:var(--dim);background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);box-shadow:none;opacity:1}
+.btn.asc:disabled::after{display:none}
+
 /* ---------- Dock ---------- */
 #bar{flex:1;display:flex;gap:5px;overflow-x:auto;overflow-y:hidden;padding:6px 7px 4px;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.12) transparent}
 #bar::-webkit-scrollbar{height:4px}#bar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:3px}
@@ -148,7 +190,7 @@ html.overlay .pills{-webkit-app-region:drag;cursor:grab}
     <button id="bSpeed" class="ib full" title="Game speed">1x</button>
     <button id="bAuto" class="ib full" title="Auto-wave"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 6.5A5 5 0 0 0 4 4.3L2.5 6M3 9.5a5 5 0 0 0 9 2.2L13.5 10"/><path d="M2.5 2.8V6h3.2M13.5 13.2V10h-3.2"/></svg></button>
     <button id="bMute" class="ib full" title="Sound"><svg class="main" viewBox="0 0 16 16"><path fill="currentColor" d="M2 6h2.5L8 3v10L4.5 10H2z"/><path d="M10.5 5.5a3.5 3.5 0 0 1 0 5M12.3 3.7a6 6 0 0 1 0 8.6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg><svg class="alt" viewBox="0 0 16 16"><path fill="currentColor" d="M2 6h2.5L8 3v10L4.5 10H2z"/><path d="m10.5 6 4 4m0-4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
-    <button id="bNew" class="ib full"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 8A5.5 5.5 0 1 1 11.6 3.8"/><path d="M12 1.5v2.8H9.2"/></svg><span id="bNewTxt"></span></button>
+    <button id="bPres" class="ib star full" title="Prestige"><svg viewBox="0 0 16 16"><path fill="currentColor" d="m8 1.4 1.9 4.1 4.5.5-3.4 3 1 4.4L8 11.2l-4 2.2 1-4.4-3.4-3 4.5-.5z"/></svg></button>
     <button id="bMin" class="ib" title="Minimize to pill / expand"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path id="bMinPath" d="m4 6 4 4 4-4"/></svg></button>
   </div>
   <div id="stage" class="full">
@@ -171,6 +213,21 @@ html.overlay .pills{-webkit-app-region:drag;cursor:grab}
       <div id="mSub" class="msub"></div>
       <div id="mOpts" class="mopts"></div>
       <div class="prow"><button id="mReroll" class="btn sm"></button><button id="mAuto" class="btn sm" title="Auto-pick mutations for idle play"></button></div>
+    </div>
+    <div id="pres" class="ovl hidden">
+      <div class="pr-head">
+        <div id="prEmblem" class="emblem"><svg viewBox="0 0 16 16"><path d="m8 1.4 1.9 4.1 4.5.5-3.4 3 1 4.4L8 11.2l-4 2.2 1-4.4-3.4-3 4.5-.5z"/></svg></div>
+        <div class="pr-ttl">
+          <div class="pr-t">PRESTIGE</div>
+          <div class="pr-s"><span class="pr-star">★<span id="prFrom"></span></span><span class="pr-arrow">→</span><span class="pr-star to">★<span id="prTo"></span></span><span id="prBonus" class="pr-bonus"></span></div>
+        </div>
+        <button id="prClose" class="x" title="Close (Esc)">×</button>
+      </div>
+      <div id="prReqs" class="pr-grid"></div>
+      <div class="pr-foot">
+        <button id="prReroll" class="btn sm" title="Restart on a new map without earning stars"></button>
+        <button id="prGo" class="btn asc"></button>
+      </div>
     </div>
     <div id="over" class="ovl hidden">
       <div class="oh">CORE BREACHED</div>
@@ -368,7 +425,7 @@ const towerAt = (x, y) => S.towers.find(t => t.x === x && t.y === y);
 
 // ================= State & persistence =================
 let S;
-const ui = { build:null, sel:null, hover:null, min:false, confirmT:0, mutT:null, mutOpts:[], shake:0 };
+const ui = { build:null, sel:null, hover:null, min:false, rerollT:0, pres:false, mutT:null, mutOpts:[], shake:0 };
 const randSeed = () => Math.floor(Math.random() * 2 ** 31);
 
 function makeTower(type, x, y){
@@ -377,7 +434,7 @@ function makeTower(type, x, y){
 function makeState(m){
   return {
     seed:m.seed, gold:m.gold, lives:m.lives, wave:m.wave, prestige:m.prestige, catalysts:m.catalysts, best:m.best,
-    speed:m.speed, auto:m.auto, autoMut:m.autoMut, muted:m.muted,
+    bossKills:m.bossKills, runEarned:m.runEarned, speed:m.speed, auto:m.auto, autoMut:m.autoMut, muted:m.muted,
     towers:m.towers.map(t => {
       const type = TOWER_INDEX[t.id];
       if (type === undefined) throw new Error(`Unknown tower id in save: ${t.id}`);
@@ -389,12 +446,12 @@ function makeState(m){
   };
 }
 function freshRun(meta){
-  return makeState({ seed:randSeed(), gold:100 + 50 * meta.prestige, lives:START_LIVES, wave:0, towers:[], ...meta });
+  return makeState({ seed:randSeed(), gold:100 + 50 * meta.prestige, lives:START_LIVES, wave:0, towers:[], bossKills:0, runEarned:0, ...meta });
 }
 function save(){
   localStorage.setItem(SAVE_KEY, JSON.stringify({
     seed:S.seed, gold:S.gold, lives:S.lives, wave:S.waveActive ? S.wave - 1 : S.wave,
-    prestige:S.prestige, catalysts:S.catalysts, best:S.best, speed:S.speed, auto:S.auto, autoMut:S.autoMut, muted:S.muted, min:ui.min,
+    prestige:S.prestige, catalysts:S.catalysts, best:S.best, bossKills:S.bossKills, runEarned:S.runEarned, speed:S.speed, auto:S.auto, autoMut:S.autoMut, muted:S.muted, min:ui.min,
     towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested })),
   }));
 }
@@ -410,6 +467,8 @@ function load(){
   if (old) localStorage.removeItem(SAVE_KEY_V1);
   if (!raw) { S = freshRun({ prestige:0, catalysts:0, best:0, speed:1, auto:false, autoMut:false, muted:false }); setMap(S.seed); return; }
   const d = JSON.parse(raw);
+  // Saves from before prestige requirements have no run-progress counters; the run starts counting now.
+  if (d.bossKills === undefined) { d.bossKills = 0; d.runEarned = 0; }
   S = makeState(d);
   ui.min = d.min;
   setMap(S.seed);
@@ -512,7 +571,7 @@ function setPos(e){
 }
 
 // ================= Economy & feedback =================
-function earn(g){ S.gold += g; S.inc[S.incI] += g; }
+function earn(g){ S.gold += g; S.runEarned += g; S.inc[S.incI] += g; }
 function addFx(f){ if (S.fx.length < 260) S.fx.push(f); }
 function addText(x, y, s, c, big){
   if (!big && S.fx.length > 150) return;
@@ -568,6 +627,7 @@ function kill(e, src){
   if (e.boss) {
     const c = 1 + Math.floor(S.wave / 30);
     S.catalysts += c;
+    S.bossKills++;
     addText(e.x, e.y - .55, `+${c} ◆ CATALYST`, '#c084fc', true);
     burst(e.x, e.y, '#fbbf24', 20, 3);
     shake(6);
@@ -803,10 +863,32 @@ function gameOver(){
   S.best = Math.max(S.best, S.wave);
   closePanel();
   $('mut').classList.add('hidden');
-  const earned = Math.floor(S.wave / 10);
-  $('oTxt').innerHTML = `Reached wave <b>${S.wave}</b> · Best <b>${S.best}</b><br>New Map grants <b style="color:#fde68a">+${earned} ★</b><br><span style="color:#8590a6">(+10% damage &amp; gold per star)</span>`;
+  const ready = prestigeReady();
+  $('oTxt').innerHTML = `Reached wave <b>${S.wave}</b> · Best <b>${S.best}</b><br>` + (ready
+    ? `Prestige ready: <b style="color:#fde68a">+${prestigeReward()} ★</b>`
+    : `<span style="color:#8590a6">Prestige requirements not met: no ★ this run</span>`);
+  setText($('oNew'), ready ? `★ Ascend · +${prestigeReward()} ★` : 'New Map');
+  $('oNew').classList.toggle('asc', ready);
   $('over').classList.remove('hidden');
   save();
+}
+
+// ================= Prestige =================
+const clearedWaves = () => S.waveActive ? S.wave - 1 : S.wave;
+function prestigeReqs(){
+  const p = S.prestige;
+  return [
+    { icon:'≋', label:'Reach wave',    have:clearedWaves(), need:10 + 5 * p },
+    { icon:'☠', label:'Bosses slain',  have:S.bossKills, need:1 + Math.floor(p / 2) },
+    { icon:'✦', label:'Mutation tier', have:Math.max(0, ...S.towers.map(t => t.muts.length)), need:1 + Math.floor(p / 3) },
+    { icon:'$', label:'Gold earned',   have:S.runEarned, need:1500 * Math.pow(2, p) },
+  ];
+}
+const prestigeReady = () => prestigeReqs().every(r => r.have >= r.need);
+const prestigeReward = () => Math.max(1, Math.floor(clearedWaves() / 10));
+function ascend(){
+  if (!prestigeReady()) throw new Error('Ascend called with prestige requirements unmet');
+  newMap(prestigeReward());
 }
 
 // ================= Player actions =================
@@ -851,15 +933,16 @@ function applyMut(t, k){
   sfx('mut');
   save();
 }
-function newMap(){
-  const earned = Math.floor(S.wave / 10);
+function newMap(earned){
   S = freshRun({ prestige:S.prestige + earned, catalysts:S.catalysts, best:Math.max(S.best, S.wave), speed:S.speed, auto:S.auto, autoMut:S.autoMut, muted:S.muted });
   setMap(S.seed);
   closePanel();
   $('mut').classList.add('hidden');
   $('over').classList.add('hidden');
+  closePrestige();
   ui.build = null;
-  S.banner = { s: earned ? `NEW MAP · +${earned} ★` : 'NEW MAP', c:'#fde68a', t:2 };
+  if (earned) { burst(W / TS / 2, H / TS / 2, '#fde68a', 60, 5); shake(5); sfx('mut'); }
+  S.banner = { s: earned ? `ASCENDED · ★${S.prestige}  (+${S.prestige * 10}% dmg & gold)` : 'NEW MAP', c:'#fde68a', t:2.4 };
   save();
 }
 
@@ -1384,6 +1467,37 @@ function renderMutOpts(){
     box.append(b);
   }
 }
+const reqCards = [0, 1, 2, 3].map(() => {
+  const el = document.createElement('div');
+  el.className = 'rq';
+  el.innerHTML = '<div class="rq-i"></div><div class="rq-b"><div class="rq-l"></div><div class="rq-v"></div><div class="rq-bar"><i></i></div></div>';
+  $('prReqs').append(el);
+  return { el, icon:el.querySelector('.rq-i'), label:el.querySelector('.rq-l'), value:el.querySelector('.rq-v'), bar:el.querySelector('.rq-bar i') };
+});
+function openPrestige(){ closePanel(); ui.build = null; ui.pres = true; ui.rerollT = 0; $('pres').classList.remove('hidden'); refreshPrestige(prestigeReady()); }
+function closePrestige(){ ui.pres = false; $('pres').classList.add('hidden'); }
+function refreshPrestige(ready){
+  const reqs = prestigeReqs(), reward = prestigeReward(), met = reqs.filter(r => r.have >= r.need).length;
+  reqs.forEach((r, i) => {
+    const c = reqCards[i], done = r.have >= r.need;
+    c.el.classList.toggle('done', done);
+    setText(c.icon, done ? '✓' : r.icon);
+    setText(c.label, r.label);
+    const v = `${fmt(Math.min(r.have, r.need))} / ${fmt(r.need)}`;
+    if (c.value._v !== v) { c.value._v = v; const [a, b] = v.split(' / '); c.value.innerHTML = `${a} <span class="n">/ ${b}</span>`; }
+    c.bar.style.width = Math.min(100, r.have / r.need * 100) + '%';
+  });
+  setText($('prFrom'), String(S.prestige));
+  setText($('prTo'), String(S.prestige + (ready ? reward : 0)));
+  setText($('prBonus'), `+${S.prestige * 10}% → +${(S.prestige + (ready ? reward : 0)) * 10}% dmg & gold`);
+  $('prEmblem').classList.toggle('ready', ready);
+  const go = $('prGo');
+  go.disabled = !ready;
+  setText(go, ready ? `★ Ascend · +${reward} ★` : `🔒 Locked · ${met}/4 met`);
+  const rr = $('prReroll');
+  setText(rr, ui.rerollT > 0 ? 'Sure? Lose run' : '⟳ Reroll map');
+  rr.classList.toggle('sell', ui.rerollT > 0);
+}
 function updateUI(){
   setText($('sWave'), String(S.wave));
   setText($('sGold'), fmt(S.gold));
@@ -1396,10 +1510,10 @@ function updateUI(){
   $('bSpeed').classList.toggle('on', S.speed > 1);
   $('bAuto').classList.toggle('on', S.auto);
   $('bMute').classList.toggle('off', S.muted);
-  const bn = $('bNew');
-  setText($('bNewTxt'), ui.confirmT > 0 ? 'Sure?' : '');
-  bn.classList.toggle('warn', ui.confirmT > 0);
-  bn.title = `New Map / Prestige: restart on a new map for +${Math.floor(S.wave / 10)} ★ (1 per 10 waves)\nYou have ★${S.prestige} (+${S.prestige * 10}% dmg & gold) · ◆${S.catalysts} Catalysts`;
+  const ready = prestigeReady(), bp = $('bPres');
+  bp.classList.toggle('ready', ready);
+  bp.title = `Prestige · ★${S.prestige} (+${S.prestige * 10}% dmg & gold) · ◆${S.catalysts} Catalysts${ready ? '\nReady to ascend!' : ''}`;
+  if (ui.pres) refreshPrestige(ready);
   $('bMinPath').setAttribute('d', ui.min ? 'm4 10 4-4 4 4' : 'm4 6 4 4 4-4');
   hot.forEach((b, i) => { b.classList.toggle('sel', ui.build === i); b.classList.toggle('poor', S.gold < TOWERS[i].cost); });
   if (ui.sel) refreshPanel();
@@ -1437,15 +1551,18 @@ $('bWave').onclick = startWave;
 $('bSpeed').onclick = () => { S.speed = S.speed % 3 + 1; save(); };
 $('bAuto').onclick = () => { S.auto = !S.auto; S.autoT = 1; save(); };
 $('bMute').onclick = () => { S.muted = !S.muted; save(); };
-$('bNew').onclick = () => { if (ui.confirmT > 0) { ui.confirmT = 0; newMap(); } else ui.confirmT = 3; };
-$('oNew').onclick = newMap;
+$('bPres').onclick = () => ui.pres ? closePrestige() : openPrestige();
+$('prClose').onclick = closePrestige;
+$('prGo').onclick = ascend;
+$('prReroll').onclick = () => { if (ui.rerollT > 0) newMap(0); else ui.rerollT = 3; };
+$('oNew').onclick = () => prestigeReady() ? ascend() : newMap(0);
 $('bMin').onclick = () => { ui.min = !ui.min; $('w').classList.toggle('min', ui.min); tip.classList.add('hidden'); save(); };
 document.addEventListener('keydown', ev => {
   if (ev.code === 'Space') {
     if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
     ev.preventDefault(); startWave(); return;
   }
-  if (ev.key === 'Escape') { ui.build = null; closePanel(); return; }
+  if (ev.key === 'Escape') { ui.build = null; closePanel(); closePrestige(); return; }
   const i = HOTKEYS.indexOf(ev.key);
   if (i >= 0 && !S.over) { ui.build = ui.build === i ? null : i; closePanel(); }
 });
@@ -1465,7 +1582,7 @@ let last = performance.now(), acc = 0, lastSave = 0;
 function frame(now){
   const dt = Math.min((now - last) / 1000, .25);
   last = now;
-  if (ui.confirmT > 0) ui.confirmT -= dt;
+  if (ui.rerollT > 0) ui.rerollT -= dt;
   ui.shake *= Math.exp(-dt * 12);
   if (!S.over && !ui.mutT) {
     acc += dt;

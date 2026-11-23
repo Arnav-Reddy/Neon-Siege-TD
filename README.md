@@ -38,7 +38,7 @@ Open `index.html` in any modern browser. The whole game is that one file.
 | Cancel | Right-click or `Esc` |
 | Start the next wave | `▶` or `Space` |
 | Speed / Auto-wave / Sound | `1x·2x·3x`, `⟲`, speaker |
-| New Map / Prestige | `⟳` (click twice to confirm) |
+| Prestige / Reroll map | `★` (glows gold when you can ascend) |
 
 ## Features
 
@@ -47,7 +47,7 @@ Open `index.html` in any modern browser. The whole game is that one file.
 - **Aether Mint:** makes gold every second plus a payout at the end of each wave. Adjacent Chrono Obelisks speed it up. Its mutations are Compound Interest, Midas Aura, Bounty Harvester and Quantum Overclock.
 - **Mutations:** at every 5th level a tower evolves visually and you pick one of 3 traits. Turn on Auto-mutate for idle play, or spend boss Catalysts (◆) to reroll the choices.
 - **Enemies:** Runners, Brutes, Swarms, Shielded, and a Boss every 10 waves.
-- **Prestige:** start a new map to earn 1 ★ for every 10 waves you reached. Each ★ gives +10% damage and gold for good.
+- **Prestige:** click the ★ button to see your requirements. You must reach a wave, slay bosses, mutate a tower and earn gold, and each target gets harder as you collect stars. Once every card turns green, **Ascend** to earn 1 ★ for every 10 waves cleared. Each ★ gives +10% damage and gold for good. **Reroll map** starts a fresh run without stars.
 - **Saves:** progress saves to `localStorage`. Saves from the original 10-tower version migrate automatically.
 
 ## Build it yourself
