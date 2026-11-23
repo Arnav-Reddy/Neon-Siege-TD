@@ -27,7 +27,11 @@ It floats over full-screen browsers, videos and apps that use borderless or wind
 
 ## Play in a browser instead
 
-Open `index.html` in any modern browser. The whole game is that one file.
+Play it live at **https://arnav-reddy.github.io/Tower-Defense-Mini-Game-/**, or open `index.html` in any modern browser. The whole game is that one file.
+
+## Updates
+
+The desktop app (v1.0.2 and later) loads the game live from that page. Every update pushed to `main` reaches your installed app the next time you open it, with no new download. You only need to download a new release when the desktop shell itself changes. The app needs an internet connection to start.
 
 ## Controls
 
