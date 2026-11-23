@@ -64,4 +64,6 @@ npm start
 npm run dist
 ```
 
-`npm start` runs the overlay, and `npm run dist` builds an installer for your OS into `dist/`. Pushing a tag such as `v1.0.1` makes GitHub Actions build every platform and publish a Release.
+`npm start` runs the overlay, and `npm run dist` builds an installer for your OS into `dist/`.
+
+**Publish a release:** go to **Actions → Release → Run workflow**. GitHub builds Windows, macOS and Linux and publishes them as release `v<version>`, using the version in `package.json`. Bump that version before publishing the next release.

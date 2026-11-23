@@ -1,6 +1,10 @@
 name: Release
 
+# Run from the Actions tab ("Run workflow"), or push a tag like v1.0.1.
+# The release tag always comes from package.json's version, which is also
+# the tag electron-builder uploads to.
 on:
+  workflow_dispatch:
   push:
     tags: ['v*']
 
@@ -11,7 +15,10 @@ jobs:
   create-release:
     runs-on: ubuntu-latest
     steps:
-      - run: gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --title "Neon Siege TD $GITHUB_REF_NAME" --generate-notes
+      - uses: actions/checkout@v4
+      - run: |
+          TAG="v$(node -p "require('./package.json').version")"
+          gh release view "$TAG" || gh release create "$TAG" --target "$GITHUB_SHA" --title "Neon Siege TD $TAG" --generate-notes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
