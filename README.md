@@ -1,6 +1,6 @@
 # Neon Siege TD: Tower Defense Mini Game
 
-A small incremental tower defense game that floats in the bottom-right corner of your screen. It stays on top of your browser and other apps, including apps in full screen.
+A small incremental tower defense game that floats on top of whatever you're working on, including apps in full screen. You can drag it anywhere and resize it.
 
 ![screenshot](docs/screenshot.png)
 
@@ -17,7 +17,8 @@ Go to [**Releases**](https://github.com/Arnav-Reddy/tower-defense-mini-game-/rel
 ## Using the overlay
 
 - The game opens as a borderless widget in the bottom-right corner. There's no taskbar or Dock entry.
-- **Move it:** drag the stat pills (wave, gold, lives) in the top bar.
+- **Move it:** drag the stat bar (or the ⋮⋮ grip) to put it anywhere. It snaps to the nearest screen corner, and minimizing or resizing keeps that corner fixed.
+- **Resize it:** drag the corner grip (opposite the corner it's anchored to) to scale it from 60% to 250%. Double-click the grip to reset to 100%. Size and position are remembered.
 - **Show or hide:** press `Ctrl+Shift+T` (`Cmd+Shift+T` on macOS) from any app, or click the tray / menu-bar icon.
 - **Quit:** right-click the tray icon and choose **Quit**.
 - **Shrink:** the `⌄` button shrinks the widget to a small pill. The window shrinks with it, so it covers nothing else.

@@ -1,31 +1,52 @@
-// Desktop overlay shell: a transparent, frameless, always-on-top window that
-// sits in the bottom-right corner above other apps, including full-screen ones.
+// Desktop overlay shell: a transparent, frameless, always-on-top window that floats above other
+// apps (including full-screen ones). The page drags it via native drag regions and sizes it to the widget.
 const { app, BrowserWindow, screen, ipcMain, globalShortcut, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
-const WIDTH = 400, HEIGHT = 340, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+T';
+const WIDTH = 400, HEIGHT = 344, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+T';
 let win, tray;
 
 if (!app.requestSingleInstanceLock()) app.quit();
+
+const posFile = () => path.join(app.getPath('userData'), 'window.json');
+const savePos = () => fs.writeFileSync(posFile(), JSON.stringify(win.getPosition()));
 
 function toggle(){
   if (win.isVisible()) win.hide();
   else { win.showInactive(); win.setAlwaysOnTop(true, 'screen-saver'); }
 }
 
-// The widget reports its size (full card or minimized pill); grow/shrink the
-// window around its bottom-right corner so it stays anchored where it is.
-function fitTo(w, h){
+// Keep a rectangle fully inside the work area of the display it is on.
+function keepOnScreen(b){
+  const wa = screen.getDisplayMatching(b).workArea;
+  return {
+    x: Math.min(Math.max(b.x, wa.x), wa.x + wa.width - b.width),
+    y: Math.min(Math.max(b.y, wa.y), wa.y + wa.height - b.height),
+    width: b.width, height: b.height,
+  };
+}
+
+// The widget reports its size plus which corner it is anchored to (ax: 'l'|'r', ay: 't'|'b');
+// grow/shrink the window around that corner.
+function fitTo(w, h, ax, ay){
   const b = win.getBounds();
-  win.setBounds({ x: b.x + b.width - w, y: b.y + b.height - h, width: w, height: h });
+  win.setBounds(keepOnScreen({
+    x: ax === 'r' ? b.x + b.width - w : b.x,
+    y: ay === 'b' ? b.y + b.height - h : b.y,
+    width: w, height: h,
+  }));
+  savePos();
 }
 
 app.whenReady().then(() => {
   if (process.platform === 'darwin') app.dock.hide(); // agent app: required to float over macOS full-screen Spaces
   const wa = screen.getPrimaryDisplay().workArea;
+  const [x, y] = fs.existsSync(posFile())
+    ? JSON.parse(fs.readFileSync(posFile(), 'utf8'))
+    : [wa.x + wa.width - WIDTH - MARGIN, wa.y + wa.height - HEIGHT - MARGIN];
   win = new BrowserWindow({
-    width: WIDTH, height: HEIGHT,
-    x: wa.x + wa.width - WIDTH - MARGIN, y: wa.y + wa.height - HEIGHT - MARGIN,
+    ...keepOnScreen({ x, y, width: WIDTH, height: HEIGHT }),
     frame: false, transparent: true, resizable: false, maximizable: false, fullscreenable: false,
     skipTaskbar: true, hasShadow: false, alwaysOnTop: true, backgroundColor: '#00000000',
     webPreferences: { preload: path.join(__dirname, 'preload.js') },
@@ -33,8 +54,9 @@ app.whenReady().then(() => {
   win.setAlwaysOnTop(true, 'screen-saver');
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   win.loadFile(path.join(__dirname, 'index.html'));
+  win.on('moved', savePos);
 
-  ipcMain.on('fit', (_e, w, h) => fitTo(Math.ceil(w), Math.ceil(h)));
+  ipcMain.on('fit', (_e, w, h, ax, ay) => fitTo(Math.ceil(w), Math.ceil(h), ax, ay));
   globalShortcut.register(HOTKEY, toggle);
 
   tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'build', 'icon.png')).resize({ width: 16, height: 16 }));
