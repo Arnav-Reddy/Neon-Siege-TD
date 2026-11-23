@@ -212,7 +212,7 @@ html.overlay .handle{-webkit-app-region:drag}
     <button id="bWave" class="ib go" title="Start next wave (Space)"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 2.8v10.4L13 8z"/></svg></button>
     <div class="seg full">
       <button id="bSpeed" class="ib" title="Game speed">1x</button>
-      <button id="bAuto" class="ib" title="Auto-wave"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 6.5A5 5 0 0 0 4 4.3L2.5 6M3 9.5a5 5 0 0 0 9 2.2L13.5 10"/><path d="M2.5 2.8V6h3.2M13.5 13.2V10h-3.2"/></svg></button>
+      <button id="bAuto" class="ib" title="Auto-wave: start the next wave automatically">AUTO</button>
     </div>
     <button id="bPres" class="ib pres full" title="Prestige"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 1.5h7v1.6h2.6v1.6a3 3 0 0 1-2.9 3A4 4 0 0 1 9 10v1.6h2.2v2.9H4.8v-2.9H7V10a4 4 0 0 1-2.2-2.3 3 3 0 0 1-2.9-3V3.1h2.6zM3.4 4.6v.1c0 .7.5 1.3 1.1 1.4V4.6zm9.2 0h-1.1v1.5c.6-.1 1.1-.7 1.1-1.4z"/></svg><span>Prestige</span></button>
     <button id="bMin" class="ib" title="Minimize to pill / expand"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path id="bMinPath" d="m4 6 4 4 4-4"/></svg></button>
@@ -280,17 +280,17 @@ const RARITY = [
 ];
 
 const TOWERS = [
-  { id:'bolt',   name:'Bolt Turret',      short:'Bolt',    cost:25,     kind:'proj',   dmg:5,     range:2.4, rate:2.5,  rarity:0, color:'#ffd37a', dark:'#8a5a12', role:'Single target', desc:'Fast-firing kinetic shots. Reliable single-target starter.' },
-  { id:'frost',  name:'Frost Emitter',    short:'Frost',   cost:75,     kind:'pulse',  dmg:12,    range:1.7, rate:0.9,  rarity:0, slow:0.4, slowT:1.5, color:'#9fd8e6', dark:'#245a6b', role:'AoE · Slow', desc:'Cryo pulse that damages and slows every enemy in its radius.' },
-  { id:'flak',   name:'Flak Cannon',      short:'Flak',    cost:200,    kind:'shell',  dmg:40,    range:2.6, rate:0.75, rarity:1, splash:0.9, color:'#ff653f', dark:'#8a2a12', role:'Splash', desc:'Heavy explosive shells that deal splash damage.' },
-  { id:'mint',   name:'Aether Mint',      short:'Mint',    cost:350,    kind:'mint',   gps:2,     bonus:25,  range:1.8, rate:1, rarity:1, color:'#ffb23f', dark:'#16115e', role:'Economy', desc:'Does not attack. Generates gold every second plus a payout at the end of each wave. Chrono-boostable.' },
-  { id:'tesla',  name:'Tesla Coil',       short:'Tesla',   cost:550,    kind:'chain',  dmg:110,   range:2.4, rate:1.0,  rarity:2, jumps:4, color:'#8f86ff', dark:'#2a2380', role:'Chain', desc:'Chain lightning that arcs between nearby enemies.' },
-  { id:'venom',  name:'Venom Spitter',    short:'Venom',   cost:1400,   kind:'proj',   dmg:70,    range:2.4, rate:1.4,  rarity:2, color:'#7fd18b', dark:'#1f5a2c', role:'Poison · Shred', desc:'Stacking poison damage over time that also shreds enemy armor.' },
-  { id:'rail',   name:'Railgun Sniper',   short:'Rail',    cost:3500,   kind:'rail',   dmg:2200,  range:99,  rate:0.33, rarity:3, crit:0.3, critMul:4, color:'#6fa8ff', dark:'#1d3f8a', role:'Sniper', desc:'Map-wide range and slow fire, with massive critical hits on the toughest enemy.' },
-  { id:'prism',  name:'Prism Beam',       short:'Prism',   cost:9000,   kind:'beam',   dmg:500,   range:2.6, rate:1.0,  rarity:3, color:'#ff9bc0', dark:'#8a2f58', role:'Ramping beam', desc:'Continuous laser whose damage doubles every second it stays locked on (max ×64).' },
-  { id:'hell',   name:'Hellfire Mortar',  short:'Hellfire',cost:22000,  kind:'mortar', dmg:1400,  range:3.2, rate:0.45, rarity:4, splash:0.7, color:'#e8412b', dark:'#6b160a', role:'Cluster · Lava', desc:'Fires clusters of burning shells that leave damaging lava pools on the path.' },
-  { id:'chrono', name:'Chrono Obelisk',   short:'Chrono',  cost:55000,  kind:'pulse',  dmg:3500,  range:2.2, rate:1.0,  rarity:4, slow:0.6, slowT:1.2, buff:true, color:'#fff4dc', dark:'#6b678f', role:'Slow · Support', desc:'Time-dilation field: heavy slow, and +30% speed for adjacent towers (Mints included).' },
-  { id:'sing',   name:'Singularity Core', short:'Singular',cost:150000, kind:'hole',   dmg:30000, range:2.6, rate:0.25, rarity:5, color:'#b07cff', dark:'#2c1466', role:'Pull · AoE', desc:'Black hole that drags enemies backward along the path and deals massive AoE damage.' },
+  { id:'bolt',   name:'Wheel Gun',      short:'Wheel Gun',    cost:25,     kind:'proj',   dmg:5,     range:2.4, rate:2.5,  rarity:0, color:'#ffd37a', dark:'#8a5a12', role:'Single target', desc:'Pit-crew pneumatic gun firing wheel nuts. A fast, reliable single-target starter.' },
+  { id:'frost',  name:'Marshal Post',    short:'Marshal',   cost:75,     kind:'pulse',  dmg:12,    range:1.7, rate:0.9,  rarity:0, slow:0.4, slowT:1.5, color:'#ffd400', dark:'#7a6400', role:'AoE · Slow', desc:'Marshals wave yellow flags: damages and slows every car in the zone.' },
+  { id:'flak',   name:'Tyre Launcher',      short:'Tyres',    cost:200,    kind:'shell',  dmg:40,    range:2.6, rate:0.75, rarity:1, splash:0.9, color:'#ff653f', dark:'#8a2a12', role:'Splash', desc:'Lobs spare tyres that burst on impact for splash damage.' },
+  { id:'mint',   name:'Sponsor Billboard',      short:'Sponsor',    cost:350,    kind:'mint',   gps:2,     bonus:25,  range:1.8, rate:1, rarity:1, color:'#ffb23f', dark:'#16115e', role:'Economy', desc:'Does not attack. Earns sponsorship money every second plus a payout at the end of each wave. Race Control speeds it up.' },
+  { id:'tesla',  name:'ERS Battery',       short:'ERS',   cost:550,    kind:'chain',  dmg:110,   range:2.4, rate:1.0,  rarity:2, jumps:4, color:'#8f86ff', dark:'#2a2380', role:'Chain', desc:'Discharges energy-recovery lightning that arcs between nearby cars.' },
+  { id:'venom',  name:'Fuel Sprayer',    short:'Fuel',   cost:1400,   kind:'proj',   dmg:70,    range:2.4, rate:1.4,  rarity:2, color:'#7fd18b', dark:'#1f5a2c', role:'Corrode · Shred', desc:'Sprays corrosive fuel: stacking damage over time that also eats through armour.' },
+  { id:'rail',   name:'Radar Gun',   short:'Radar',    cost:3500,   kind:'rail',   dmg:2200,  range:99,  rate:0.33, rarity:3, crit:0.3, critMul:4, color:'#6fa8ff', dark:'#1d3f8a', role:'Sniper', desc:'Speed-trap sniper with map-wide range, slow fire and huge critical hits on the toughest car.' },
+  { id:'prism',  name:'Timing Beam',       short:'Timing',   cost:9000,   kind:'beam',   dmg:500,   range:2.6, rate:1.0,  rarity:3, color:'#ff9bc0', dark:'#8a2f58', role:'Ramping beam', desc:'Timing-gate laser whose damage doubles every second it stays locked on (max ×64).' },
+  { id:'hell',   name:'Fire Mortar',  short:'Mortar',cost:22000,  kind:'mortar', dmg:1400,  range:3.2, rate:0.45, rarity:4, splash:0.7, color:'#e8412b', dark:'#6b160a', role:'Cluster · Fire', desc:'Fires clusters of burning flares that leave patches of fire on the track.' },
+  { id:'chrono', name:'Race Control',   short:'Control',  cost:55000,  kind:'pulse',  dmg:3500,  range:2.2, rate:1.0,  rarity:4, slow:0.6, slowT:1.2, buff:true, color:'#fff4dc', dark:'#6b678f', role:'Slow · Support', desc:'Calls a Virtual Safety Car: heavy slow in range, and +30% speed for adjacent towers (Sponsors included).' },
+  { id:'sing',   name:'Wind Tunnel', short:'Tunnel',cost:150000, kind:'hole',   dmg:30000, range:2.6, rate:0.25, rarity:5, color:'#b07cff', dark:'#2c1466', role:'Pull · AoE', desc:'Industrial wind tunnel that blasts cars backward along the track and deals massive AoE damage.' },
 ];
 const TOWER_INDEX = Object.fromEntries(TOWERS.map((t, i) => [t.id, i]));
 const HOTKEYS = ['1','2','3','4','5','6','7','8','9','0','-'];
@@ -1074,257 +1074,230 @@ function renderBackground(){
   }
 }
 
+// ---------- 2.5D: sprite stacking ----------
+// A "solid" is a footprint path (built around the origin) repeated from height z0 to z1 (in px),
+// in a darker side colour, then capped with its top colour. Shifting each layer up the screen
+// gives a camera tilted down from the south; rotating each layer keeps the volume correct as it turns.
+function shade(hex, f){ const n = parseInt(hex.slice(1), 16); return `rgb(${(n >> 16 & 255) * f | 0},${(n >> 8 & 255) * f | 0},${(n & 255) * f | 0})`; }
+function solid(c, x, y, z0, z1, side, top, path, rot){
+  c.fillStyle = side;
+  for (let z = z0; z < z1; z += 1) { c.save(); c.translate(x, y - z); if (rot) c.rotate(rot); path(c); c.fill(); c.restore(); }
+  c.fillStyle = top; c.save(); c.translate(x, y - z1); if (rot) c.rotate(rot); path(c); c.fill(); c.restore();
+}
+const fRect = (w, h, r) => c => rr(c, -w / 2, -h / 2, w, h, r || 0);
+const fRectAt = (x, y, w, h, r) => c => rr(c, x, y, w, h, r || 0);
+const fCirc = rad => c => { c.beginPath(); c.arc(0, 0, rad, 0, 7); };
+const TOWER_TOP = { bolt:10, frost:20, flak:10, mint:21, tesla:12, venom:11, rail:14, prism:18, hell:9, chrono:17, sing:10 };
+
 function drawTower(c, type, px, py, s, ang, tier, now, recoil){
-  const d = TOWERS[type], col = d.color, dk = d.dark, tc = TIER_COL[Math.min(tier, 5)], r = s / 2, nb = 1 + Math.min(tier, 3);
-  const mint = d.kind === 'mint', ringCol = mint ? '#ffc85c' : tc, k = recoil * r * .22;
-  if (tier > 0) glow(c, px, py, r * (1.2 + .12 * Math.sin(now * 3 + px * .1) + tier * .04), ringCol, .45);
-  c.save(); c.translate(px, py);
-  // base plate
-  rr(c, -r * .84, -r * .84, r * 1.68, r * 1.68, r * .3);
-  c.fillStyle = lin(c, 0, -r, 0, r, '#3a352c', '#1a1814'); c.fill();
-  c.lineWidth = tier ? 1.4 : 1; c.strokeStyle = tier ? rgba(tc, .95) : rgba(col, .45); c.stroke();
-  rr(c, -r * .74, -r * .74, r * 1.48, r * 1.48, r * .22); c.strokeStyle = 'rgba(255,255,255,.07)'; c.lineWidth = 1; c.stroke();
-  for (const [bx, by] of [[-1,-1],[1,-1],[-1,1],[1,1]]) circle(c, bx * r * .6, by * r * .6, .9, 'rgba(255,255,255,.18)');
-  circle(c, 0, 0, r * .58, '#15130f');
-  c.strokeStyle = rgba(col, .3); c.lineWidth = 1; c.beginPath(); c.arc(0, 0, r * .58, 0, 7); c.stroke();
-  c.lineCap = 'round';
+  const d = TOWERS[type], col = d.color, tc = TIER_COL[Math.min(tier, 5)], u = s / 32, r = s / 2, nb = 1 + Math.min(tier, 3);
+  const k = recoil * 3 * u, H = 3 * u, ringCol = d.kind === 'mint' ? '#ffc85c' : tc;
+  // ground shadow, mutation aura, concrete plinth
+  c.fillStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.ellipse(px + 3 * u, py + 4 * u, r * .86, r * .64, 0, 0, 7); c.fill();
+  if (tier > 0) glow(c, px, py - 4 * u, r * (1.25 + .12 * Math.sin(now * 3 + px * .1)), ringCol, .45);
+  solid(c, px, py, 0, H, '#3f444c', '#6b717c', fRect(s * .8, s * .8, 3 * u));
+  c.save(); c.translate(px, py - H); rr(c, -s * .4, -s * .4, s * .8, s * .8, 3 * u);
+  c.strokeStyle = tier ? tc : rgba(col, .85); c.lineWidth = 1.2 * u; c.stroke(); c.restore();
+  const offs = n => Array.from({ length:n }, (_, i) => (i - (n - 1) / 2));
   switch (d.id) {
-    case 'bolt': {
-      c.save(); c.rotate(ang);
-      for (let i = 0; i < nb; i++) {
-        const o = (i - (nb - 1) / 2) * r * .2;
-        c.fillStyle = '#d9d0bd'; c.fillRect(r * .1 - k, o - r * .06, r * .6, r * .12);
-        c.fillStyle = col; c.fillRect(r * .62 - k, o - r * .07, r * .1, r * .14);
+    case 'bolt': { // Wheel Gun: compressor drum + pneumatic gun(s)
+      solid(c, px, py, H, H + 4 * u, shade(col, .5), col, fCirc(5.5 * u));
+      for (const o of offs(nb)) {
+        solid(c, px, py, H + 4 * u, H + 7 * u, '#30333a', '#9aa1ad', fRectAt(-2 * u - k, o * 4 * u - 1.6 * u, 11 * u, 3.2 * u, u), ang);
+        solid(c, px, py, H + 4.5 * u, H + 6.5 * u, '#7a5a10', '#ffd37a', fRectAt(9 * u - k, o * 4 * u - 1.3 * u, 3 * u, 2.6 * u, .6 * u), ang);
       }
-      rr(c, -r * .36, -r * .28, r * .58, r * .56, r * .12); c.fillStyle = lin(c, 0, -r * .3, 0, r * .3, col, dk); c.fill();
-      c.fillStyle = 'rgba(255,255,255,.25)'; c.fillRect(-r * .28, -r * .22, r * .36, r * .07);
-      c.restore();
-      glow(c, 0, 0, r * .3, col, .5); circle(c, 0, 0, r * .1, '#fff');
+      c.strokeStyle = '#141418'; c.lineWidth = 1.2 * u; c.beginPath(); c.moveTo(px - 4 * u, py - H - 3 * u); c.quadraticCurveTo(px - 10 * u, py + 3 * u, px - 2 * u, py + 6 * u); c.stroke();
       break;
     }
-    case 'frost': {
-      poly(c, 6, r * .5, Math.PI / 6); c.fillStyle = lin(c, 0, -r * .5, 0, r * .5, '#2f5e63', '#1d3a3c'); c.fill();
-      c.strokeStyle = rgba(col, .8); c.lineWidth = 1; c.stroke();
-      c.save(); c.rotate(now * .8);
-      const n = 3 + nb;
+    case 'frost': { // Marshal Post: hut + waving yellow flags
+      solid(c, px, py + u, H, H + 6 * u, '#b8bcc4', '#eef0f3', fRect(11 * u, 9 * u, u));
+      solid(c, px, py + u, H + 6 * u, H + 7.5 * u, '#a5401c', '#ff653f', fRect(13 * u, 11 * u, 1.2 * u));
+      for (const o of offs(nb)) {
+        const fx = px + 4 * u + o * 3 * u, base = py - H - 7 * u, top = base - 10 * u;
+        c.strokeStyle = '#d9dde3'; c.lineWidth = u; c.beginPath(); c.moveTo(fx, base); c.lineTo(fx, top); c.stroke();
+        c.fillStyle = col; c.beginPath(); c.moveTo(fx, top);
+        for (let j = 1; j <= 4; j++) c.lineTo(fx + j * 2 * u, top + Math.sin(now * 8 + j + o) * u);
+        for (let j = 4; j >= 0; j--) c.lineTo(fx + j * 2 * u, top + 5 * u + Math.sin(now * 8 + j + o) * u);
+        c.closePath(); c.fill(); c.strokeStyle = 'rgba(0,0,0,.35)'; c.lineWidth = .6 * u; c.stroke();
+      }
+      break;
+    }
+    case 'flak': { // Tyre Launcher: stacked spare tyres + launch tube
+      for (let i = 0; i < 2; i++) {
+        solid(c, px - 5 * u, py + 3 * u, H + i * 3 * u, H + i * 3 * u + 3 * u, '#0b0b0d', '#2a2a2f', fCirc(4.5 * u));
+        circle(c, px - 5 * u, py + 3 * u - H - i * 3 * u - 3 * u, 1.8 * u, '#0b0b0d');
+        c.strokeStyle = col; c.lineWidth = .8 * u; c.beginPath(); c.arc(px - 5 * u, py + 3 * u - H - i * 3 * u - 3 * u, 3.4 * u, 0, 7); c.stroke();
+      }
+      for (const o of offs(nb)) {
+        solid(c, px + 3 * u, py - u, H + 3 * u, H + 7 * u, shade(col, .5), col, fRectAt(-3 * u - k, o * 5 * u - 2.2 * u, 12 * u, 4.4 * u, 2 * u), ang);
+        solid(c, px + 3 * u, py - u, H + 3.5 * u, H + 6.5 * u, '#0b0b0d', '#1a1a1d', fRectAt(8 * u - k, o * 5 * u - 1.8 * u, 1.5 * u, 3.6 * u, .5 * u), ang);
+      }
+      break;
+    }
+    case 'mint': { // Sponsor Billboard on two posts, facing the camera
+      for (const ox of [-6 * u, 6 * u]) solid(c, px + ox, py + 2 * u, H, H + 9 * u, '#4a4f5c', '#8a90a0', fRect(1.8 * u, 1.8 * u));
+      const bw = 20 * u, bh = 9 * u, bx = px - bw / 2, by = py + 2 * u - H - 9 * u - bh;
+      c.fillStyle = '#16115e'; c.fillRect(bx + u, by + u, bw, bh);
+      c.fillStyle = lin(c, 0, by, 0, by + bh, '#ffeab0', '#ffb23f'); c.fillRect(bx, by, bw, bh);
+      c.strokeStyle = '#16115e'; c.lineWidth = u; c.strokeRect(bx, by, bw, bh);
+      c.fillStyle = '#16115e'; c.font = `900 ${7 * u}px 'Titillium Web',sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+      c.fillText('$$$', px, by + bh / 2 + .6 * u);
+      if (recoil > 0) glow(c, px, by + bh / 2, bw * .7, '#ffc85c', .55 * recoil);
+      for (let i = 0; i < 2 + tier; i++) circle(c, bx + (i + .5) * bw / (2 + tier), by - .9 * u, .8 * u, '#fff4dc');
+      break;
+    }
+    case 'tesla': { // ERS Battery: block with terminals and live arcs
+      solid(c, px, py, H, H + 6 * u, '#17134a', '#3730aa', fRect(15 * u, 11 * u, 1.5 * u));
+      c.save(); c.translate(px, py - H - 6 * u); c.fillStyle = '#ffc85c'; c.beginPath();
+      c.moveTo(1 * u, -4 * u); c.lineTo(-2.5 * u, .5 * u); c.lineTo(0, .5 * u); c.lineTo(-1 * u, 4 * u); c.lineTo(2.5 * u, -.8 * u); c.lineTo(0, -.8 * u); c.closePath(); c.fill(); c.restore();
+      const tops = [-4.5, 4.5].map(ox => { solid(c, px + ox * u, py - 3 * u, H + 6 * u, H + 9 * u, '#4a4f5c', '#c9ced6', fCirc(1.6 * u)); return [px + ox * u, py - 3 * u - H - 9 * u]; });
+      c.strokeStyle = '#e4e1ff'; c.lineWidth = .9 * u;
+      for (let i = 0; i < nb; i++) {
+        c.beginPath(); c.moveTo(...tops[0]);
+        for (let j = 1; j < 5; j++) c.lineTo(tops[0][0] + (tops[1][0] - tops[0][0]) * j / 5, tops[0][1] - 2 * u + (Math.random() - .5) * 4 * u);
+        c.lineTo(...tops[1]); c.stroke();
+      }
+      glow(c, px, tops[0][1] - 2 * u, 9 * u, col, .35);
+      break;
+    }
+    case 'venom': { // Fuel Sprayer: drum + nozzle(s)
+      solid(c, px - 2 * u, py + u, H, H + 8 * u, shade(col, .45), col, fCirc(5.5 * u));
+      c.strokeStyle = '#14361b'; c.lineWidth = .8 * u; c.beginPath(); c.arc(px - 2 * u, py + u - H - 8 * u, 4 * u, 0, 7); c.stroke();
+      circle(c, px - 2 * u, py + u - H - 8 * u, 1.3 * u, '#14361b');
+      for (const o of offs(nb)) solid(c, px, py, H + 5 * u, H + 7 * u, '#2b2f36', '#8a90a0', fRectAt(2 * u - k, o * 3.4 * u - 1.2 * u, 10 * u, 2.4 * u, u), ang);
+      break;
+    }
+    case 'rail': { // Radar Gun on a tripod
+      c.strokeStyle = '#8a90a0'; c.lineWidth = 1.1 * u; c.beginPath();
+      for (const [fx, fy] of [[-6, 4], [6, 4], [0, -5]]) { c.moveTo(px, py - H - 9 * u); c.lineTo(px + fx * u, py + fy * u - H); }
+      c.stroke();
+      for (const o of offs(nb)) {
+        solid(c, px, py, H + 8 * u, H + 11 * u, shade(col, .45), col, fRectAt(-5 * u - k, o * 5.5 * u - 2.4 * u, 15 * u, 4.8 * u, 1.5 * u), ang);
+        solid(c, px, py, H + 8.5 * u, H + 10.5 * u, '#0b0b0d', '#2a2a2f', fRectAt(9.5 * u - k, o * 5.5 * u - 1.8 * u, 1.5 * u, 3.6 * u, .5 * u), ang);
+      }
+      if (recoil > .5) { const lx = px + Math.cos(ang) * 12 * u, ly = py - H - 11 * u + Math.sin(ang) * 12 * u; glow(c, lx, ly, 6 * u, '#e10600', .8); }
+      break;
+    }
+    case 'prism': { // Timing Beam: gate pillar with a red band and a rotating emitter
+      solid(c, px, py, H, H + 13 * u, '#b8bcc4', '#f4f4f4', fRect(6 * u, 6 * u, u));
+      solid(c, px, py, H + 9 * u, H + 11 * u, '#8a0a05', '#e10600', fRect(6.4 * u, 6.4 * u, u));
+      solid(c, px, py, H + 13 * u, H + 15 * u, '#22252b', '#4a4f58', fRectAt(-2 * u, -2 * u, 7 * u, 4 * u, u), ang);
+      glow(c, px + Math.cos(ang) * 5 * u, py - H - 15 * u + Math.sin(ang) * 5 * u, 5 * u, col, .9);
+      for (let i = 0; i < Math.min(tier, 3); i++) circle(c, px - 2 * u + i * 2 * u, py - H - 6 * u, .7 * u, '#ffc85c');
+      break;
+    }
+    case 'hell': { // Fire Mortar: armoured box with a turning cluster of tubes
+      solid(c, px, py, H, H + 4 * u, '#3e1006', '#8a2a12', fRect(16 * u, 14 * u, 2 * u));
+      const n = nb + 2;
       for (let i = 0; i < n; i++) {
-        c.rotate(Math.PI * 2 / n);
-        c.beginPath(); c.moveTo(r * .2, 0); c.lineTo(r * .34, -r * .06); c.lineTo(r * .48, 0); c.lineTo(r * .34, r * .06); c.closePath();
-        c.fillStyle = '#e6f3f1'; c.fill();
+        const a = ang + i / n * Math.PI * 2, tx = px + Math.cos(a) * 4 * u, ty = py + Math.sin(a) * 3 * u;
+        solid(c, tx, ty, H + 4 * u, H + 8 * u - k, '#22252b', '#4a4f58', fCirc(2.2 * u));
+        circle(c, tx, ty - H - 8 * u + k, 1.4 * u, '#0b0b0d');
+        glow(c, tx, ty - H - 8 * u + k, 2.6 * u, '#ff8a3d', .3 + .6 * recoil);
       }
-      c.restore();
-      glow(c, 0, 0, r * .42, col, .55); circle(c, 0, 0, r * .12 * (1 + .15 * Math.sin(now * 4)), '#f2faf8');
       break;
     }
-    case 'flak': {
-      c.save(); c.rotate(ang);
-      for (let i = 0; i < nb + 1; i++) {
-        const o = (i - nb / 2) * r * .26;
-        c.fillStyle = '#eaa27a'; c.fillRect(r * .05 - k, o - r * .08, r * .58, r * .16);
-        c.fillStyle = '#3a1208'; c.fillRect(r * .56 - k, o - r * .11, r * .12, r * .22);
-      }
-      rr(c, -r * .4, -r * .34, r * .62, r * .68, r * .08); c.fillStyle = lin(c, 0, -r * .34, 0, r * .34, col, dk); c.fill();
-      c.strokeStyle = 'rgba(0,0,0,.35)'; c.beginPath(); c.moveTo(-r * .1, -r * .3); c.lineTo(-r * .1, r * .3); c.stroke();
-      c.restore();
-      circle(c, 0, 0, r * .1, '#f3d2b0');
+    case 'chrono': { // Race Control tower with a glass control room and a clock
+      solid(c, px, py, H, H + 14 * u, '#9aa1ad', '#e8eaee', fRect(12 * u, 12 * u, u));
+      solid(c, px, py, H + 9 * u, H + 12.5 * u, '#0c1736', '#1f3a7a', fRect(13 * u, 13 * u, u));
+      solid(c, px, py, H + 12.5 * u, H + 14 * u, '#b8bcc4', '#f4f4f4', fRect(14 * u, 14 * u, 1.2 * u));
+      const cy = py - H - 14 * u;
+      circle(c, px, cy, 3.6 * u, '#fff4dc');
+      c.strokeStyle = '#16115e'; c.lineWidth = .8 * u; c.beginPath(); c.arc(px, cy, 3.6 * u, 0, 7); c.stroke();
+      c.beginPath(); c.moveTo(px, cy); c.lineTo(px + Math.cos(now * 2) * 3 * u, cy + Math.sin(now * 2) * 3 * u); c.stroke();
       break;
     }
-    case 'mint': {
-      const bright = 1 + tier * .25 + recoil * .6;
-      poly(c, 8, r * .6, Math.PI / 8); c.fillStyle = lin(c, -r * .6, -r * .6, r * .6, r * .6, '#ffe2a0', '#7a5414'); c.fill();
-      c.strokeStyle = 'rgba(246,234,208,.6)'; c.lineWidth = 1; c.stroke();
-      circle(c, 0, 0, r * .42, '#1d2614');
-      c.save(); c.rotate(now * 1.2);
-      c.strokeStyle = '#ffc85c'; c.lineWidth = 1.2;
-      for (let i = 0; i < 10; i++) { c.rotate(Math.PI / 5); c.beginPath(); c.moveTo(r * .3, 0); c.lineTo(r * .4, 0); c.stroke(); }
+    case 'sing': { // Wind Tunnel: fan housing with spinning blades
+      solid(c, px, py, H, H + 7 * u, '#24104f', '#4b2a99', fCirc(12 * u));
+      const ty = py - H - 7 * u;
+      circle(c, px, ty, 10 * u, '#0b0820');
+      c.save(); c.translate(px, ty); c.rotate(-now * 7);
+      for (let i = 0, n = 4 + nb; i < n; i++) { c.rotate(Math.PI * 2 / n); c.fillStyle = '#c9c4ef'; c.beginPath(); c.ellipse(5 * u, 0, 4.5 * u, 1.6 * u, .35, 0, 7); c.fill(); }
       c.restore();
-      for (let i = 0; i < 3; i++) { const a = -now * .7 + i * Math.PI * 2 / 3; circle(c, Math.cos(a) * r * .5, Math.sin(a) * r * .5, r * .07, '#f6ead0'); }
-      glow(c, 0, 0, r * .36 * bright, '#ffc85c', .7);
-      const g = c.createRadialGradient(-r * .06, -r * .06, 0, 0, 0, r * .22);
-      g.addColorStop(0, '#fff4dc'); g.addColorStop(.5, '#ffc85c'); g.addColorStop(1, '#c77a1c');
-      c.fillStyle = g; c.beginPath(); c.arc(0, 0, r * .22 * (1 + .08 * Math.sin(now * 4)), 0, 7); c.fill();
-      break;
-    }
-    case 'tesla': {
-      for (let i = 0; i < 3; i++) { c.strokeStyle = i % 2 ? dk : col; c.lineWidth = 2; c.beginPath(); c.arc(0, 0, r * (.5 - i * .11), 0, 7); c.stroke(); }
-      const g = c.createRadialGradient(0, 0, 0, 0, 0, r * .2); g.addColorStop(0, '#fff'); g.addColorStop(1, col);
-      c.fillStyle = g; c.beginPath(); c.arc(0, 0, r * .2, 0, 7); c.fill();
-      c.strokeStyle = '#ebe6f7'; c.lineWidth = 1;
-      for (let i = 0; i < nb + 1; i++) {
-        const a = now * 5 + i * 2.1; c.beginPath(); c.moveTo(Math.cos(a) * r * .2, Math.sin(a) * r * .2);
-        for (let j = 1; j <= 3; j++) { const q = .2 + j * .12, aa = a + (Math.random() - .5) * .5; c.lineTo(Math.cos(aa) * r * q, Math.sin(aa) * r * q); }
-        c.stroke();
-      }
-      glow(c, 0, 0, r * .5, col, .35);
-      break;
-    }
-    case 'venom': {
-      c.save(); c.rotate(ang);
-      for (let i = 0; i < nb; i++) {
-        const o = (i - (nb - 1) / 2) * r * .22;
-        c.fillStyle = '#34481c'; c.fillRect(r * .1 - k, o - r * .09, r * .52, r * .18);
-        c.fillStyle = '#b5d08a'; c.fillRect(r * .56 - k, o - r * .06, r * .1, r * .12);
-      }
-      c.restore();
-      const g = c.createRadialGradient(-r * .12, -r * .12, 0, 0, 0, r * .4);
-      g.addColorStop(0, '#e6efd2'); g.addColorStop(.45, col); g.addColorStop(1, dk);
-      c.fillStyle = g; c.beginPath(); c.arc(0, 0, r * .38, 0, 7); c.fill();
-      for (let i = 0; i < 3; i++) { const p = (now * .6 + i / 3) % 1; circle(c, Math.sin(i * 2 + now) * r * .15, r * .2 - p * r * .4, r * .05 * (1 - p), 'rgba(230,239,210,.8)'); }
-      break;
-    }
-    case 'rail': {
-      c.save(); c.rotate(ang);
-      for (let i = 0; i < nb; i++) {
-        const o = (i - (nb - 1) / 2) * r * .3;
-        c.fillStyle = '#a9cbe0'; c.fillRect(r * .05 - k, o - r * .13, r * .95, r * .06); c.fillRect(r * .05 - k, o + r * .07, r * .95, r * .06);
-        c.fillStyle = rgba(col, .5 + .5 * recoil); c.fillRect(r * .1 - k, o - r * .03, r * .88, r * .06);
-      }
-      rr(c, -r * .42, -r * .26, r * .56, r * .52, r * .08); c.fillStyle = lin(c, 0, -r * .26, 0, r * .26, col, dk); c.fill();
-      for (let i = 0; i < 3; i++) circle(c, -r * .3 + i * r * .14, 0, r * .045, '#dbe7ee');
-      c.restore();
-      break;
-    }
-    case 'prism': {
-      c.save(); c.rotate(now * .8);
-      const n = 4 + Math.min(tier, 3);
-      c.beginPath();
-      for (let i = 0; i < n * 2; i++) { const a = i / (n * 2) * Math.PI * 2, rad = i % 2 ? r * .22 : r * .56; c.lineTo(Math.cos(a) * rad, Math.sin(a) * rad); }
-      c.closePath();
-      const g = c.createRadialGradient(0, 0, 0, 0, 0, r * .56); g.addColorStop(0, '#fff'); g.addColorStop(.5, col); g.addColorStop(1, dk);
-      c.fillStyle = g; c.fill(); c.strokeStyle = 'rgba(255,255,255,.5)'; c.lineWidth = .8; c.stroke();
-      c.restore();
-      c.save(); c.rotate(ang); c.fillStyle = '#fbeef4'; c.fillRect(r * .2, -r * .05, r * .32, r * .1); c.restore();
-      glow(c, 0, 0, r * .3, '#ffffff', .6);
-      break;
-    }
-    case 'hell': {
-      c.save(); c.rotate(ang); c.translate(-k, 0);
-      rr(c, -r * .44, -r * .42, r * .84, r * .84, r * .14); c.fillStyle = lin(c, 0, -r * .42, 0, r * .42, '#a8341e', dk); c.fill();
-      const tubes = nb + 2;
-      for (let i = 0; i < tubes; i++) {
-        const a = i / tubes * Math.PI * 2, tx = Math.cos(a) * r * .22 + r * .05, ty = Math.sin(a) * r * .22;
-        circle(c, tx, ty, r * .11, '#1c0508');
-        circle(c, tx, ty, r * .06, rgba('#e2552d', .4 + .6 * recoil));
-      }
-      c.restore();
-      break;
-    }
-    case 'chrono': {
-      c.strokeStyle = rgba(col, .8); c.lineWidth = 1;
-      for (let i = 0; i < 12; i++) { const a = i / 12 * Math.PI * 2; c.beginPath(); c.moveTo(Math.cos(a) * r * .48, Math.sin(a) * r * .48); c.lineTo(Math.cos(a) * r * .55, Math.sin(a) * r * .55); c.stroke(); }
-      c.beginPath(); c.moveTo(-r * .26, -r * .38); c.lineTo(r * .26, -r * .38); c.lineTo(-r * .26, r * .38); c.lineTo(r * .26, r * .38); c.closePath();
-      c.fillStyle = lin(c, 0, -r * .4, 0, r * .4, '#f6f1e6', '#d9d0bd'); c.fill();
-      const sand = (now * .25) % 1;
-      c.fillStyle = '#ffc85c';
-      c.beginPath(); c.moveTo(-r * .18 * (1 - sand), -r * .26 * (1 - sand) - r * .02); c.lineTo(r * .18 * (1 - sand), -r * .26 * (1 - sand) - r * .02); c.lineTo(0, -r * .02); c.closePath(); c.fill();
-      c.beginPath(); c.moveTo(-r * .18 * sand, r * .36); c.lineTo(r * .18 * sand, r * .36); c.lineTo(0, r * .36 - r * .2 * sand); c.closePath(); c.fill();
-      c.save(); c.rotate(now * 2); c.strokeStyle = '#ffc85c'; c.lineWidth = 1.4; c.beginPath(); c.moveTo(0, 0); c.lineTo(0, -r * .5); c.stroke(); c.restore();
-      break;
-    }
-    case 'sing': {
-      glow(c, 0, 0, r * .7, col, .5);
-      c.save(); c.rotate(now * 1.5); c.scale(1, .45);
-      c.strokeStyle = lin(c, -r * .6, 0, r * .6, 0, '#8f86ff', '#6b3f7a'); c.lineWidth = 3;
-      c.beginPath(); c.arc(0, 0, r * .48, 0, 7); c.stroke();
-      c.restore();
-      c.save(); c.rotate(-now * 3); c.strokeStyle = '#ffc85c'; c.lineWidth = 1;
-      for (let i = 0; i < nb + 1; i++) { c.rotate(Math.PI * 2 / (nb + 1)); c.beginPath(); c.arc(0, 0, r * .36, 0, 1); c.stroke(); }
-      c.restore();
-      circle(c, 0, 0, r * .26, '#000');
-      c.strokeStyle = 'rgba(241,224,236,.9)'; c.lineWidth = .8; c.beginPath(); c.arc(0, 0, r * .27, 0, 7); c.stroke();
+      circle(c, px, ty, 2.2 * u, '#9a8fe0');
+      glow(c, px, ty, 12 * u, col, .25);
       break;
     }
   }
-  c.restore();
+  const top = py - (3 + TOWER_TOP[d.id]) * u;
   for (let i = 0; i < Math.min(tier, 4); i++) {
     const rx = r * (.98 + i * .13), ry = r * (.32 + i * .07);
-    c.save(); c.translate(px, py); c.rotate(now * (.7 + i * .35) * (i % 2 ? -1 : 1) + i);
-    c.strokeStyle = rgba(ringCol, .6); c.lineWidth = 1;
-    c.beginPath(); c.ellipse(0, 0, rx, ry, 0, 0, 7); c.stroke();
-    glow(c, rx, 0, 3.5, ringCol, .8); circle(c, rx, 0, 1.4, '#fff');
+    c.save(); c.translate(px, (py + top) / 2); c.rotate(now * (.7 + i * .35) * (i % 2 ? -1 : 1) + i);
+    c.strokeStyle = rgba(ringCol, .6); c.lineWidth = u; c.beginPath(); c.ellipse(0, 0, rx, ry, 0, 0, 7); c.stroke();
+    glow(c, rx, 0, 3.5 * u, ringCol, .8); circle(c, rx, 0, 1.4 * u, '#fff');
     c.restore();
   }
   if (tier > 0) {
-    const bx = px + r * .64, by = py - r * .64;
-    circle(c, bx, by, 5.8, '#16115e'); circle(c, bx, by, 5, tc);
-    c.fillStyle = '#16115e'; c.font = "800 7.5px 'Titillium Web',sans-serif"; c.textAlign = 'center'; c.textBaseline = 'middle';
-    c.fillText(String(tier), bx, by + .4);
+    const bx = px + r * .7, by = top + 2 * u;
+    circle(c, bx, by, 5.8 * u, '#16115e'); circle(c, bx, by, 5 * u, tc);
+    c.fillStyle = '#16115e'; c.font = `800 ${7.5 * u}px 'Titillium Web',sans-serif`; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(String(tier), bx, by + .4 * u);
   }
 }
 
-function tyre(x, y, w, h){
-  ctx.fillStyle = '#0d0d0f'; rr(ctx, x - w / 2, y - h / 2, w, h, Math.min(w, h) * .3); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,.16)'; ctx.fillRect(x - w / 2 + w * .15, y - h / 2, w * .12, h);
+// ---------- 2.5D race cars ----------
+function carSolid(px, py, rot, z0, z1, side, top, path){ solid(ctx, px, py, z0, z1, side, top, path, rot); }
+function openWheeler(e, d, px, py, L, Wd){
+  const b = d.body, a = d.accent, h = L / 12.8, rot = e.rot, helm = a === '#ffffff' ? '#ffd37a' : a;
+  const tyreAt = (x, y, w, t) => carSolid(px, py, rot, 0, 2.6 * h, '#09090b', '#2c2c31', fRectAt(x - w / 2, y - t / 2, w, t, Math.min(w, t) * .3));
+  carSolid(px, py, rot, 0, .8 * h, '#0d0d10', '#1c1c20', fRectAt(-L * .45, -Wd * .22, L * .87, Wd * .44, Wd * .1));      // floor plank
+  carSolid(px, py, rot, .3 * h, h, shade(a, .5), a, fRectAt(L * .4, -Wd * .47, L * .09, Wd * .94));                         // front wing
+  tyreAt(-L * .3, -Wd * .39, L * .17, Wd * .24); tyreAt(-L * .3, Wd * .39, L * .17, Wd * .24);                                // rear tyres
+  tyreAt(L * .26, -Wd * .37, L * .14, Wd * .2); tyreAt(L * .26, Wd * .37, L * .14, Wd * .2);                                  // front tyres
+  const pods = c => { c.beginPath(); c.moveTo(-L * .42, -Wd * .13); c.lineTo(-L * .2, -Wd * .3); c.lineTo(L * .06, -Wd * .29); c.lineTo(L * .16, -Wd * .11);
+    c.lineTo(L * .16, Wd * .11); c.lineTo(L * .06, Wd * .29); c.lineTo(-L * .2, Wd * .3); c.lineTo(-L * .42, Wd * .13); c.closePath(); };
+  carSolid(px, py, rot, .8 * h, 2.2 * h, shade(b, .5), b, pods);                                                              // sidepods
+  carSolid(px, py, rot, .8 * h, 1.6 * h, shade(b, .5), b, c => { c.beginPath(); c.moveTo(L * .14, -Wd * .1); c.lineTo(L * .44, -Wd * .05); c.lineTo(L * .44, Wd * .05); c.lineTo(L * .14, Wd * .1); c.closePath(); });
+  carSolid(px, py, rot, 2.2 * h, 3 * h, shade(b, .6), b, c => { c.beginPath(); c.moveTo(-L * .42, -Wd * .05); c.lineTo(L * .1, -Wd * .1); c.lineTo(L * .1, Wd * .1); c.lineTo(-L * .42, Wd * .05); c.closePath(); });
+  carSolid(px, py, rot, 3 * h, 3 * h, a, a, fRectAt(-L * .4, -Wd * .035, L * .48, Wd * .07));                                // livery stripe
+  if (d.heavy) { ctx.save(); ctx.translate(px, py - 2.2 * h); ctx.rotate(rot); pods(ctx); ctx.strokeStyle = a; ctx.lineWidth = Math.max(.6, Wd * .05); ctx.stroke(); ctx.restore(); }
+  carSolid(px, py, rot, 2.2 * h, 2.2 * h, '#0a0a0e', '#0a0a0e', c => { c.beginPath(); c.ellipse(L * .08, 0, L * .085, Wd * .1, 0, 0, 7); });   // cockpit
+  carSolid(px, py, rot, 2.2 * h, 3.3 * h, shade(helm, .55), helm, fCircAt(L * .07, 0, Wd * .07));                            // helmet
+  ctx.save(); ctx.translate(px, py - 3.7 * h); ctx.rotate(rot); ctx.strokeStyle = '#d9dde3'; ctx.lineWidth = Math.max(.6, Wd * .05);
+  ctx.beginPath(); ctx.ellipse(L * .1, 0, L * .1, Wd * .13, 0, -1.8, 1.8); ctx.stroke(); ctx.restore();                         // halo
+  carSolid(px, py, rot, h, 3.6 * h, '#1a1a1d', '#2c2c31', fRectAt(-L * .46, -Wd * .05, L * .04, Wd * .1));                     // rear-wing pylon
+  carSolid(px, py, rot, 3.6 * h, 4.4 * h, shade(a, .5), a, fRectAt(-L * .5, -Wd * .42, L * .1, Wd * .84));                    // rear wing
+  if (e.drs) carSolid(px, py, rot, 4.4 * h, 4.4 * h, '#0b0b0d', '#0b0b0d', fRectAt(-L * .46, -Wd * .38, L * .025, Wd * .76)); // DRS slot open
+  return 4.4 * h;
 }
-function openWheeler(e, d, L, Wd){
-  const b = d.body, a = d.accent;
-  // suspension arms
-  ctx.strokeStyle = '#1a1a1a'; ctx.lineWidth = Math.max(.5, Wd * .05); ctx.beginPath();
-  for (const sy of [-1, 1]) { ctx.moveTo(-L * .2, 0); ctx.lineTo(-L * .3, sy * Wd * .38); ctx.moveTo(L * .2, 0); ctx.lineTo(L * .26, sy * Wd * .36); }
-  ctx.stroke();
-  // four exposed tyres (rears wider)
-  tyre(-L * .3, -Wd * .39, L * .17, Wd * .24); tyre(-L * .3, Wd * .39, L * .17, Wd * .24);
-  tyre(L * .26, -Wd * .37, L * .14, Wd * .2); tyre(L * .26, Wd * .37, L * .14, Wd * .2);
-  // rear wing (DRS flap opens on straights)
-  ctx.fillStyle = a; ctx.fillRect(-L * .5, -Wd * .42, L * .1, Wd * .84);
-  if (e.drs) { ctx.fillStyle = '#0d0d0f'; ctx.fillRect(-L * .46, -Wd * .38, L * .025, Wd * .76); }
-  // floor and sidepods
-  ctx.fillStyle = b; ctx.beginPath();
-  ctx.moveTo(-L * .42, -Wd * .13); ctx.lineTo(-L * .2, -Wd * .3); ctx.lineTo(L * .06, -Wd * .29); ctx.lineTo(L * .16, -Wd * .11);
-  ctx.lineTo(L * .16, Wd * .11); ctx.lineTo(L * .06, Wd * .29); ctx.lineTo(-L * .2, Wd * .3); ctx.lineTo(-L * .42, Wd * .13); ctx.closePath(); ctx.fill();
-  if (d.heavy) { ctx.strokeStyle = a; ctx.lineWidth = Math.max(.6, Wd * .05); ctx.stroke(); } // carbon armour pinstripe
-  // nose and front wing
-  ctx.beginPath(); ctx.moveTo(L * .14, -Wd * .1); ctx.lineTo(L * .44, -Wd * .05); ctx.lineTo(L * .44, Wd * .05); ctx.lineTo(L * .14, Wd * .1); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = a; ctx.fillRect(L * .4, -Wd * .47, L * .09, Wd * .94);
-  // livery stripe down the spine
-  ctx.fillRect(-L * .4, -Wd * .04, L * .82, Wd * .08);
-  // cockpit, helmet and halo
-  ctx.fillStyle = '#0a0a0e'; ctx.beginPath(); ctx.ellipse(-L * .02, 0, L * .085, Wd * .1, 0, 0, 7); ctx.fill();
-  circle(ctx, -L * .03, 0, Wd * .065, a === '#ffffff' ? '#ffd37a' : a);
-  ctx.strokeStyle = '#d9dde3'; ctx.lineWidth = Math.max(.6, Wd * .05);
-  ctx.beginPath(); ctx.ellipse(0, 0, L * .1, Wd * .13, 0, -1.8, 1.8); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(L * .1, 0); ctx.lineTo(L * .05, 0); ctx.stroke();
+function hypercar(e, d, px, py, L, Wd){
+  const h = L / 12.8, rot = e.rot;
+  const tyreAt = (x, y, w, t) => carSolid(px, py, rot, 0, 3 * h, '#09090b', '#2c2c31', fRectAt(x - w / 2, y - t / 2, w, t, Math.min(w, t) * .3));
+  tyreAt(-L * .28, -Wd * .44, L * .17, Wd * .18); tyreAt(-L * .28, Wd * .44, L * .17, Wd * .18);
+  tyreAt(L * .28, -Wd * .44, L * .15, Wd * .16); tyreAt(L * .28, Wd * .44, L * .15, Wd * .16);
+  if (e.odOn > 0) { ctx.save(); ctx.translate(px, py - 1.5 * h); ctx.rotate(rot); for (const sy of [-.2, .2]) {
+    const f = L * (.18 + Math.random() * .12); ctx.fillStyle = 'rgba(255,138,61,.9)'; ctx.beginPath(); ctx.moveTo(-L * .48, Wd * sy - 2); ctx.lineTo(-L * .48 - f, Wd * sy); ctx.lineTo(-L * .48, Wd * sy + 2); ctx.fill(); } ctx.restore(); }
+  carSolid(px, py, rot, .8 * h, 3.4 * h, '#0b0b0d', d.body, c => { c.beginPath(); c.moveTo(-L * .48, -Wd * .42); c.lineTo(L * .3, -Wd * .44);
+    c.quadraticCurveTo(L * .5, -Wd * .3, L * .5, 0); c.quadraticCurveTo(L * .5, Wd * .3, L * .3, Wd * .44); c.lineTo(-L * .48, Wd * .42); c.closePath(); });
+  carSolid(px, py, rot, 3.4 * h, 3.4 * h, d.accent, d.accent, c => { c.beginPath(); rr(c, -L * .46, -Wd * .2, L * .9, Wd * .05, 0); rr(c, -L * .46, Wd * .15, L * .9, Wd * .05, 0); });
+  carSolid(px, py, rot, 3.4 * h, 5 * h, '#020305', '#0c1018', c => { c.beginPath(); c.ellipse(L * .08, 0, L * .17, Wd * .17, 0, 0, 7); });            // canopy
+  carSolid(px, py, rot, 5 * h, 5 * h, 'rgba(255,255,255,.25)', 'rgba(255,255,255,.25)', c => { c.beginPath(); c.ellipse(L * .13, -Wd * .05, L * .06, Wd * .04, 0, 0, 7); });
+  for (const sy of [-.25, .25]) carSolid(px, py, rot, 3.4 * h, 5.2 * h, '#1a1a1d', '#2c2c31', fRectAt(-L * .45, Wd * sy - Wd * .03, L * .04, Wd * .06));
+  carSolid(px, py, rot, 5.2 * h, 6 * h, shade(d.accent, .5), d.accent, fRectAt(-L * .5, -Wd * .48, L * .08, Wd * .96));         // rear wing
+  return 6 * h;
 }
-function hypercar(e, d, L, Wd){
-  tyre(-L * .28, -Wd * .44, L * .17, Wd * .18); tyre(-L * .28, Wd * .44, L * .17, Wd * .18);
-  tyre(L * .28, -Wd * .44, L * .15, Wd * .16); tyre(L * .28, Wd * .44, L * .15, Wd * .16);
-  if (e.odOn > 0) for (const sy of [-.2, .2]) { // overdrive exhaust flames
-    const f = L * (.18 + Math.random() * .12);
-    ctx.fillStyle = 'rgba(255,138,61,.9)'; ctx.beginPath(); ctx.moveTo(-L * .48, Wd * sy - 2); ctx.lineTo(-L * .48 - f, Wd * sy); ctx.lineTo(-L * .48, Wd * sy + 2); ctx.fill();
-  }
-  ctx.fillStyle = d.body; ctx.beginPath();
-  ctx.moveTo(-L * .48, -Wd * .42); ctx.lineTo(L * .3, -Wd * .44); ctx.quadraticCurveTo(L * .5, -Wd * .3, L * .5, 0);
-  ctx.quadraticCurveTo(L * .5, Wd * .3, L * .3, Wd * .44); ctx.lineTo(-L * .48, Wd * .42); ctx.closePath(); ctx.fill();
-  // carbon weave hint and gold livery
-  ctx.strokeStyle = 'rgba(255,255,255,.06)'; ctx.lineWidth = 1;
-  for (let x = -L * .44; x < L * .4; x += 3) { ctx.beginPath(); ctx.moveTo(x, -Wd * .4); ctx.lineTo(x + 3, Wd * .4); ctx.stroke(); }
-  ctx.fillStyle = d.accent; ctx.fillRect(-L * .46, -Wd * .2, L * .9, Wd * .05); ctx.fillRect(-L * .46, Wd * .15, L * .9, Wd * .05);
-  ctx.fillRect(-L * .5, -Wd * .48, L * .07, Wd * .96); // rear wing
-  ctx.fillStyle = '#05070a'; ctx.beginPath(); ctx.ellipse(L * .08, 0, L * .17, Wd * .17, 0, 0, 7); ctx.fill(); // canopy
-  ctx.fillStyle = 'rgba(255,255,255,.25)'; ctx.beginPath(); ctx.ellipse(L * .13, -Wd * .05, L * .06, Wd * .04, 0, 0, 7); ctx.fill();
-}
+const fCircAt = (x, y, rad) => c => { c.beginPath(); c.arc(x, y, rad, 0, 7); };
 function drawCar(e, now){
   const d = ENEMIES[e.type], px = e.x * TS, py = e.y * TS, L = d.size * 2 * TS, Wd = L * (d.boss ? .58 : .42);
   if (e.boss) glow(ctx, px, py, L * .9, '#d4af37', .25 + .1 * Math.sin(now * 5));
-  ctx.save(); ctx.translate(px, py); ctx.rotate(e.rot);
+  // ground shadow, offset away from the camera's light
+  ctx.save(); ctx.translate(px + L * .08, py + L * .1); ctx.rotate(e.rot); ctx.fillStyle = 'rgba(0,0,0,.4)'; rr(ctx, -L * .5, -Wd * .5, L, Wd, Wd * .3); ctx.fill(); ctx.restore();
   if (d.slip || e.drs || e.odOn > 0) { // slipstream wake / speed streaks
-    ctx.strokeStyle = 'rgba(255,255,255,.18)'; ctx.lineWidth = 1;
+    ctx.save(); ctx.translate(px, py - 2); ctx.rotate(e.rot); ctx.strokeStyle = 'rgba(255,255,255,.2)'; ctx.lineWidth = 1;
     for (const sy of [-.3, .3]) { ctx.beginPath(); ctx.moveTo(-L * .5, Wd * sy); ctx.lineTo(-L * (d.slip ? 1.9 : 1.2), Wd * sy * 1.4); ctx.stroke(); }
+    ctx.restore();
   }
-  ctx.fillStyle = 'rgba(0,0,0,.4)'; rr(ctx, -L * .47 + 1.2, -Wd * .48 + 1.8, L * .94, Wd * .96, Wd * .25); ctx.fill();
-  if (d.boss) hypercar(e, d, L, Wd); else openWheeler(e, d, L, Wd);
+  const top = d.boss ? hypercar(e, d, px, py, L, Wd) : openWheeler(e, d, px, py, L, Wd);
   if (e.shield > 0) { // ERS kinetic shield / hypercar shield phase
     const f = e.shield / e.maxShield;
-    ctx.beginPath(); ctx.ellipse(0, 0, L * .62, Wd * .95, 0, 0, 7);
-    ctx.fillStyle = `rgba(127,224,208,${.1 * f})`; ctx.fill();
-    ctx.strokeStyle = `rgba(127,224,208,${.35 + .6 * f})`; ctx.lineWidth = 1.3; ctx.stroke();
+    ctx.save(); ctx.translate(px, py - top / 2); ctx.rotate(e.rot); ctx.beginPath(); ctx.ellipse(0, 0, L * .62, Wd * .95, 0, 0, 7);
+    ctx.fillStyle = `rgba(127,224,208,${.1 * f})`; ctx.fill(); ctx.strokeStyle = `rgba(127,224,208,${.35 + .6 * f})`; ctx.lineWidth = 1.3; ctx.stroke(); ctx.restore();
   }
-  ctx.restore();
   const R = Math.max(L, Wd) / 2;
-  if (e.slowT > 0) { ctx.strokeStyle = 'rgba(159,216,230,.9)'; ctx.lineWidth = 1.2; ctx.setLineDash([2, 2]); ctx.beginPath(); ctx.arc(px, py, R + 2, 0, 7); ctx.stroke(); ctx.setLineDash([]); }
-  if (e.pT > 0) for (let i = 0; i < Math.min(3, e.pStacks); i++) circle(ctx, px + Math.cos(now * 3 + i * 2.1) * (R + 2), py + Math.sin(now * 3 + i * 2.1) * (R + 2), 1.3, '#7fd18b');
+  if (e.slowT > 0) { ctx.strokeStyle = 'rgba(255,212,0,.9)'; ctx.lineWidth = 1.2; ctx.setLineDash([2, 2]); ctx.beginPath(); ctx.arc(px, py - top / 2, R + 2, 0, 7); ctx.stroke(); ctx.setLineDash([]); }
+  if (e.pT > 0) for (let i = 0; i < Math.min(3, e.pStacks); i++) circle(ctx, px + Math.cos(now * 3 + i * 2.1) * (R + 2), py - top / 2 + Math.sin(now * 3 + i * 2.1) * (R + 2), 1.3, '#7fd18b');
   if (e.hp < e.maxHp || e.boss || e.shield < e.maxShield) {
-    const bw = Math.max(14, L * 1.1), bx = px - bw / 2, by = py - R - 6;
+    const bw = Math.max(14, L * 1.1), bx = px - bw / 2, by = py - R - top - 5;
     ctx.fillStyle = 'rgba(0,0,0,.8)'; ctx.fillRect(bx - 1, by - 1, bw + 2, 4);
     const f = Math.max(0, e.hp / e.maxHp);
     ctx.fillStyle = f > .5 ? '#7fd18b' : f > .25 ? '#ffc85c' : '#ff653f'; ctx.fillRect(bx, by, bw * f, 2);
@@ -1415,12 +1388,14 @@ function render(now){
     if (r < 50) drawRange(t.x + .5, t.y + .5, r, col);
     rr(ctx, t.x * TS + 1, t.y * TS + 1, TS - 2, TS - 2, 6); ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke();
   }
-  for (const t of S.towers) drawTower(ctx, t.type, (t.x + .5) * TS, (t.y + .5) * TS, TS, t.ang, t.muts.length, now, t.recoil);
-  for (const e of S.enemies) drawCar(e, now);
+  const things = S.towers.map(t => ({ y: t.y + .5, draw: () => drawTower(ctx, t.type, (t.x + .5) * TS, (t.y + .5) * TS, TS, t.ang, t.muts.length, now, t.recoil) }))
+    .concat(S.enemies.map(e => ({ y: e.y, draw: () => drawCar(e, now) })));
+  things.sort((a, b) => a.y - b.y);
+  for (const t of things) t.draw();
   // prism beams
   for (const t of S.towers) {
     if (TOWERS[t.type].kind !== 'beam' || !t.target || t.target.dead) continue;
-    const x1 = (t.x + .5) * TS, y1 = (t.y + .5) * TS, x2 = t.target.x * TS, y2 = t.target.y * TS, w = 1.2 + Math.min(t.lock, 6) * .7;
+    const x1 = (t.x + .5) * TS + Math.cos(t.ang) * 5, y1 = (t.y + .5) * TS - 18 + Math.sin(t.ang) * 5, x2 = t.target.x * TS, y2 = t.target.y * TS, w = 1.2 + Math.min(t.lock, 6) * .7;
     ctx.lineCap = 'round';
     ctx.strokeStyle = 'rgba(143,134,255,.28)'; ctx.lineWidth = w * 3.2; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
     ctx.strokeStyle = '#fbeef4'; ctx.lineWidth = w; ctx.stroke();
@@ -1433,8 +1408,8 @@ function render(now){
       glow(ctx, p.x * TS, (p.y - p.h) * TS, 6, '#e2552d', .7);
       circle(ctx, p.x * TS, (p.y - p.h) * TS, 1.6, '#fbf3e4');
     } else {
-      glow(ctx, p.x * TS, p.y * TS, p.kind === 'flak' ? 6 : 5, p.c, .75);
-      circle(ctx, p.x * TS, p.y * TS, p.kind === 'flak' ? 1.8 : 1.3, '#ffffff');
+      if (p.kind === 'flak') { circle(ctx, p.x * TS, p.y * TS, 3.2, '#0b0b0d'); ctx.strokeStyle = '#ff653f'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(p.x * TS, p.y * TS, 2.2, 0, 7); ctx.stroke(); }
+      else { glow(ctx, p.x * TS, p.y * TS, 5, p.c, .75); circle(ctx, p.x * TS, p.y * TS, 1.3, '#ffffff'); }
     }
   }
   // particles
@@ -1497,7 +1472,7 @@ function iconCanvas(cvs, type, size, tier){
   const g = cvs.getContext('2d');
   g.setTransform(RS, 0, 0, RS, 0, 0);
   g.clearRect(0, 0, size, size);
-  drawTower(g, type, size / 2, size / 2, size * .86, -Math.PI / 4, tier, .6, 0);
+  drawTower(g, type, size / 2, size * .66, size * .7, -Math.PI / 4, tier, .6, 0);
 }
 const bar = $('bar'), tip = $('tip'), hot = [];
 TOWERS.forEach((d, i) => {

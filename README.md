@@ -38,14 +38,14 @@ Open `index.html` in any modern browser. The whole game is that one file.
 | Inspect, upgrade or sell | Click a placed tower |
 | Cancel | Right-click or `Esc` |
 | Start the next wave | `▶` or `Space` |
-| Speed / Auto-wave | `1x·2x·3x`, `⟲` |
+| Speed / Auto-wave | `1x·2x·3x`, `AUTO` |
 | Prestige | `🏆 Prestige` (a red dot appears when you can prestige) |
 
 ## Features
 
 - **Random circuits:** every run gets a new winding 12×7 Grand Prix layout. It has asphalt with a rubbered racing line, red-and-white apex kerbs, gravel traps, open grass to build on, a starting grid under a five-light gantry, and a chequered finish line.
-- **11 towers:** Bolt, Frost, Flak, **Aether Mint** (economy), Tesla, Venom, Railgun, Prism, Hellfire, Chrono and Singularity.
-- **Aether Mint:** makes gold every second plus a payout at the end of each wave. Adjacent Chrono Obelisks speed it up. Its mutations are Compound Interest, Midas Aura, Bounty Harvester and Quantum Overclock.
+- **11 trackside towers**, drawn in 3D with height, shadows and depth: Wheel Gun, Marshal Post (yellow flags slow cars), Tyre Launcher, **Sponsor Billboard** (economy), ERS Battery, Fuel Sprayer, Radar Gun, Timing Beam, Fire Mortar, Race Control and Wind Tunnel (blows cars backward).
+- **Sponsor Billboard:** earns gold every second plus a payout at the end of each wave. An adjacent Race Control tower speeds it up. Its mutations are Compound Interest, Midas Aura, Bounty Harvester and Quantum Overclock.
 - **Mutations:** at every 5th level a tower evolves visually and you pick one of 3 traits. Turn on Auto-mutate for idle play, or spend boss Catalysts (◆) to reroll the choices.
 - **Race cars:** top-down open-wheelers that bank smoothly through corners, with bigger bounties for bigger cars:
   - **Formula Junior:** small, enters in packs.
