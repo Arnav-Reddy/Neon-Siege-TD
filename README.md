@@ -1,6 +1,6 @@
 # Neon Siege TD: Tower Defense Mini Game
 
-A small incremental tower defense game that floats on top of whatever you're working on, including apps in full screen. You can drag it anywhere and resize it.
+A small incremental tower defense game set on a Formula 1-style circuit. It floats on top of whatever you're working on, including apps in full screen, and you can drag it anywhere and resize it. It plays silently, with no sound or music.
 
 ![screenshot](docs/screenshot.png)
 
@@ -38,17 +38,24 @@ Open `index.html` in any modern browser. The whole game is that one file.
 | Inspect, upgrade or sell | Click a placed tower |
 | Cancel | Right-click or `Esc` |
 | Start the next wave | `▶` or `Space` |
-| Speed / Auto-wave / Sound | `1x·2x·3x`, `⟲`, speaker |
-| Prestige / Reroll map | `★` (glows gold when you can ascend) |
+| Speed / Auto-wave | `1x·2x·3x`, `⟲` |
+| Prestige | `🏆 Prestige` (a red dot appears when you can prestige) |
 
 ## Features
 
-- **Random maps:** every run gets a new winding 12×7 path, built from a saved seed, from the spawn portal to the core.
+- **Random circuits:** every run gets a new winding 12×7 Grand Prix layout. It has asphalt with a rubbered racing line, red-and-white apex kerbs, gravel traps, pit-pad build slots, a starting grid under a five-light gantry, and a chequered finish line.
 - **11 towers:** Bolt, Frost, Flak, **Aether Mint** (economy), Tesla, Venom, Railgun, Prism, Hellfire, Chrono and Singularity.
 - **Aether Mint:** makes gold every second plus a payout at the end of each wave. Adjacent Chrono Obelisks speed it up. Its mutations are Compound Interest, Midas Aura, Bounty Harvester and Quantum Overclock.
 - **Mutations:** at every 5th level a tower evolves visually and you pick one of 3 traits. Turn on Auto-mutate for idle play, or spend boss Catalysts (◆) to reroll the choices.
-- **Enemies:** Runners, Brutes, Swarms, Shielded, and a Boss every 10 waves.
-- **Prestige:** click the ★ button to see your requirements. You must reach a wave, slay bosses, mutate a tower and earn gold, and each target gets harder as you collect stars. Once every card turns green, **Ascend** to earn 1 ★ for every 10 waves cleared. Each ★ gives +10% damage and gold for good. **Reroll map** starts a fresh run without stars.
+- **Race cars:** top-down open-wheelers that bank smoothly through corners, with bigger bounties for bigger cars:
+  - **Formula Junior:** small, enters in packs.
+  - **Midfield Spec Racer:** the standard car.
+  - **Papaya Aero Racer:** DRS speed burst on straights.
+  - **Silver-Teal Hybrid:** regenerating ERS shield.
+  - **Racing Green GT:** armoured, and shrugs off half of any slow.
+  - **Rosso / Midnight Prototypes:** slipstream that tows cars behind them.
+  - **Hypercar boss (every 10 waves):** Overdrive surges, shield phases, and big gold, Championship Point and Catalyst drops.
+- **Prestige:** click **🏆 Prestige** to see how many **Championship Points** you'd earn: 1 per 10 waves, plus 1 per ×10 gold earned beyond 1k, plus any CP dropped by Hypercar bosses. Once every requirement card is met (reach a wave, beat bosses, mutate a tower, earn gold), prestiging resets your run onto a fresh circuit. Each CP gives +5% tower damage and gold for good. The requirements get harder each time you prestige.
 - **Saves:** progress saves to `localStorage`. Saves from the original 10-tower version migrate automatically.
 
 ## Build it yourself

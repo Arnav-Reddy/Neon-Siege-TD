@@ -4,7 +4,7 @@ const { app, BrowserWindow, screen, ipcMain, globalShortcut, Tray, Menu, nativeI
 const path = require('path');
 const fs = require('fs');
 
-const WIDTH = 400, HEIGHT = 344, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+T';
+const WIDTH = 420, HEIGHT = 344, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+T';
 let win, tray;
 
 if (!app.requestSingleInstanceLock()) app.quit();
