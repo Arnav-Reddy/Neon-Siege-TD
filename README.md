@@ -6,13 +6,13 @@ A small incremental tower defense game set on a Formula 1-style circuit. It floa
 
 ## Download
 
-Go to [**Releases**](https://github.com/Arnav-Reddy/tower-defense-mini-game-/releases/latest) and download the file for your system:
+Go to [**Releases**](https://github.com/Arnav-Reddy/tower-defense-mini-game-/releases/latest) and, under **Assets**, download the file for your system. Don't use the "Source code (zip)" links: those contain the project files, not the app.
 
 | System | File | First launch |
 | --- | --- | --- |
-| Windows | `Neon Siege TD Setup x.y.z.exe` (installer) or `Neon Siege TD x.y.z.exe` (portable) | If SmartScreen appears, click **More info → Run anyway**. The app isn't code-signed. |
-| macOS (Apple Silicon or Intel) | `Neon Siege TD-x.y.z-arm64.dmg` or `…-x64.dmg` | Drag the app to Applications. The first time, right-click it and choose **Open** (or go to **System Settings → Privacy & Security → Open Anyway**). The app isn't notarized. |
-| Linux | `Neon Siege TD-x.y.z.AppImage` | `chmod +x` the file, then run it. |
+| Windows | `Neon-Siege-TD-Setup-x.y.z.exe` (installer) or `Neon-Siege-TD-x.y.z.exe` (portable, no install) | If SmartScreen appears, click **More info → Run anyway**. The app isn't code-signed. |
+| macOS | `Neon-Siege-TD-x.y.z-arm64.dmg` for Apple Silicon (M1 and newer), `Neon-Siege-TD-x.y.z.dmg` for Intel | Open the `.dmg` and drag the app to Applications. The first time, right-click it and choose **Open** (or go to **System Settings → Privacy & Security → Open Anyway**). The app isn't notarized. |
+| Linux | `Neon-Siege-TD-x.y.z.AppImage` | `chmod +x` the file, then run it. |
 
 ## Using the overlay
 
