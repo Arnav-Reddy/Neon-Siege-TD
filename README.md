@@ -1,30 +1,67 @@
 # Neon Siege TD: Tower Defense Mini Game
 
-A small incremental tower defense game that sits in the bottom-right corner of your screen like a desktop widget. The whole game is one file, `index.html`, with HTML, CSS, JavaScript and Web Audio sound effects inside. It has no dependencies.
+A small incremental tower defense game that floats in the bottom-right corner of your screen. It stays on top of your browser and other apps, including apps in full screen.
 
 ![screenshot](docs/screenshot.png)
 
-## Play
+## Download
 
-Open `index.html` in any modern browser. Your progress saves to `localStorage` automatically.
+Go to [**Releases**](https://github.com/Arnav-Reddy/tower-defense-mini-game-/releases/latest) and download the file for your system:
+
+| System | File | First launch |
+| --- | --- | --- |
+| Windows | `Neon Siege TD Setup x.y.z.exe` (installer) or `Neon Siege TD x.y.z.exe` (portable) | If SmartScreen appears, click **More info → Run anyway**. The app isn't code-signed. |
+| macOS (Apple Silicon or Intel) | `Neon Siege TD-x.y.z-arm64.dmg` or `…-x64.dmg` | Drag the app to Applications. The first time, right-click it and choose **Open** (or go to **System Settings → Privacy & Security → Open Anyway**). The app isn't notarized. |
+| Linux | `Neon Siege TD-x.y.z.AppImage` | `chmod +x` the file, then run it. |
+
+## Using the overlay
+
+- The game opens as a borderless widget in the bottom-right corner. There's no taskbar or Dock entry.
+- **Move it:** drag the stat pills (wave, gold, lives) in the top bar.
+- **Show or hide:** press `Ctrl+Shift+T` (`Cmd+Shift+T` on macOS) from any app, or click the tray / menu-bar icon.
+- **Quit:** right-click the tray icon and choose **Quit**.
+- **Shrink:** the `⌄` button shrinks the widget to a small pill. The window shrinks with it, so it covers nothing else.
+
+It floats over full-screen browsers, videos and apps that use borderless or windowed full screen. On macOS it appears in full-screen Spaces too. Games running in *exclusive* full-screen mode take over the display, so no normal window can draw on top of them. Switch those games to **borderless / windowed full screen** to see the overlay.
+
+## Play in a browser instead
+
+Open `index.html` in any modern browser. The whole game is that one file.
 
 ## Controls
 
 | Action | How |
 | --- | --- |
-| Pick a tower | Click it in the hotbar, or press `1`–`9`, `0` |
+| Pick a tower | Click it in the dock, or press `1`–`9`, `0`, `-` |
 | Place a tower | Click an empty tile |
 | Inspect, upgrade or sell | Click a placed tower |
 | Cancel | Right-click or `Esc` |
 | Start the next wave | `▶` or `Space` |
-| Speed / Auto-wave / Sound | `1x·2x·3x`, `AUTO`, `♪` |
+| Speed / Auto-wave / Sound | `1x·2x·3x`, `⟲`, speaker |
 | New Map / Prestige | `⟳` (click twice to confirm) |
-| Minimize to a status bar | `–` |
 
 ## Features
 
 - **Random maps:** every run gets a new winding 12×7 path, built from a saved seed, from the spawn portal to the core.
-- **10 towers:** Bolt ($25), Frost ($75), Flak ($200), Tesla ($550), Venom ($1.4k), Railgun ($3.5k), Prism ($9k), Hellfire ($22k), Chrono ($55k) and Singularity ($150k).
-- **Mutations:** at every 5th level a tower mutates. It gains orbit rings, extra barrels, a pulsing aura and a tier badge. You also pick one of 3 traits: Split, Execute, Gold Siphon, Overclock, Shockwave Crit or Range. Every trait also gives ×1.5 damage. Turn on Auto-mutate for idle play, or spend boss Catalysts (◆) to reroll the choices.
-- **Enemies:** Runners, Brutes (armored), Swarms, Shielded (shields that regenerate), and a Boss every 10 waves. Bosses drop bonus gold and Catalysts.
+- **11 towers:** Bolt, Frost, Flak, **Aether Mint** (economy), Tesla, Venom, Railgun, Prism, Hellfire, Chrono and Singularity.
+- **Aether Mint:** makes gold every second plus a payout at the end of each wave. Adjacent Chrono Obelisks speed it up. Its mutations are Compound Interest, Midas Aura, Bounty Harvester and Quantum Overclock.
+- **Mutations:** at every 5th level a tower evolves visually and you pick one of 3 traits. Turn on Auto-mutate for idle play, or spend boss Catalysts (◆) to reroll the choices.
+- **Enemies:** Runners, Brutes, Swarms, Shielded, and a Boss every 10 waves.
 - **Prestige:** start a new map to earn 1 ★ for every 10 waves you reached. Each ★ gives +10% damage and gold for good.
+- **Saves:** progress saves to `localStorage`. Saves from the original 10-tower version migrate automatically.
+
+## Build it yourself
+
+```bash
+npm install
+```
+
+```bash
+npm start
+```
+
+```bash
+npm run dist
+```
+
+`npm start` runs the overlay, and `npm run dist` builds an installer for your OS into `dist/`. Pushing a tag such as `v1.0.1` makes GitHub Actions build every platform and publish a Release.

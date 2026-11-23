@@ -1,0 +1,28 @@
+{
+  "name": "neon-siege-td",
+  "productName": "Neon Siege TD",
+  "version": "1.0.0",
+  "description": "Incremental tower defense that floats as an always-on-top desktop overlay.",
+  "author": "Arnav V",
+  "license": "UNLICENSED",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "45.4.1",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "appId": "com.arnavreddy.neonsiegetd",
+    "productName": "Neon Siege TD",
+    "files": ["main.js", "preload.js", "index.html", "build/icon.png"],
+    "directories": { "buildResources": "build" },
+    "win": { "target": ["nsis", "portable"] },
+    "nsis": { "oneClick": true },
+    "mac": { "target": [{ "target": "dmg", "arch": ["arm64", "x64"] }], "category": "public.app-category.games" },
+    "linux": { "target": ["AppImage"], "category": "Game" },
+    "publish": { "provider": "github", "releaseType": "release" }
+  }
+}
