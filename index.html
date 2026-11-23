@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="dark">
+<link rel="icon" href="data:,">
 <title>Neon Siege TD</title>
 <style>
 /* Titillium Web, SIL Open Font License 1.1, embedded so the game works offline */
@@ -30,9 +32,9 @@ svg{display:block}
 
 /* ---------- Shell (position via #wrap, size via zoom on #w) ---------- */
 #wrap{position:fixed;z-index:2147483000}
-#w{position:relative;width:420px;height:344px;display:flex;flex-direction:column;overflow:hidden;user-select:none;-webkit-user-select:none;
-  background:var(--paper);border:var(--rule);border-radius:7px;box-shadow:4px 4px 0 var(--ink);font-size:11px;font-variant-numeric:tabular-nums}
-#w.min{width:auto;height:40px}
+#w{position:relative;width:420px;height:400px;display:flex;flex-direction:column;overflow:hidden;user-select:none;-webkit-user-select:none;
+  background:var(--paper);border:var(--rule);border-radius:8px;box-shadow:4px 4px 0 var(--ink);font-size:11px;font-variant-numeric:tabular-nums}
+#w.min{width:auto;height:42px}
 #w.min .full{display:none!important}
 #w.dragging{box-shadow:7px 7px 0 var(--ink)}
 html.overlay,html.overlay body{background:transparent;background-image:none}
@@ -41,15 +43,16 @@ html.overlay #w{box-shadow:none}
 html.overlay .handle{-webkit-app-region:drag}
 
 /* ---------- Top bar ---------- */
-#top{height:38px;flex:none;display:flex;align-items:center;gap:4px;padding:0 6px 0 3px;border-bottom:var(--rule);background:var(--paper2)}
+#top{height:38px;flex:none;display:flex;align-items:center;gap:4px;padding:0 6px;border-bottom:var(--rule);background:var(--paper2)}
 #w.min #top{border-bottom:none}
-.grip{width:14px;height:26px;display:grid;place-items:center;color:var(--ink3);cursor:grab}
+.grip{position:relative;width:14px;height:28px;display:grid;place-items:center;color:var(--ink3);cursor:grab}
+.grip::after{content:"";position:absolute;inset:-3px}
 .grip:hover{color:var(--ink)}
 .stats{display:flex;align-items:center;flex:1;min-width:0;height:26px;overflow:hidden;white-space:nowrap;cursor:grab;
   background:var(--paper);border:var(--rule);border-radius:4px}
 #w.dragging .stats,#w.dragging .grip{cursor:grabbing}
-.st{display:flex;align-items:center;gap:3px;height:100%;padding:0 4px;font-family:var(--mono);font-weight:700;font-size:11px;color:var(--ink)}
-.st+.st{border-left:var(--rule)}
+.st{display:flex;align-items:center;gap:3px;height:100%;padding:0 3px;font-family:var(--mono);font-weight:700;font-size:11px;color:var(--ink)}
+.sep{flex:none;width:1.5px;height:14px;background:var(--ink);opacity:.55}
 .st svg{width:11px;height:11px;flex:none}
 .st-w svg{color:var(--steel)}.st-g svg{color:var(--ochre)}.st-l svg{color:var(--ember)}
 .st .rate{font-size:9.5px;font-weight:700;color:var(--moss)}
@@ -75,34 +78,35 @@ html.overlay .handle{-webkit-app-region:drag}
 @keyframes nudge{0%,100%{transform:none}50%{transform:translateY(-2px)}}
 
 /* ---------- Stage ---------- */
-#stage{position:relative;width:384px;height:224px;margin:7px auto 0;flex:none;border:var(--rule);border-radius:4px;overflow:hidden;box-sizing:content-box}
+#stage{position:relative;width:384px;height:224px;margin:8px auto 0;flex:none;border:var(--rule);border-radius:4px;overflow:hidden;box-sizing:content-box}
 #cv{display:block;width:384px;height:224px;cursor:crosshair}
 .ovl{position:absolute;z-index:5;animation:pop .14s ease-out}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
 /* ---------- Inspector ---------- */
-#panel{top:6px;width:174px;border-radius:5px;padding:8px;font-size:10px}
-.ph{display:flex;align-items:center;gap:7px;margin-bottom:7px;padding-bottom:7px;border-bottom:var(--rule)}
-#pIcon{width:28px;height:28px;flex:none;border-radius:3px;background:#120e4d;border:var(--rule)}
+#panel{top:6px;width:190px;border-radius:6px;padding:8px 10px;font-size:10px}
+.ph{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:7px;border-bottom:var(--rule)}
+#pIcon{width:26px;height:26px;flex:none;border-radius:2px;background:#120e4d;border:var(--rule)}
 .pt{flex:1;min-width:0;line-height:1.2}
-.nm{font-weight:800;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.role{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)}
-.badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:1px 5px;border:var(--rule);border-radius:3px;color:var(--ink)}
-.x{width:20px;height:20px;border-radius:3px;color:var(--ink2);font-size:15px;line-height:20px;text-align:center;overflow:hidden}
+.nm{font-weight:800;font-size:11.5px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.role{font-size:8px;font-weight:700;line-height:1;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)}
+.badge{font-family:var(--mono);font-size:9px;font-weight:700;line-height:1;padding:2px 5px;border:var(--rule);border-radius:2px;color:var(--ink)}
+.x{width:20px;height:20px;border-radius:2px;color:var(--ink2);font-size:15px;line-height:20px;text-align:center;overflow:hidden}
 .x:hover{background:var(--ink);color:var(--paper)}
-.prog{margin-bottom:7px}
-.pl{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;font-size:9px;color:var(--ink2)}
+.prog{margin-bottom:6px}
+.pl{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;font-size:9px;line-height:1;color:var(--ink2)}
 .pl b{font-family:var(--mono);color:var(--ink)}
 .track{height:7px;border:var(--rule);border-radius:2px;background:var(--paper2);overflow:hidden}
 .fill{height:100%;background:repeating-linear-gradient(-45deg,var(--plum) 0 4px,#5a52d6 4px 8px);transition:width .3s ease}
-.sg{display:grid;grid-template-columns:repeat(4,1fr);border:var(--rule);border-radius:3px;margin-bottom:7px;background:var(--paper2)}
-.sc{padding:4px 2px;text-align:center;line-height:1.25}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);border:var(--rule);border-radius:2px;margin-bottom:6px;background:var(--paper2)}
+.sc{padding:3px 2px 4px;text-align:center;line-height:1.2}
 .sc+.sc{border-left:var(--rule)}
-.sc span{display:block;font-size:7px;font-weight:700;letter-spacing:.9px;color:var(--ink3);text-transform:uppercase}
-.sc b{font-family:var(--mono);font-size:10.5px;font-weight:700}
-.muts{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:7px}
-.chip{font-size:8.5px;font-weight:700;padding:1px 5px;border-radius:3px;background:var(--plum);color:var(--paper)}
-.btn{width:100%;height:25px;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:.3px;border:var(--rule);background:var(--paper);box-shadow:var(--shadow-sm);transition:background .1s}
+.sc span{display:block;font-size:7px;font-weight:700;letter-spacing:.9px;line-height:1;color:var(--ink3);text-transform:uppercase}
+.sc b{font-family:var(--mono);font-size:10.5px;font-weight:700;line-height:1.2}
+.muts{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px;max-height:37.5px;overflow-y:auto;scrollbar-width:none}
+.muts::-webkit-scrollbar{display:none}
+.chip{font-size:8.5px;font-weight:700;line-height:1;padding:1px 5px;border-radius:2px;background:var(--plum);color:var(--paper)}
+.btn{width:100%;height:25px;border-radius:4px;font-size:10px;font-weight:800;letter-spacing:.3px;white-space:nowrap;border:var(--rule);background:var(--paper);box-shadow:var(--shadow-sm);transition:background .1s}
 .btn:not(:disabled):hover{background:var(--paper3)}
 .btn:not(:disabled):active{transform:translate(2px,2px);box-shadow:none}
 .btn:disabled{color:var(--ink3);box-shadow:none;cursor:default;transform:translate(2px,2px);background:var(--paper2)}
@@ -116,18 +120,18 @@ html.overlay .handle{-webkit-app-region:drag}
 .prow{display:flex;gap:6px}
 
 /* ---------- Full-stage sheets: mutation, prestige, game over ---------- */
-#mut,#pres,#over{inset:0;background:var(--paper);display:flex;flex-direction:column;padding:10px 11px;gap:7px}
+#mut,#pres,#over{inset:0;background:var(--paper);display:flex;flex-direction:column;padding:10px 12px;gap:8px}
 #mut,#over{align-items:center;justify-content:center}
-.mh{font-weight:900;font-size:12px;letter-spacing:3px;color:var(--plum)}
-.msub{font-size:9px;color:var(--ink2)}
-.mopts{display:flex;gap:7px;width:100%}
-.mc{flex:1;min-height:104px;border-radius:5px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;transition:transform .1s}
+.mh{font-weight:900;font-size:12px;line-height:1;letter-spacing:3px;color:var(--plum)}
+.msub{font-size:9px;line-height:1;color:var(--ink2)}
+.mopts{display:flex;gap:8px;width:100%}
+.mc{flex:1;min-height:100px;border-radius:6px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;transition:transform .1s}
 .mc:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
 .mc:active{transform:translate(2px,2px);box-shadow:none}
 .mc .i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14px;color:var(--paper);background:var(--plum);border:var(--rule)}
 .mc.eco .i{background:var(--ochre);color:var(--ink)}
-.mc .t{font-weight:800;font-size:10px}.mc .d{font-size:8.5px;color:var(--ink2);line-height:1.3}
-.mc .m{margin-top:auto;font-family:var(--mono);font-size:8.5px;font-weight:700;color:var(--moss)}
+.mc .t{font-weight:800;font-size:10px;line-height:1.2}.mc .d{font-size:8.5px;color:var(--ink2);line-height:1.2}
+.mc .m{margin-top:auto;font-family:var(--mono);font-size:8.5px;font-weight:700;line-height:1;color:var(--moss)}
 #mut .prow{width:100%}
 .oh{font-weight:900;font-size:17px;letter-spacing:4px;color:var(--ember)}
 #oTxt{text-align:center;color:var(--ink2);font-size:10.5px;line-height:1.6}
@@ -135,31 +139,31 @@ html.overlay .handle{-webkit-app-region:drag}
 #over .btn{width:160px}
 
 /* ---------- Prestige ---------- */
-.pr-head{display:flex;align-items:center;gap:9px;padding-bottom:7px;border-bottom:var(--rule)}
+.pr-head{display:flex;align-items:center;gap:10px;padding-bottom:8px;border-bottom:var(--rule)}
 .emblem{width:34px;height:34px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--paper2);border:var(--rule)}
 .emblem svg{width:18px;height:18px;fill:var(--ink3)}
 .emblem.ready{background:var(--ochre)}
 .emblem.ready svg{fill:var(--ink)}
 .pr-ttl{flex:1;min-width:0}
-.pr-t{font-weight:900;font-size:12px;letter-spacing:4px}
-.pr-s{display:flex;align-items:center;gap:5px;margin-top:2px;font-family:var(--mono);font-size:10px;font-weight:700}
+.pr-t{font-weight:900;font-size:12px;line-height:1.2;letter-spacing:4px}
+.pr-s{display:flex;align-items:center;gap:5px;margin-top:2px;font-family:var(--mono);font-size:10px;font-weight:700;line-height:1}
 .pr-star{color:var(--ink2)}.pr-star.to{color:var(--ember)}
 .pr-arrow{color:var(--ink3)}
-.pr-earn{margin-top:2px;font-size:8.5px;font-weight:700;color:var(--ink2);font-family:var(--mono)}
-.pr-bonus{margin-left:3px;font-size:8.5px;color:var(--ink2);padding:0 5px;border:1px solid var(--ink3);border-radius:3px}
-.pr-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;flex:1}
-.rq{display:flex;align-items:center;gap:7px;padding:5px 7px;border:var(--rule);border-radius:4px;background:var(--paper2)}
-.rq-i{width:22px;height:22px;flex:none;border-radius:3px;display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--ink2);background:var(--paper);border:var(--rule)}
+.pr-earn{margin-top:2px;font-size:8.5px;font-weight:700;line-height:1;color:var(--ink2);font-family:var(--mono)}
+.pr-bonus{margin-left:3px;font-size:8.5px;line-height:1;padding:1px 5px;border:1px solid var(--ink3);border-radius:2px}
+.pr-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:8px;flex:1}
+.rq{display:flex;align-items:center;gap:8px;padding:5px 8px;border:var(--rule);border-radius:4px;background:var(--paper2)}
+.rq-i{width:22px;height:22px;flex:none;border-radius:2px;display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--ink2);background:var(--paper);border:var(--rule)}
 .rq-b{flex:1;min-width:0}
-.rq-l{font-size:7.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)}
-.rq-v{font-family:var(--mono);font-size:11px;font-weight:700;margin:1px 0 3px;white-space:nowrap}
+.rq-l{font-size:7.5px;font-weight:700;line-height:1;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)}
+.rq-v{font-family:var(--mono);font-size:11px;font-weight:700;line-height:1;margin:2px 0 3px;white-space:nowrap}
 .rq-v .n{color:var(--ink3)}
 .rq-bar{height:5px;border:1px solid var(--ink);border-radius:2px;background:var(--paper);overflow:hidden}
 .rq-bar i{display:block;height:100%;background:var(--ochre);transition:width .35s ease}
 .rq.done{background:#e6e3ff}
 .rq.done .rq-i{background:var(--moss);color:var(--paper)}
 .rq.done .rq-bar i{background:var(--moss)}
-.pr-foot{display:flex;gap:6px}
+.pr-foot{display:flex;gap:8px}
 .pr-foot .btn.sm{flex:0 0 112px}
 .btn.asc{background:var(--ochre);color:var(--ink)}
 .btn.asc:not(:disabled):hover{background:#f5b53e}
@@ -167,34 +171,34 @@ html.overlay .handle{-webkit-app-region:drag}
 
 /* ---------- Dock ---------- */
 #dock{flex:1;min-height:0;display:flex;align-items:center}
-#bar{width:100%;display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:3px 8px 5px 8px;scrollbar-width:none}
-#bar::-webkit-scrollbar{display:none}
-.tw{--rc:#8c8577;position:relative;flex:none;width:56px;height:60px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+#bar{width:100%;display:flex;flex-wrap:wrap;justify-content:center;gap:4px;padding:4px 8px}
+.tw{--rc:#8c8577;position:relative;flex:none;width:56px;height:56px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
   background:var(--paper);border:var(--rule);box-shadow:var(--shadow-sm);transition:transform .1s}
 .tw:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--ink)}
 .tw:active{transform:translate(2px,2px);box-shadow:none}
 .tw.sel{background:var(--ink);color:var(--paper);transform:translate(2px,2px);box-shadow:none}
 .tw.sel .n{color:var(--paper)}.tw.sel .c{color:var(--ochre)}
 .tw.poor{opacity:.42}
-.tw .tag{position:absolute;top:4px;left:4px;width:6px;height:6px;border-radius:1px;background:var(--rc);outline:1px solid var(--ink)}
-.tw .k{position:absolute;top:2px;right:4px;font-family:var(--mono);font-size:8px;font-weight:700;color:var(--ink3)}
-.tw canvas{width:28px;height:28px;border-radius:3px;background:#120e4d}
-.tw .n{font-size:8.5px;font-weight:700;color:var(--ink);line-height:1;margin-top:2px}
-.tw .c{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--ink2);line-height:1.15}
-#tip{position:absolute;z-index:9;bottom:80px;width:188px;border-radius:5px;padding:7px 9px;pointer-events:none}
-#tip .tn{font-weight:800;font-size:11px;display:flex;justify-content:space-between}
+.tw .tag{position:absolute;top:4px;left:4px;width:6px;height:6px;border-radius:2px;background:var(--rc);outline:1px solid var(--ink)}
+.tw .k{position:absolute;top:3px;right:4px;font-family:var(--mono);font-size:8px;font-weight:700;color:var(--ink3)}
+.tw canvas{width:28px;height:28px;border-radius:2px;background:#120e4d}
+.tw .n{font-size:8.5px;font-weight:700;color:var(--ink);line-height:1}
+.tw .c{font-family:var(--mono);font-size:9px;font-weight:700;color:var(--ink2);line-height:1.2}
+#tip{position:absolute;z-index:9;bottom:128px;width:188px;border-radius:6px;padding:8px 10px;pointer-events:none}
+#tip .tn{font-weight:800;font-size:11px;line-height:1.2;display:flex;justify-content:space-between}
 #tip .tn b{font-family:var(--mono)}
-#tip .tr{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:1px 0 4px}
+#tip .tr{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:2px 0 4px}
 #tip .td{font-size:9.5px;color:var(--ink2);line-height:1.4}
 
 /* ---------- Resize grip: sits on the corner opposite the anchored one ---------- */
 #resize{position:absolute;z-index:12;width:14px;height:14px;color:var(--ink3);bottom:1px;right:1px;cursor:nwse-resize}
+#resize::after{content:"";position:absolute;inset:-4px}
 #resize:hover,#w.resizing #resize{color:var(--ember)}
 #w.ax-r #resize{right:auto;left:1px;cursor:nesw-resize;transform:scaleX(-1)}
 #w.ay-b #resize{bottom:auto;top:1px;transform:scaleY(-1);cursor:nesw-resize}
 #w.ax-r.ay-b #resize{transform:scale(-1,-1);cursor:nwse-resize}
 #w.ay-b:not(.ax-r) #top{padding-right:18px}
-#w.ay-b.ax-r #top{padding-left:16px}
+#w.ay-b.ax-r #top{padding-left:18px}
 </style>
 </head>
 <body>
@@ -403,7 +407,7 @@ const towerAt = (x, y) => S.towers.find(t => t.x === x && t.y === y);
 
 // ================= State & persistence =================
 let S;
-const ui = { build:null, sel:null, hover:null, min:false, rerollT:0, pres:false, mutT:null, mutOpts:[], shake:0,
+const ui = { build:null, sel:null, hover:null, min:false, rerollT:0, pres:false, mutT:null, mutOpts:[], catchup:0, shake:0,
   scale:1, ax:'r', ay:'b', pos:{ dx:16, dy:16 } };
 const randSeed = () => Math.floor(Math.random() * 2 ** 31);
 
@@ -419,7 +423,7 @@ function makeState(m){
       if (type === undefined) throw new Error(`Unknown tower id in save: ${t.id}`);
       return { ...makeTower(type, t.x, t.y), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), invested:t.invested };
     }),
-    waveActive:false, enemies:[], projs:[], hazards:[], fx:[], parts:[], q:[], spawnT:0, autoT:1.5, time:0,
+    waveActive:false, waveSnap:null, enemies:[], projs:[], hazards:[], fx:[], parts:[], q:[], spawnT:0, autoT:1.5, time:0,
     inc:new Array(10).fill(0), incI:0, incT:0,
     over:m.lives <= 0, banner:null, coreFlash:0,
   };
@@ -427,12 +431,13 @@ function makeState(m){
 function freshRun(meta){
   return makeState({ seed:randSeed(), gold:100 + 50 * meta.prestige, lives:START_LIVES, wave:0, towers:[], bossKills:0, runEarned:0, bossCP:0, ...meta });
 }
+function towerDTO(t){ return { id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), invested:t.invested }; }
 function save(){
   localStorage.setItem(SAVE_KEY, JSON.stringify({
-    seed:S.seed, gold:S.gold, lives:S.lives, wave:S.waveActive ? S.wave - 1 : S.wave,
+    v:2, seed:S.seed, gold:S.gold, lives:S.lives, wave:S.wave, waveActive:S.waveActive, waveSnap:S.waveSnap || null,
     prestige:S.prestige, catalysts:S.catalysts, best:S.best, bossKills:S.bossKills, runEarned:S.runEarned, ascensions:S.ascensions, bossCP:S.bossCP, speed:S.speed, auto:S.auto, autoMut:S.autoMut, min:ui.min,
     scale:ui.scale, place:{ ax:ui.ax, ay:ui.ay, dx:ui.pos.dx, dy:ui.pos.dy },
-    towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested })),
+    towers:S.towers.map(towerDTO),
   }));
 }
 // v1 stored towers by index into the old 10-tower list (no Mint).
@@ -440,24 +445,72 @@ function migrateV1(d){
   const ids = ['bolt','frost','flak','tesla','venom','rail','prism','hell','chrono','sing'];
   return { ...d, towers: d.towers.map(t => ({ id:ids[t.type], x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:0, muts:t.muts, invested:t.invested })) };
 }
+function sanitize(d){
+  if (!d || typeof d !== 'object' || Array.isArray(d)) throw new Error('Invalid save data');
+  const num = (v, def) => Number.isFinite(v) ? v : def;
+  const cleanTowers = list => {
+    const out = [], seen = new Set();
+    for (const t of Array.isArray(list) ? list : []) {
+      if (!t || !Object.hasOwn(TOWER_INDEX, t.id)) continue;
+      const type = TOWER_INDEX[t.id];
+      const x = Math.max(0, Math.min(COLS - 1, Math.floor(num(t.x, 0))));
+      const y = Math.max(0, Math.min(ROWS - 1, Math.floor(num(t.y, 0)))), pos = x + ',' + y;
+      if (seen.has(pos)) continue;
+      seen.add(pos);
+      const pool = TRAIT_POOL[TOWERS[type].kind], muts = Array.isArray(t.muts) ? t.muts : [];
+      out.push({ id:TOWERS[type].id, x, y, lv:Math.max(1, num(t.lv, 1)), kills:Math.max(0, num(t.kills, 0)), earned:Math.max(0, num(t.earned, 0)), muts:muts.filter(m => pool.includes(m)), invested:Math.max(0, num(t.invested, TOWERS[type].cost)) });
+    }
+    return out;
+  };
+  const p0 = d.place && typeof d.place === 'object' ? d.place : {};
+  const out = {
+    seed:num(d.seed, randSeed()), gold:Math.max(0, num(d.gold, 100)), lives:Math.max(0, num(d.lives, START_LIVES)),
+    wave:Math.max(0, Math.floor(num(d.wave, 0))), prestige:Math.max(0, num(d.prestige, 0)), catalysts:Math.max(0, num(d.catalysts, 0)),
+    best:Math.max(0, num(d.best, 0)), bossKills:Math.max(0, num(d.bossKills, 0)), runEarned:Math.max(0, num(d.runEarned, 0)),
+    ascensions:Math.max(0, num(d.ascensions, 0)), bossCP:Math.max(0, num(d.bossCP, 0)),
+    speed:Math.max(1, Math.min(3, num(d.speed, 1))), auto:!!d.auto, autoMut:!!d.autoMut, min:!!d.min,
+    scale:num(d.scale, 1), place:{ ax:p0.ax === 'l' ? 'l' : 'r', ay:p0.ay === 't' ? 't' : 'b', dx:num(p0.dx, 16), dy:num(p0.dy, 16) },
+    towers:cleanTowers(d.towers), waveActive:!!d.waveActive, waveSnap:null,
+  };
+  const s = d.waveSnap;
+  if (s && typeof s === 'object' && !Array.isArray(s)) out.waveSnap = {
+    wave:Math.max(1, Math.floor(num(s.wave, out.wave || 1))), gold:Math.max(0, num(s.gold, out.gold)), lives:Math.max(0, num(s.lives, out.lives)),
+    bossKills:Math.max(0, num(s.bossKills, out.bossKills)), runEarned:Math.max(0, num(s.runEarned, out.runEarned)),
+    bossCP:Math.max(0, num(s.bossCP, out.bossCP)), catalysts:Math.max(0, num(s.catalysts, out.catalysts)), towers:cleanTowers(s.towers),
+  };
+  return out;
+}
 function load(){
-  let raw = localStorage.getItem(SAVE_KEY);
-  const old = localStorage.getItem(SAVE_KEY_V1);
-  if (!raw && old) raw = JSON.stringify(migrateV1(JSON.parse(old)));
-  if (old) localStorage.removeItem(SAVE_KEY_V1);
-  if (!raw) { S = freshRun({ prestige:0, ascensions:0, catalysts:0, best:0, speed:1, auto:false, autoMut:false }); setMap(S.seed); return; }
-  const d = JSON.parse(raw);
-  // Saves from before prestige requirements have no run-progress counters; the run starts counting now.
-  if (d.bossKills === undefined) { d.bossKills = 0; d.runEarned = 0; }
-  // Saves from before Championship Points: each old star becomes 1 CP and counted one prestige.
-  if (d.ascensions === undefined) { d.ascensions = d.prestige; d.bossCP = 0; }
-  S = makeState(d);
-  ui.min = d.min;
-  // Saves from before move/resize keep the default bottom-right placement at 100%.
-  if (d.scale !== undefined) { ui.scale = d.scale; ui.ax = d.place.ax; ui.ay = d.place.ay; ui.pos = { dx:d.place.dx, dy:d.place.dy }; }
-  setMap(S.seed);
-  // A reload during a pending mutation choice resolves it automatically.
-  for (const t of S.towers) while (t.muts.length < Math.floor(t.lv / 5)) t.muts.push(mutOptions(t)[0]);
+  let raw = null;
+  try {
+    raw = localStorage.getItem(SAVE_KEY);
+    const old = localStorage.getItem(SAVE_KEY_V1);
+    if (!raw && old) raw = JSON.stringify(migrateV1(JSON.parse(old)));
+    if (old) localStorage.removeItem(SAVE_KEY_V1);
+    if (!raw) { S = freshRun({ prestige:0, ascensions:0, catalysts:0, best:0, speed:1, auto:false, autoMut:false }); setMap(S.seed); return; }
+    let d = JSON.parse(raw);
+    // Saves from before prestige requirements have no run-progress counters; the run starts counting now.
+    if (d.bossKills === undefined) { d.bossKills = 0; d.runEarned = 0; }
+    // Saves from before Championship Points: each old star becomes 1 CP and counted one prestige.
+    if (d.ascensions === undefined) { d.ascensions = d.prestige; d.bossCP = 0; }
+    d = sanitize(d);
+    const midWave = d.waveActive && d.waveSnap && d.lives > 0;
+    if (midWave) d = { ...d, wave:d.waveSnap.wave - 1, gold:d.waveSnap.gold, lives:d.waveSnap.lives, bossKills:d.waveSnap.bossKills, runEarned:d.waveSnap.runEarned, bossCP:d.waveSnap.bossCP, catalysts:d.waveSnap.catalysts, towers:d.waveSnap.towers };
+    S = makeState(d);
+    ui.min = d.min;
+    // Saves from before move/resize keep the default bottom-right placement at 100%.
+    if (d.scale !== undefined) { ui.scale = d.scale; ui.ax = d.place.ax; ui.ay = d.place.ay; ui.pos = { dx:d.place.dx, dy:d.place.dy }; }
+    setMap(S.seed);
+    // A reload during a pending mutation choice resolves it automatically.
+    for (const t of S.towers) while (t.muts.length < Math.floor(t.lv / 5)) t.muts.push(mutOptions(t)[0]);
+    if (midWave) S.banner = { s:`WAVE ${d.waveSnap.wave} RESTARTED — REWARDS RESTORED TO WAVE START`, c:'#ffc85c', t:3 };
+  } catch (e) {
+    try { localStorage.setItem(SAVE_KEY + '.corrupt', raw); } catch (ignore) {}
+    try { localStorage.removeItem(SAVE_KEY); } catch (ignore) {}
+    S = freshRun({ prestige:0, ascensions:0, catalysts:0, best:0, speed:1, auto:false, autoMut:false });
+    setMap(S.seed);
+    S.banner = { s:'SAVE UNREADABLE — FRESH RUN (backup kept)', c:'#ff653f', t:3 };
+  }
 }
 
 // ================= Stats =================
@@ -512,6 +565,7 @@ function buildWave(w){
 function startWave(){
   if (S.waveActive || S.over) return;
   S.wave++;
+  S.waveSnap = { wave:S.wave, gold:S.gold, lives:S.lives, bossKills:S.bossKills, runEarned:S.runEarned, bossCP:S.bossCP, catalysts:S.catalysts, towers:S.towers.map(towerDTO) };
   S.q = buildWave(S.wave);
   S.spawnT = .3;
   S.waveActive = true;
@@ -519,6 +573,7 @@ function startWave(){
 }
 function endWave(){
   S.waveActive = false;
+  S.waveSnap = null;
   const clear = goldScale(S.wave) * 5 * cpMult();
   earn(clear);
   let interest = 0, payouts = 0;
@@ -878,6 +933,7 @@ function update(dt){
 }
 function gameOver(){
   S.over = true;
+  S.waveSnap = null;
   S.best = Math.max(S.best, S.wave);
   closePanel();
   $('mut').classList.add('hidden');
@@ -955,6 +1011,7 @@ function newMap(earned){
   setMap(S.seed);
   closePanel();
   $('mut').classList.add('hidden');
+  ui.mutT = null; ui.mutOpts = [];
   $('over').classList.add('hidden');
   closePrestige();
   ui.build = null;
@@ -978,7 +1035,6 @@ sizeCanvases();
 
 function circle(c, x, y, r, f){ c.fillStyle = f; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); }
 function rr(c, x, y, w, h, r){ c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r); c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath(); }
-function poly(c, n, r, rot){ c.beginPath(); for (let i = 0; i < n; i++) { const a = rot + i / n * Math.PI * 2; c.lineTo(Math.cos(a) * r, Math.sin(a) * r); } c.closePath(); }
 function glow(c, x, y, r, col, a){
   const g = c.createRadialGradient(x, y, 0, x, y, r);
   g.addColorStop(0, rgba(col, a)); g.addColorStop(1, rgba(col, 0));
@@ -1573,7 +1629,10 @@ const reqCards = [0, 1, 2, 3].map(() => {
   $('prReqs').append(el);
   return { el, icon:el.querySelector('.rq-i'), label:el.querySelector('.rq-l'), value:el.querySelector('.rq-v'), bar:el.querySelector('.rq-bar i') };
 });
-function openPrestige(){ closePanel(); ui.build = null; ui.pres = true; ui.rerollT = 0; $('pres').classList.remove('hidden'); refreshPrestige(prestigeReady()); }
+function openPrestige(){
+  if (ui.mutT) { S.banner = { s:'PICK A MUTATION FIRST', c:'#ffc85c', t:1.5 }; return; }
+  closePanel(); ui.build = null; ui.pres = true; ui.rerollT = 0; $('pres').classList.remove('hidden'); refreshPrestige(prestigeReady());
+}
 function closePrestige(){ ui.pres = false; $('pres').classList.add('hidden'); }
 function refreshPrestige(ready){
   const reqs = prestigeReqs(), reward = prestigeReward(), met = reqs.filter(r => r.have >= r.need).length;
@@ -1660,13 +1719,20 @@ $('bMin').onclick = () => {
   placeInPage(); fitWindow(); save();
 };
 document.addEventListener('keydown', ev => {
+  if (ev.key === 'Escape') { ui.build = null; closePanel(); closePrestige(); return; }
   if (ev.code === 'Space') {
     if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
-    ev.preventDefault(); startWave(); return;
+    ev.preventDefault(); if (ui.pres || ui.mutT) return;
+    startWave(); return;
   }
-  if (ev.key === 'Escape') { ui.build = null; closePanel(); closePrestige(); return; }
   const i = HOTKEYS.indexOf(ev.key);
-  if (i >= 0 && !S.over) { ui.build = ui.build === i ? null : i; closePanel(); }
+  if (i >= 0 && !S.over && !ui.pres && !ui.mutT) { ui.build = ui.build === i ? null : i; closePanel(); }
+});
+let hiddenAt = 0;
+document.addEventListener('visibilitychange', () => {
+  const now = performance.now();
+  if (document.hidden) hiddenAt = now;
+  else if (hiddenAt) { ui.catchup = Math.min(300, (now - hiddenAt) / 1000); hiddenAt = 0; } // cap absence to five minutes
 });
 window.addEventListener('beforeunload', save);
 
@@ -1675,7 +1741,7 @@ window.addEventListener('beforeunload', save);
 // fixed, and the resize grip sits on the opposite (free) corner. In the browser the widget moves
 // inside the page; in the desktop overlay the OS window moves and is sized to the widget.
 const OVERLAY = !!window.overlay;
-const wrap = $('wrap'), wEl = $('w'), BASE_W = 420, BASE_H = 344, MIN_SCALE = .6, MAX_SCALE = 2.5;
+const wrap = $('wrap'), wEl = $('w'), BASE_W = 420, BASE_H = 400, MIN_SCALE = .6, MAX_SCALE = 2.5;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 function maxScale(){ return OVERLAY ? MAX_SCALE : clamp(Math.min((innerWidth - 8) / BASE_W, (innerHeight - 8) / BASE_H), MIN_SCALE, MAX_SCALE); }
 function setAnchor(ax, ay){
@@ -1709,9 +1775,13 @@ function fitWindow(){
   window.overlay.fit(r.width, r.height, ui.ax, ui.ay);
 }
 function applyScale(s){
-  ui.scale = clamp(s, MIN_SCALE, maxScale());
-  wEl.style.zoom = ui.scale;
-  RS = DPR * ui.scale;
+  // ui.scale is the *user's* zoom intent; only the applied value is clamped to the safe
+  // range. Clamping into ui.scale itself would let a temporarily small viewport shrink the
+  // widget and then persist that shrink even after the window grows again.
+  ui.scale = s;
+  const eff = clamp(s, MIN_SCALE, maxScale());
+  wEl.style.zoom = eff;
+  RS = Math.min(4, DPR * eff);
   sizeCanvases();
   renderBackground();
   hot.forEach((b, i) => iconCanvas(b._icon, i, 28, 0));
@@ -1766,7 +1836,8 @@ function frame(now){
   last = now;
   if (ui.rerollT > 0) ui.rerollT -= dt;
   ui.shake *= Math.exp(-dt * 12);
-  if (!S.over && !ui.mutT) {
+  if (!S.over && !ui.mutT && !ui.pres) {
+    if (ui.catchup > 0) { const chunk = Math.min(ui.catchup, .5); acc += chunk; ui.catchup -= chunk; } // drain catch-up without frame bombs
     acc += dt;
     while (acc >= STEP) { for (let i = 0; i < S.speed; i++) update(STEP); acc -= STEP; }
   } else acc = 0;
