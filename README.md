@@ -43,7 +43,7 @@ Open `index.html` in any modern browser. The whole game is that one file.
 
 ## Features
 
-- **Random circuits:** every run gets a new winding 12×7 Grand Prix layout. It has asphalt with a rubbered racing line, red-and-white apex kerbs, gravel traps, pit-pad build slots, a starting grid under a five-light gantry, and a chequered finish line.
+- **Random circuits:** every run gets a new winding 12×7 Grand Prix layout. It has asphalt with a rubbered racing line, red-and-white apex kerbs, gravel traps, open grass to build on, a starting grid under a five-light gantry, and a chequered finish line.
 - **11 towers:** Bolt, Frost, Flak, **Aether Mint** (economy), Tesla, Venom, Railgun, Prism, Hellfire, Chrono and Singularity.
 - **Aether Mint:** makes gold every second plus a payout at the end of each wave. Adjacent Chrono Obelisks speed it up. Its mutations are Compound Interest, Midas Aura, Bounty Harvester and Quantum Overclock.
 - **Mutations:** at every 5th level a tower evolves visually and you pick one of 3 traits. Turn on Auto-mutate for idle play, or spend boss Catalysts (◆) to reroll the choices.
@@ -75,3 +75,7 @@ npm run dist
 `npm start` runs the overlay, and `npm run dist` builds an installer for your OS into `dist/`.
 
 **Publish a release:** go to **Actions → Release → Run workflow**. GitHub builds Windows, macOS and Linux and publishes them as release `v<version>`, using the version in `package.json`. Bump that version before publishing the next release.
+
+## Credits
+
+The UI font is [Titillium Web](https://fonts.google.com/specimen/Titillium+Web) (SIL Open Font License 1.1). It's embedded in `index.html` so the game works offline.
