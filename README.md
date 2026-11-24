@@ -48,9 +48,9 @@ The desktop app (v1.0.2 and later) loads the game live from that page. Every upd
 ## Features
 
 - **Random circuits:** every run gets a new winding 12×7 Grand Prix layout. It has asphalt with a rubbered racing line, red-and-white apex kerbs, gravel traps, open grass to build on, a starting grid under a five-light gantry, and a chequered finish line.
-- **11 trackside towers**, drawn in 3D with height, shadows and depth: Wheel Gun, Marshal Post (yellow flags slow cars), Tyre Launcher, **Sponsor Billboard** (economy), ERS Battery, Fuel Sprayer, Radar Gun, Timing Beam, Fire Mortar, Race Control and Wind Tunnel (blows cars backward).
-- **Sponsor Billboard:** earns gold every second plus a payout at the end of each wave. An adjacent Race Control tower speeds it up. Its mutations are Compound Interest, Midas Aura, Bounty Harvester and Quantum Overclock.
-- **Mutations:** at every 5th level a tower evolves visually and you pick one of 3 traits. Turn on Auto-mutate for idle play, or spend boss Catalysts (◆) to reroll the choices.
+- **11 trackside towers**, drawn in 3D: Wheel Gun, Marshal Post, Tyre Launcher, **Sponsor Billboard** (economy), ERS Battery, Fuel Sprayer, Radar Gun, Timing Beam, Fire Mortar, Race Control and Wind Tunnel. Each tier costs about 2.7× the last but hits harder per dollar, and every extra copy of the same tower costs 20% more (Sponsors 40%). Upgrades give +18% damage per level for +32% cost.
+- **Sponsor Billboard:** earns gold every second (+25% per level) plus a payout worth 25 seconds of income at the end of each lap. An adjacent Race Control tower speeds it up.
+- **Mutations:** every 5 levels a tower mutates. You choose one of **its own three themed mutations** (for example Wheel Gun: Impact Wrench, Twin Guns, Loose Wheel Nut; Marshal Post: Red Flag, Double Yellows, Penalty Points). Picks stack, and every pick also gives ×1.45 damage or income. Auto-mutate spreads picks evenly.
 - **Race cars:** top-down open-wheelers that bank smoothly through corners, with bigger bounties for bigger cars:
   - **Formula Junior:** small, enters in packs.
   - **Midfield Spec Racer:** the standard car.
@@ -59,7 +59,9 @@ The desktop app (v1.0.2 and later) loads the game live from that page. Every upd
   - **Racing Green GT:** armoured, and shrugs off half of any slow.
   - **Rosso / Midnight Prototypes:** slipstream that tows cars behind them.
   - **Hypercar boss (every 10 waves):** Overdrive surges, shield phases, and big gold, Championship Point and Catalyst drops.
-- **Prestige:** click **🏆 Prestige** to see how many **Championship Points** you'd earn: 1 per 10 waves, plus 1 per ×10 gold earned beyond 1k, plus any CP dropped by Hypercar bosses. Once every requirement card is met (reach a wave, beat bosses, mutate a tower, earn gold), prestiging resets your run onto a fresh circuit. Each CP gives +5% tower damage and gold for good. The requirements get harder each time you prestige.
+- **Seasons and prestige:** each season has targets (reach a lap, beat Hypercars, mutate a tower, earn gold) that rise every season. Finish a season for **Championship Points**: 3 base, plus 1 per 5 laps beyond the target, plus CP dropped by Hypercars. A season summary shows what you earned, then you spend CP at **Team HQ** on permanent upgrades: Aero Package (damage), Sponsorship Deal (gold), Pit Crew Training (attack speed), Starting Budget, Reinforced Barriers (lives) and Data Telemetry (cheaper upgrades).
+- **Lives:** you start with 10. A car that reaches the finish costs lives by type and remaining health, from 1 for a Spec car up to 10 for a Hypercar.
+- **Laps:** each lap starts with a quick five-light sequence. A progress bar shows the cars left, and between laps you see a preview of the next grid.
 - **Saves:** progress saves to `localStorage`. Saves from the original 10-tower version migrate automatically.
 
 ## Build it yourself
