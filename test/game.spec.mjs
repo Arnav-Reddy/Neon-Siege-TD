@@ -131,3 +131,18 @@ test('inspector buttons stay inside the panel with many mutations', async () => 
   });
   expect(outside).toEqual([]);
 });
+
+test('selecting any economy tower keeps the race running', async () => {
+  await newSave();
+  for (const id of ['mint', 'wind', 'pit', 'solar']) {
+    const t0 = await page.evaluate(id => {
+      for (const t of [...S.towers]) sell(t);
+      S.prestige = 3; S.gold = 1e9;
+      for (let y = 0; y < ROWS; y++) for (let x = 0; x < COLS; x++) if (!isPath(x, y) && !S.towers.length) place(TOWER_INDEX[id], x, y);
+      if (id === 'mint') S.towers[0].muts = ['mint_merch'];
+      openPanel(S.towers[0]);
+      return S.time;
+    }, id);
+    await page.waitForFunction(t0 => S.time > t0 + 0.2, t0);
+  }
+});

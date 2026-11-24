@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.5.0">
+<meta name="app-version" content="2.5.1">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -1106,7 +1106,6 @@ function updEcon(t, dt){
   if (t.pitCycle >= 18) { t.pitCycle = 0; t.pitWin = pitWindow(t); }
 }
 function tapPit(t){ if (t.pitWin > 0) { t.pitWin = 0; t.pitFull = true; t.pitStop = 1.8; burst(t.x + .5, t.y + .5, '#7fd18b', 12, 2); return true; } return false; }
-function updMint(t, dt){ updEcon(t, dt); }
 function updBeam(t, s, dt, cx, cy){
   const cap = beamCap(t), delta = mc(t, 'prism_delta');
   let e = t.target;
@@ -2209,7 +2208,7 @@ function render(now){
     const d = TOWERS[t.type];
     if (d.kind === 'emp' && t.fieldR) { ctx.setLineDash([3, 3]); ctx.lineDashOffset = -now * 30; ctx.strokeStyle = 'rgba(127,224,255,.55)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc((t.x + .5) * TS, (t.y + .5) * TS, t.fieldR * TS, 0, 7); ctx.stroke(); ctx.setLineDash([]); ctx.fillStyle = 'rgba(127,224,255,.06)'; ctx.fill(); }
     if (d.buff) { ctx.setLineDash([2, 5]); ctx.lineDashOffset = now * 10; ctx.strokeStyle = 'rgba(236,228,208,.25)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc((t.x + .5) * TS, (t.y + .5) * TS, stats(t).range * TS, 0, 7); ctx.stroke(); ctx.setLineDash([]); }
-    if (false) { ctx.strokeStyle = 'rgba(255,200,92,.18)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc((t.x + .5) * TS, (t.y + .5) * TS, mintStats(t).range * TS, 0, 7); ctx.stroke(); }
+    if (TOWERS[t.type].id === 'mint' && mc(t, 'mint_merch')) { ctx.strokeStyle = 'rgba(255,200,92,.18)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc((t.x + .5) * TS, (t.y + .5) * TS, TOWERS[t.type].range * TS, 0, 7); ctx.stroke(); }
   }
   // build hover
   const hv = ui.hover;
@@ -2233,7 +2232,7 @@ function render(now){
   }
   // inspected tower
   if (ui.sel) {
-    const t = ui.sel, col = TOWERS[t.type].color, r = isMint(t) ? mintStats(t).range : stats(t).range;
+    const t = ui.sel, col = TOWERS[t.type].color, r = isMint(t) ? TOWERS[t.type].range : stats(t).range;
     if (r < 50) drawRange(t.x + .5, t.y + .5, r, col);
     rr(ctx, t.x * TS + 1, t.y * TS + 1, TS - 2, TS - 2, 6); ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke();
   }
