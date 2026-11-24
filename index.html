@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.4.0">
+<meta name="app-version" content="2.5.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -279,14 +279,15 @@ html.overlay .handle{-webkit-app-region:drag}
 #tip .tr{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin:1px 0 4px}
 #tip .td{font-size:9.5px;color:var(--ink2);line-height:1.4}
 
-/* ---------- Resize grip: sits on the corner opposite the anchored one ---------- */
-#resize{position:absolute;z-index:12;width:14px;height:14px;color:var(--ink3);bottom:1px;right:1px;cursor:nwse-resize}
-#resize:hover,#w.resizing #resize{color:var(--ember)}
-#w.ax-r #resize{right:auto;left:1px;cursor:nesw-resize;transform:scaleX(-1)}
-#w.ay-b #resize{bottom:auto;top:1px;transform:scaleY(-1);cursor:nesw-resize}
-#w.ax-r.ay-b #resize{transform:scale(-1,-1);cursor:nwse-resize}
-#w.ay-b:not(.ax-r) #top{padding-right:18px}
-#w.ay-b.ax-r #top{padding-left:16px}
+/* ---------- Resize handles on every edge and corner ---------- */
+/* Resize from any side or corner: the opposite side stays fixed while dragging */
+.rz{position:absolute;z-index:12;-webkit-app-region:no-drag}
+.rz-n,.rz-s{left:12px;right:12px;height:6px;cursor:ns-resize}.rz-n{top:0}.rz-s{bottom:0}
+.rz-e,.rz-w{top:12px;bottom:12px;width:6px;cursor:ew-resize}.rz-e{right:0}.rz-w{left:0}
+.rz-ne,.rz-nw,.rz-se,.rz-sw{width:12px;height:12px}
+.rz-ne{top:0;right:0;cursor:nesw-resize}.rz-sw{bottom:0;left:0;cursor:nesw-resize}
+.rz-nw{top:0;left:0;cursor:nwse-resize}.rz-se{bottom:0;right:0;cursor:nwse-resize}
+#w.resizing .rz{background:transparent}
 </style>
 </head>
 <body>
@@ -406,7 +407,7 @@ html.overlay .handle{-webkit-app-region:drag}
     <div class="upd-n">Your 5 save slots are kept.</div>
     <div class="prow"><button id="updLater" class="btn sm">Later</button><button id="updGo" class="btn asc">Update &amp; Reload Now</button></div>
   </div></div>
-  <div id="resize" class="full" title="Drag to resize · double-click to reset"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M14 6 6 14M14 10l-4 4M14 14h0"/></svg></div>
+  <div class="rz rz-n full" data-dir="n" title="Drag to resize · double-click to reset"></div><div class="rz rz-s full" data-dir="s" title="Drag to resize · double-click to reset"></div><div class="rz rz-e full" data-dir="e" title="Drag to resize · double-click to reset"></div><div class="rz rz-w full" data-dir="w" title="Drag to resize · double-click to reset"></div><div class="rz rz-ne full" data-dir="ne" title="Drag to resize · double-click to reset"></div><div class="rz rz-nw full" data-dir="nw" title="Drag to resize · double-click to reset"></div><div class="rz rz-se full" data-dir="se" title="Drag to resize · double-click to reset"></div><div class="rz rz-sw full" data-dir="sw" title="Drag to resize · double-click to reset"></div>
 </div>
 </div>
 <script type="text/plain" id="game-src">
@@ -2820,7 +2821,7 @@ window.addEventListener('beforeunload', save);
 
 // ================= Placement: move, resize, anchor =================
 // The widget anchors to the screen corner it is nearest. Minimizing and resizing keep that corner
-// fixed, and the resize grip sits on the opposite (free) corner. In the browser the widget moves
+// fixed; resizing from any edge keeps the opposite side fixed. In the browser the widget moves
 // inside the page; in the desktop overlay the OS window moves and is sized to the widget.
 const OVERLAY = !!window.overlay;
 const wrap = $('wrap'), wEl = $('w'), BASE_W = 440, BASE_H = 344, MIN_SCALE = .6, MAX_SCALE = 2.5;
@@ -2884,20 +2885,42 @@ document.querySelectorAll('.handle').forEach(h => h.addEventListener('pointerdow
   };
   h.addEventListener('pointermove', move); h.addEventListener('pointerup', up);
 }));
-// Resize from the free corner; double-click resets to 100%.
-const grip = $('resize');
-grip.addEventListener('pointerdown', ev => {
-  if (ev.button !== 0) return;
-  ev.preventDefault();
-  if (OVERLAY) computeAnchor();
-  const sx = ui.ax === 'r' ? -1 : 1, sy = ui.ay === 'b' ? -1 : 1, x0 = ev.screenX, y0 = ev.screenY, s0 = ui.scale;
-  grip.setPointerCapture(ev.pointerId);
-  wEl.classList.add('resizing');
-  const move = e => { applyScale(s0 + Math.max(sx * (e.screenX - x0) / BASE_W, sy * (e.screenY - y0) / BASE_H)); placeInPage(); };
-  const up = () => { grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up); wEl.classList.remove('resizing'); save(); };
-  grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up);
+// Resize from any edge or corner. While dragging, the widget is anchored to the opposite side so that side
+// stays put; on release it re-anchors to the nearest screen corner. Double-click any handle resets to 100%.
+function anchorTo(ax, ay){
+  if (OVERLAY) { setAnchor(ax, ay); return; }
+  const r = wEl.getBoundingClientRect();
+  ui.pos = { dx: ax === 'l' ? r.left : innerWidth - r.right, dy: ay === 't' ? r.top : innerHeight - r.bottom };
+  setAnchor(ax, ay);
+}
+document.querySelectorAll('.rz').forEach(h => {
+  h.addEventListener('pointerdown', ev => {
+    if (ev.button !== 0) return;
+    ev.preventDefault();
+    const dir = h.dataset.dir;
+    if (OVERLAY) computeAnchor();
+    const sx = dir.includes('e') ? 1 : dir.includes('w') ? -1 : 0, sy = dir.includes('s') ? 1 : dir.includes('n') ? -1 : 0;
+    anchorTo(sx > 0 ? 'l' : sx < 0 ? 'r' : ui.ax, sy > 0 ? 't' : sy < 0 ? 'b' : ui.ay);
+    const x0 = ev.screenX, y0 = ev.screenY, s0 = ui.scale;
+    let want = s0, queued = false;
+    h.setPointerCapture(ev.pointerId);
+    wEl.classList.add('resizing');
+    const apply = () => { queued = false; applyScale(want); placeInPage(); };
+    const move = e => {
+      const gx = sx * (e.screenX - x0) / BASE_W, gy = sy * (e.screenY - y0) / BASE_H;
+      want = s0 + (sx && sy ? Math.max(gx, gy) : sx ? gx : gy);
+      if (!queued) { queued = true; requestAnimationFrame(apply); }   // at most one resize per frame
+    };
+    const up = () => {
+      h.removeEventListener('pointermove', move); h.removeEventListener('pointerup', up);
+      if (queued) apply();
+      wEl.classList.remove('resizing');
+      computeAnchor(); placeInPage(); fitWindow(); save();
+    };
+    h.addEventListener('pointermove', move); h.addEventListener('pointerup', up);
+  });
+  h.addEventListener('dblclick', () => { applyScale(1); placeInPage(); save(); });
 });
-grip.addEventListener('dblclick', () => { applyScale(1); placeInPage(); save(); });
 window.addEventListener('resize', () => { if (!OVERLAY) { applyScale(ui.scale); placeInPage(); } });
 
 // ================= Main loop =================
