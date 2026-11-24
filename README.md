@@ -60,8 +60,8 @@ The game also updates itself. At start-up it compares its version with the `inde
 
 - **Five save slots:** the home screen lists five garage slots. Each has a name, season, lap, best lap, CP and gold. You can rename, export or delete a slot (deleting asks twice) and import a save into the first empty slot. **Continue Last Session** reopens the slot you played last. Old single saves move into Slot 1 as "Legacy Team".
 - **Random circuits:** every run gets a new winding 12×7 Grand Prix layout with kerbs, gravel traps, a starting grid under a five-light gantry and a chequered finish. Two or three **hot-zone tiles** sit next to the track: **DRS** (+40% attack speed), **Grandstand** (+50% range, +25% crit chance) and **VIP** (+100% kill payout).
-- **19 trackside towers, unlocked by prestige rank:**
-  - P0: Wheel Gun $100, Marshal $350, Tyres $1K, Wind Tunnel $1.1K, ERS $3.6K
+- **20 trackside towers, unlocked by prestige rank:**
+  - P0: Wheel Gun $100, Marshal $350, Tyres $1K, Sponsor $1.1K, Wind Tunnel $900, ERS $3.6K
   - P1: Fuel $11K, Radar $32K, Pit Crew $90K, Timing $100K
   - P2: Mortar $240K, Race Control $650K, EMP $1.8M
   - P3: Singularity $5.5M, Solar $18M, Orbital $45M
@@ -71,7 +71,8 @@ The game also updates itself. At start-up it compares its version with the `inde
   Locked towers show their rank on the dock.
 - **Tower cap:** you can field 5 towers, plus 1 per prestige rank and 1 per Pit Garage Expansion.
 - **Levels:** every level costs 1.6× the last and gives about +30% power, plus tower perks (extra barrels, more chain jumps, rail pierce, flak fragments and more). The inspector previews the next level's change. Lv3 unlocks target priority. Lv5 unlocks **Push Lap** (+60% fire rate for 4 s, 20 s cooldown) and the first **mutation draft**. You choose 1 of 3 mutations (4 with HQ), and a mutation can be stacked. Press **📌 Select** under a mutation to pin it: that tower then takes it automatically every time it mutates, until you unpin it in the inspector. `MAX` buys every level you can afford, then shows each earned draft one at a time (or applies the pinned mutation).
-- **Economy without car money:** kill and lap gold grow slowly (`13.5 × 1.08^lap`). Three towers make money:
+- **Economy without car money:** kill and lap gold grow slowly (`13.5 × 1.08^lap`). Four towers make money:
+  - **Sponsor Billboard:** earns gold every second of a lap, plus a lap-end bonus worth 25 seconds of income. Mutations: Title Sponsor, Prize Money, Merch Stand (+40% kill gold for towers in its radius).
   - **Trackside Wind Tunnel:** charges from 30 shots by adjacent towers and pays out at most 3 times a lap.
   - **Pit-Crew Gantry:** every 18 s a 3.5 s PIT window opens. Click it for a full payout; a missed window pays 30%. At most 2 pit stops a lap.
   - **Paddock Solar Grid:** pays at the end of each lap for every empty pad, scaled by weather (sun 100%, rain 40%, night 0%).

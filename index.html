@@ -433,7 +433,8 @@ const TOWERS = [
   { id:'bolt',   name:'Wheel Gun',          short:'Wheel Gun', cost:100,          kind:'proj',   dmg:8,          range:2.4, rate:2.5,  pr:0, cat:'kinetic',   rarity:0, color:'#ffd37a', dark:'#8a5a12', role:'Single target', desc:'Pit-crew pneumatic gun. Every level adds a barrel and faster tracers.' },
   { id:'frost',  name:'Marshal Post',       short:'Marshal',   cost:350,         kind:'pulse',  dmg:14,         range:1.7, rate:.9,   pr:0, cat:'energy',    rarity:0, slow:.35, slowT:1.5, light:true, color:'#ffd400', dark:'#7a6400', role:'Slow · Floodlight', desc:'Yellow flags slow and damage every car in range; each level adds +4% brittle damage taken. Floodlights reveal stealth cars and light towers at night.' },
   { id:'flak',   name:'Tyre Launcher',      short:'Tyres',     cost:1000,         kind:'shell',  dmg:110,        range:2.6, rate:.75,  pr:0, cat:'explosive', rarity:1, splash:.9, color:'#ff653f', dark:'#8a2a12', role:'Splash · Shrapnel', desc:'Exploding tyres. Every level widens the blast and adds +1 shrapnel fragment.' },
-  { id:'wind',   name:'Trackside Wind Tunnel', short:'Wind Tunnel', cost:1100,    kind:'econ',   grant:150,      range:1,   rate:1,    pr:0, cat:null,        rarity:1, color:'#7fd18b', dark:'#1f5a2c', role:'Economy · Shots', desc:'Ignores cars. Charges whenever adjacent towers fire 30 shots, then pays a gold grant (max 3 per lap).' },
+  { id:'mint',   name:'Sponsor Billboard',  short:'Sponsor',   cost:1100,        kind:'econ',   grant:6,        range:1.8, rate:1,    pr:0, cat:null,        rarity:1, color:'#ffb23f', dark:'#16115e', role:'Economy · Per second', desc:'Ignores cars. Earns sponsorship money every second of a lap, plus a lap-end bonus worth 25 seconds of income.' },
+  { id:'wind',   name:'Trackside Wind Tunnel', short:'Wind Tunnel', cost:900,     kind:'econ',   grant:150,      range:1,   rate:1,    pr:0, cat:null,        rarity:1, color:'#7fd18b', dark:'#1f5a2c', role:'Economy · Shots', desc:'Ignores cars. Charges whenever adjacent towers fire 30 shots, then pays a gold grant (max 3 per lap).' },
   { id:'tesla',  name:'ERS Battery',        short:'ERS',       cost:3600,        kind:'chain',  dmg:300,        range:2.4, rate:1,    pr:0, cat:'energy',    rarity:1, jumps:3, color:'#8f86ff', dark:'#2a2380', role:'Chain', desc:'Energy-recovery lightning that arcs between cars. +1 bounce every 2 levels.' },
   { id:'venom',  name:'Fuel Sprayer',       short:'Fuel',      cost:11000,        kind:'proj',   dmg:900,        range:2.4, rate:1.4,  pr:1, cat:'explosive', rarity:2, fire:true, color:'#7fd18b', dark:'#1f5a2c', role:'Corrode · Shred', desc:'Corrosive fuel: stacking burn damage that strips armour.' },
   { id:'rail',   name:'Radar Gun',          short:'Radar',     cost:32000,       kind:'rail',   dmg:22000,      range:99,  rate:.33,  pr:1, cat:'kinetic',   rarity:2, crit:.3, critMul:4, color:'#6fa8ff', dark:'#1d3f8a', role:'Sniper · Pierce', desc:'Map-wide speed-trap sniper with big crits. +1 car pierced every 2 levels.' },
@@ -467,6 +468,9 @@ const MUTS = {
   flak:  [ { id:'flak_soft',     icon:'◎', name:'Soft Compound',      desc:'+35% blast radius per stack' },
            { id:'flak_stack',    icon:'⑂', name:'Pit Stack',          desc:'+1 extra tyre per stack' },
            { id:'flak_wall',     icon:'▦', name:'Tyre Wall',          desc:'Blasts slow 30% (+10%/stack, max 60%)' } ],
+  mint:  [ { id:'mint_title',    icon:'$', name:'Title Sponsor',      desc:'+80% money per second per stack' },
+           { id:'mint_prize',    icon:'★', name:'Prize Money',        desc:'+100% lap-end bonus per stack' },
+           { id:'mint_merch',    icon:'♛', name:'Merch Stand',        desc:'Towers in its radius earn +40% gold per kill per stack' } ],
   wind:  [ { id:'wind_flow',     icon:'≋', name:'Laminar Flow',       desc:'Needs 20% fewer shots per stack (min 12)' },
            { id:'wind_grant',    icon:'$', name:'Aero Grant',         desc:'+40% grant per stack' },
            { id:'wind_draft',    icon:'»', name:'Draft Tunnel',       desc:'Adjacent towers +10% attack speed per stack' } ],
@@ -645,9 +649,9 @@ function makeState(d){
     slot:d.slot, name:d.name, created:d.created, season:d.season, prestige:d.prestige, cp:d.cp, hq:{ ...d.hq }, best:d.best,
     speed:d.speed, auto:d.auto,
     seed:r.seed, gold:r.gold, lives:r.lives, wave:r.wave, endless:r.endless, rerolls:r.rerolls, bossKills:r.bossKills, carKills:r.carKills, runEarned:r.runEarned, resist:r.resist,
-    towers:r.towers.map(t => ({ ...makeTower(TOWER_INDEX[t.id], t.x, t.y, t.invested), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), prio:t.prio, mutSel:t.mutSel || null })),
+    towers:r.towers.filter(t => Object.hasOwn(TOWER_INDEX, t.id)).map(t => ({ ...makeTower(TOWER_INDEX[t.id], t.x, t.y, t.invested), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), prio:t.prio, mutSel:t.mutSel || null })),
     waveActive:false, enemies:[], projs:[], hazards:[], fx:[], parts:[], drones:[], detQ:[], q:[], nextQ:null, waveTotal:0, lightsT:0, goT:0, spawnT:0, autoT:1.5, time:0,
-    inc:new Array(10).fill(0), incI:0, incT:0, dmgCat:{}, scT:0, scCD:0, boss:null,
+    inc:new Array(10).fill(0), incI:0, incT:0, dmgCat:{}, scT:0, scCD:0, boss:null, lap:null,
     over:r.lives <= 0, banner:null, coreFlash:0, hot:[],
   };
 }
@@ -661,8 +665,10 @@ function newCareer(slot, name){
   return c;
 }
 function serialize(){
-  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto,
-    run:{ seed:S.seed, gold:S.gold, lives:S.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:S.bossKills, carKills:S.carKills, runEarned:S.runEarned, resist:S.resist,
+  // Mid-lap, save the run as it was when the lap started (minus what was earned since); spending stays spent.
+  const L = S.waveActive ? S.lap : { gold:0, cp:0, lives:S.lives, bossKills:S.bossKills, carKills:S.carKills };
+  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp - L.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto,
+    run:{ seed:S.seed, gold:S.gold - L.gold, lives:L.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:L.bossKills, carKills:L.carKills, runEarned:S.runEarned - L.gold, resist:S.resist,
       towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested, prio:t.prio, mutSel:t.mutSel })) } };
 }
 function save(){
@@ -680,7 +686,17 @@ function loadPrefs(){
   const p = JSON.parse(raw);
   ui.min = p.min; ui.scale = p.scale; ui.ax = p.place.ax; ui.ay = p.place.ay; ui.pos = { dx:p.place.dx, dy:p.place.dy };
 }
-const readSlot = n => { const raw = localStorage.getItem(SLOT_KEY(n)); return raw ? JSON.parse(raw) : null; };
+function readSlot(n){
+  const raw = localStorage.getItem(SLOT_KEY(n));
+  if (!raw) return null;
+  try { return JSON.parse(raw); }
+  catch {
+    localStorage.setItem(SLOT_KEY(n) + '.corrupt', raw);
+    localStorage.removeItem(SLOT_KEY(n));
+    homeMsg(`Slot ${n} was damaged and has been cleared (a copy is kept as ${SLOT_KEY(n)}.corrupt).`);
+    return null;
+  }
+}
 // The single-save game (neonSiegeTD.v2) becomes Slot 1. Its economy and towers changed, so only the career carries over.
 function migrateLegacy(){
   const raw = localStorage.getItem('neonSiegeTD.v2');
@@ -697,6 +713,7 @@ function openSlot(n){
   S = makeState(d);
   setMap(S.seed);
   for (const t of S.towers) while (t.muts.length < Math.floor(t.lv / 5)) t.muts.push(t.mutSel || autoPick(t));
+  clearDraft();
   ui.home = false; ui.build = null; ui.sel = null;
   if (S.over) gameOver();
   save();
@@ -776,9 +793,11 @@ function dpsOf(t, s){
   }
 }
 // Economy towers: payouts are fixed by level/mutations/tile and capped per lap. Nothing depends on cars.
+const sponsorBonus = (t, lv = t.lv) => econPay(t, lv) * 25 * (1 + mc(t, 'mint_prize'));
 function econPay(t, lv = t.lv){
   const d = TOWERS[t.type], vip = hotAt(t) === 'vip' ? 1 + tileMult() : 1;
   let g = d.grant * Math.pow(LEVEL_POWER, lv - 1) * Math.pow(MUT_POWER, t.muts.length) * tuneMult(t) * vip;
+  if (d.id === 'mint') g *= 1 + .8 * mc(t, 'mint_title');
   if (d.id === 'wind') g *= 1 + .4 * mc(t, 'wind_grant');
   if (d.id === 'pit') g *= 1 + .35 * mc(t, 'pit_undercut');
   if (d.id === 'solar') g *= 1 + .3 * mc(t, 'solar_cells');
@@ -858,6 +877,7 @@ function startWave(){
   S.lightsT = LIGHTS;
   S.spawnT = 0;
   S.waveActive = true;
+  S.lap = { gold:0, cp:0, lives:S.lives, bossKills:S.bossKills, carKills:S.carKills };
   // Adaptive chassis (lap 25+): resist whatever category did the most damage last lap.
   const top = Object.entries(S.dmgCat).sort((a, b) => b[1] - a[1])[0];
   S.resist = S.wave >= 25 && top ? top[0] : null;
@@ -872,6 +892,7 @@ function endWave(){
   let paid = 0;
   for (const t of S.towers) {
     const d = TOWERS[t.type];
+    if (d.id === 'mint') { const g = sponsorBonus(t); earn(g); t.earned += g; paid += g; addText(t.x + .5, t.y + .1, '+$' + fmt(g), '#ffc85c', true); }
     if (d.id === 'solar') { const g = solarPay(t); earn(g); t.earned += g; paid += g; if (g) addText(t.x + .5, t.y + .1, '+$' + fmt(g), '#ffc85c', true); }
     if (d.id === 'dyson' && mc(t, 'dy_ascend')) { S.cp += 2 * mc(t, 'dy_ascend'); addText(t.x + .5, t.y - .3, `+${2 * mc(t, 'dy_ascend')} CP`, '#ffc85c', true); }
   }
@@ -907,7 +928,8 @@ function setPos(e){
 }
 
 // ================= Economy & feedback =================
-function earn(g){ S.gold += g; S.runEarned += g; S.inc[S.incI] += g; }
+function earn(g){ S.gold += g; S.runEarned += g; S.inc[S.incI] += g; if (S.waveActive) S.lap.gold += g; }
+function earnCP(n){ S.cp += n; if (S.waveActive) S.lap.cp += n; }
 function addFx(f){ if (S.fx.length < 260) S.fx.push(f); }
 function addText(x, y, s, c, big){
   if (!big && S.fx.length > 150) return;
@@ -946,11 +968,17 @@ function hit(e, amt, src, mode){
   if (e.hp <= 0) kill(e, src);
   return dealt;
 }
+function merchMult(src){
+  if (!src) return 1;
+  let n = 0;
+  for (const m of S.towers) if (TOWERS[m.type].id === 'mint' && Math.hypot(m.x - src.x, m.y - src.y) <= TOWERS[m.type].range) n += mc(m, 'mint_merch');
+  return 1 + .4 * n;
+}
 function kill(e, src){
   e.dead = true;
   const ed = ENEMIES[e.type];
   const vip = src && hotAt(src) === 'vip' ? 1 + tileMult() : 1, night = weather() === 'night' ? 1.5 : 1;
-  const g = e.gold * vip * night;
+  const g = e.gold * vip * night * merchMult(src);
   earn(g);
   S.carKills++;
   if (src) { src.kills++; src.earned += g; }
@@ -966,7 +994,7 @@ function kill(e, src){
   if (e.boss) {
     S.bossKills++;
     const cp = 2 + Math.floor(S.wave / 25) + (S.season - 1);
-    S.cp += cp;
+    earnCP(cp);
     if (S.boss === e) S.boss = null;
     addText(e.x, e.y - .55, `${ed.name.toUpperCase()} DOWN · +${cp} CP`, '#ffc85c', true);
     burst(e.x, e.y, '#ffc85c', 20, 3);
@@ -1059,6 +1087,12 @@ function shotFired(t){
 }
 function updEcon(t, dt){
   const d = TOWERS[t.type];
+  if (d.id === 'mint') {
+    if (!S.waveActive || S.lightsT > 0) return;
+    t.cd += dt;
+    if (t.cd >= 1) { t.cd -= 1; const g = econPay(t); earn(g); t.earned += g; addText(t.x + .5, t.y + .1, '+$' + fmt(g), '#ffc85c'); }
+    return;
+  }
   if (d.id !== 'pit' || !S.waveActive || S.lightsT > 0) return;
   if (t.pitStop > 0) {
     t.pitStop -= dt;
@@ -1180,7 +1214,7 @@ function spirePulse(t, s, cars){
   }
   if (bf && t.pulses % 12 === 0) {
     const victims = S.enemies.filter(e => !e.dead && !e.boss).sort((a, b) => (b.hp + b.shield) - (a.hp + a.shield)).slice(0, Math.min(4, bf));
-    for (const e of victims) { e.shield = 0; e.hp = 0; kill(e, t); S.cp += 1; addText(e.x, e.y - .45, 'BLACK FLAG · +1 CP', '#16115e', true); }
+    for (const e of victims) { e.shield = 0; e.hp = 0; kill(e, t); earnCP(1); addText(e.x, e.y - .45, 'BLACK FLAG · +1 CP', '#16115e', true); }
   }
 }
 function dysonFire(t, s, cars, cx, cy){
@@ -1530,7 +1564,9 @@ function seasonFinale(){
   openSeasonEnd();
 }
 // A new run on a fresh circuit; CP, rank, unlocks and HQ upgrades stay.
+function clearDraft(){ ui.mutT = null; ui.mutQueue = 0; $('mut').classList.add('hidden'); }
 function newRun(){
+  clearDraft();
   const d = serialize();
   d.run = freshRun(d);
   S = makeState(d);
@@ -2482,7 +2518,8 @@ function refreshPanel(){
   let delta;
   if (econ) {
     const now = d.id === 'solar' ? solarPay(t) : econPay(t), next = d.id === 'solar' ? solarPay(t, t.lv + 1) : econPay(t, t.lv + 1);
-    setText($('pK1'), d.id === 'solar' ? 'Lap pay' : 'Payout'); setText($('pV1'), fmt(now));
+    setText($('pK1'), d.id === 'solar' ? 'Lap pay' : d.id === 'mint' ? 'Per sec' : 'Payout'); setText($('pV1'), fmt(now));
+    if (d.id === 'mint') { setText($('pK2'), 'Lap bonus'); setText($('pV2'), fmt(sponsorBonus(t))); setText($('pK3'), 'Radius'); setText($('pV3'), TOWERS[t.type].range.toFixed(1)); }
     if (d.id === 'wind') { setText($('pK2'), 'Charge'); setText($('pV2'), `${t.charge}/${windNeed(t)}`); setText($('pK3'), 'This lap'); setText($('pV3'), `${t.pays}/3`); }
     if (d.id === 'pit') { setText($('pK2'), 'Next PIT'); setText($('pV2'), t.pitWin > 0 ? 'NOW!' : S.waveActive ? Math.ceil(18 - t.pitCycle) + 's' : 'lap'); setText($('pK3'), 'This lap'); setText($('pV3'), `${t.pitsDone}/${pitCap(t)}`); }
     if (d.id === 'solar') { setText($('pK2'), 'Pads'); setText($('pV2'), solarPads(t).toFixed(0)); setText($('pK3'), 'Weather'); setText($('pV3'), Math.round(solarWeather(t) * 100) + '%'); }
@@ -2770,11 +2807,12 @@ $('bMin').onclick = () => {
 };
 document.addEventListener('keydown', ev => {
   if (!S || ui.home) return;
+  if (ev.key === 'Escape') { ui.build = null; closePanel(); closePrestige(); if (ui.hqMode) closeHQ(); return; }
+  if (ui.pres) return;                      // the race is paused behind the prestige sheet
   if (ev.code === 'Space') {
     if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
     ev.preventDefault(); startWave(); return;
   }
-  if (ev.key === 'Escape') { ui.build = null; closePanel(); closePrestige(); if (ui.hqMode) closeHQ(); return; }
   const i = HOTKEYS.indexOf(ev.key);
   if (i >= 0 && !S.over && TOWERS[i].pr <= S.prestige) { ui.build = ui.build === i ? null : i; closePanel(); }
 });
@@ -2873,12 +2911,16 @@ placeInPage();
 openHome();
 checkUpdates(false);
 let last = performance.now(), acc = 0, lastSave = 0;
+const CATCHUP_MAX = 300, CATCHUP_PER_FRAME = 2;  // seconds
 function frame(now){
-  const dt = Math.min((now - last) / 1000, .25);
+  const raw = (now - last) / 1000, dt = Math.min(raw, .25);
   last = now;
   ui.shake *= Math.exp(-dt * 12);
-  if (S && !ui.home && !S.over && !ui.mutT && !ui.season) {
-    acc += dt;
+  if (S && !ui.home && !S.over && !ui.mutT && !ui.season && !ui.pres) {
+    ui.catchup = Math.min(CATCHUP_MAX, (ui.catchup || 0) + raw - dt);
+    const extra = Math.min(ui.catchup, CATCHUP_PER_FRAME);
+    ui.catchup -= extra;
+    acc += dt + extra;
     while (acc >= STEP) { for (let i = 0; i < S.speed; i++) update(STEP); acc -= STEP; }
   } else acc = 0;
   if (S && !ui.min) render(now / 1000);
