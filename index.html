@@ -141,6 +141,7 @@ html.overlay .handle{-webkit-app-region:drag}
 .mh{font-weight:900;font-size:12px;letter-spacing:3px;color:var(--plum)}
 .msub{font-size:9px;color:var(--ink2)}
 .mopts{display:flex;gap:7px;width:100%}
+.mcol{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}.mcol .mc{width:100%}.mcol .msel{height:21px;margin:0}
 .mc{flex:1;min-height:104px;border-radius:5px;padding:8px 6px;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center;transition:transform .1s}
 .mc:hover{transform:translate(-2px,-2px);box-shadow:5px 5px 0 var(--ink)}
 .mc:active{transform:translate(2px,2px);box-shadow:none}
@@ -305,7 +306,7 @@ html.overlay .handle{-webkit-app-region:drag}
     <button id="bWave" class="ib go" title="Start next wave (Space)"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 2.8v10.4L13 8z"/></svg></button>
     <div class="seg full">
       <button id="bSpeed" class="ib" title="Game speed">1x</button>
-      <button id="bAuto" class="ib" title="Idle mode: starts laps and spends gold on the cheapest tower upgrade automatically">AUTO</button>
+      <button id="bAuto" class="ib" title="Auto-lap: start the next lap automatically">AUTO</button>
     </div>
     <button id="bSC" class="ib sc full" title="Deploy Safety Car: 75% global slow for 6s (45s cooldown)">SC</button>
     <button id="bPres" class="ib pres full" title="Prestige"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 1.5h7v1.6h2.6v1.6a3 3 0 0 1-2.9 3A4 4 0 0 1 9 10v1.6h2.2v2.9H4.8v-2.9H7V10a4 4 0 0 1-2.2-2.3 3 3 0 0 1-2.9-3V3.1h2.6zM3.4 4.6v.1c0 .7.5 1.3 1.1 1.4V4.6zm9.2 0h-1.1v1.5c.6-.1 1.1-.7 1.1-1.4z"/></svg><span>Prestige</span></button>
@@ -329,13 +330,13 @@ html.overlay .handle{-webkit-app-region:drag}
       <div id="pDelta" class="pdelta"></div>
       </div>
       <div class="uprow"><button id="pUp" class="btn up fit"></button><button id="pMax" class="btn up max fit" title="Buy every level you can afford">MAX</button></div>
-      <div class="prow"><button id="pSell" class="btn sell fit"></button><button id="pOD" class="btn sm od fit" title="Push Lap: +60% fire rate for 4s (20s cooldown, Lv 5+)">Push Lap</button><button id="pAuto" class="btn sm fit" title="Auto-pick mutations for idle play"></button></div>
+      <div class="prow"><button id="pSell" class="btn sell fit"></button><button id="pOD" class="btn sm od fit" title="Push Lap: +60% fire rate for 4s (20s cooldown, Lv 5+)">Push Lap</button><button id="pSel" class="btn sm fit" title="Pinned mutation: applied automatically on every mutation of this tower. Click to unpin."></button></div>
     </div>
     <div id="mut" class="ovl hidden">
       <div class="mh">✦ MUTATION <span id="mTitle"></span></div>
       <div id="mSub" class="msub"></div>
       <div id="mOpts" class="mopts"></div>
-      <div class="prow"><button id="mReroll" class="btn sm" title="Reshuffle this draft (rerolls come from Constructors' HQ)"></button><button id="mAuto" class="btn sm" title="Auto-pick mutations for idle play (spreads picks evenly)"></button></div>
+      <div class="prow"><button id="mReroll" class="btn sm" title="Reshuffle this draft (rerolls come from Constructors' HQ)"></button></div>
     </div>
     <div id="pres" class="ovl hidden">
       <div class="pr-head">
@@ -636,15 +637,15 @@ const G = { aura:0, slow:0 }; // circuit-wide effects recomputed every step
 
 function makeTower(type, x, y, paid){
   return { type, x, y, lv:1, kills:0, earned:0, muts:[], invested:paid, cd:0, buff:1, aura:0, haste:0, lock:0, target:null, extra:[], beams:[],
-    harvest:0, pulses:0, vscT:15, fieldR:0, prio:'first', odT:0, odCD:0, jamT:0, shots:0, charge:0, pays:0, pitCycle:0, pitWin:0, pitStop:0, pitFull:false, pitsDone:0, ang:-Math.PI / 2, recoil:0, flash:0 };
+    harvest:0, pulses:0, vscT:15, fieldR:0, prio:'first', odT:0, odCD:0, jamT:0, shots:0, charge:0, pays:0, pitCycle:0, pitWin:0, pitStop:0, pitFull:false, pitsDone:0, mutSel:null, ang:-Math.PI / 2, recoil:0, flash:0 };
 }
 function makeState(d){
   const r = d.run;
   return {
     slot:d.slot, name:d.name, created:d.created, season:d.season, prestige:d.prestige, cp:d.cp, hq:{ ...d.hq }, best:d.best,
-    speed:d.speed, auto:d.auto, autoMut:d.autoMut,
+    speed:d.speed, auto:d.auto,
     seed:r.seed, gold:r.gold, lives:r.lives, wave:r.wave, endless:r.endless, rerolls:r.rerolls, bossKills:r.bossKills, carKills:r.carKills, runEarned:r.runEarned, resist:r.resist,
-    towers:r.towers.map(t => ({ ...makeTower(TOWER_INDEX[t.id], t.x, t.y, t.invested), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), prio:t.prio })),
+    towers:r.towers.map(t => ({ ...makeTower(TOWER_INDEX[t.id], t.x, t.y, t.invested), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), prio:t.prio, mutSel:t.mutSel || null })),
     waveActive:false, enemies:[], projs:[], hazards:[], fx:[], parts:[], drones:[], detQ:[], q:[], nextQ:null, waveTotal:0, lightsT:0, goT:0, spawnT:0, autoT:1.5, time:0,
     inc:new Array(10).fill(0), incI:0, incT:0, dmgCat:{}, scT:0, scCD:0, boss:null,
     over:r.lives <= 0, banner:null, coreFlash:0, hot:[],
@@ -655,14 +656,14 @@ function freshRun(career){
     bossKills:0, carKills:0, runEarned:0, resist:null, towers:[] };
 }
 function newCareer(slot, name){
-  const c = { v:3, slot, name:name || `Team ${slot}`, created:Date.now(), season:1, prestige:0, cp:0, hq:{}, best:0, speed:1, auto:false, autoMut:false };
+  const c = { v:3, slot, name:name || `Team ${slot}`, created:Date.now(), season:1, prestige:0, cp:0, hq:{}, best:0, speed:1, auto:false };
   c.run = freshRun(c);
   return c;
 }
 function serialize(){
-  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto, autoMut:S.autoMut,
+  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto,
     run:{ seed:S.seed, gold:S.gold, lives:S.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:S.bossKills, carKills:S.carKills, runEarned:S.runEarned, resist:S.resist,
-      towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested, prio:t.prio })) } };
+      towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested, prio:t.prio, mutSel:t.mutSel })) } };
 }
 function save(){
   savePrefs();
@@ -695,7 +696,7 @@ function openSlot(n){
   if (!d) throw new Error(`Slot ${n} is empty`);
   S = makeState(d);
   setMap(S.seed);
-  for (const t of S.towers) while (t.muts.length < Math.floor(t.lv / 5)) t.muts.push(autoPick(t));
+  for (const t of S.towers) while (t.muts.length < Math.floor(t.lv / 5)) t.muts.push(t.mutSel || autoPick(t));
   ui.home = false; ui.build = null; ui.sel = null;
   if (S.over) gameOver();
   save();
@@ -1483,7 +1484,6 @@ function update(dt){
     if (S.spawnT <= 0) { const it = S.q.shift(); spawnEnemy(it.ty); S.spawnT = S.q.length ? S.q[0].gap : 0; }
   }
   if (!S.waveActive && S.auto && !ui.season) { S.autoT -= dt; if (S.autoT <= 0) startWave(); }
-  if (S.auto) autoUpgrade(dt);
   applyBuffs();
   applyDraft();
   updLighting();
@@ -1590,15 +1590,6 @@ function levelUp(t){
   burst(t.x + .5, t.y + .5, '#ffc85c', 10, 2);
   return t.lv % 5 === 0;
 }
-// Idle play: while AUTO is on, buy one level on the cheapest tower every half second; drafts auto-pick.
-function autoUpgrade(dt){
-  ui.autoUpT = (ui.autoUpT || 0) - dt;
-  if (ui.autoUpT > 0 || !S.towers.length) return;
-  ui.autoUpT = .5;
-  const t = S.towers.reduce((a, x) => upCost(x) < upCost(a) ? x : a);
-  if (S.gold < upCost(t)) return;
-  if (levelUp(t)) applyMut(t, autoPick(t));
-}
 function upgrade(t){
   if (S.gold < upCost(t)) return;
   if (levelUp(t)) queueMutations(t, 1);
@@ -1614,7 +1605,7 @@ function upgradeMax(t){
   save();
 }
 function queueMutations(t, n){
-  if (S.autoMut) { for (let i = 0; i < n; i++) applyMut(t, autoPick(t)); return; }
+  if (t.mutSel) { for (let i = 0; i < n; i++) applyMut(t, t.mutSel); return; }
   ui.mutQueue += n;
   if (!ui.mutT) openMut(t);
 }
@@ -2516,8 +2507,8 @@ function refreshPanel(){
   od.disabled = t.lv < 5 || t.odCD > 0;
   od.classList.toggle('on', t.odT > 0);
   setText(od, t.lv < 5 ? 'Push Lv5' : t.odT > 0 ? 'PUSHING' : t.odCD > 0 ? `Push ${Math.ceil(t.odCD)}s` : 'Push');
-  setText($('pAuto'), `Auto ${S.autoMut ? 'ON' : 'OFF'}`);
-  $('pAuto').classList.toggle('on', S.autoMut);
+  $('pSel').classList.toggle('hidden', !t.mutSel);
+  if (t.mutSel) setText($('pSel'), `📌 ${MUT_BY_ID[t.mutSel].name} ✕`);
 }
 // ---------------- Mutation drafts (shown one by one for every earned pick) ----------------
 function openMut(t){
@@ -2528,21 +2519,30 @@ function openMut(t){
   renderMutOpts();
   $('mut').classList.remove('hidden');
 }
+// Apply one draft pick; a pinned mutation also fills every remaining queued draft.
+function pickMut(t, id){
+  applyMut(t, id);
+  ui.mutQueue = Math.max(0, ui.mutQueue - 1);
+  if (t.mutSel) { while (ui.mutQueue > 0) { applyMut(t, t.mutSel); ui.mutQueue--; } }
+  if (ui.mutQueue > 0) { openMut(t); return; }
+  ui.mutT = null; $('mut').classList.add('hidden');
+  if (ui.sel) $('panel').classList.remove('hidden');
+}
 function renderMutOpts(){
   const box = $('mOpts'), t = ui.mutT, eco = isMint(t);
   box.innerHTML = '';
   for (const o of ui.mutOpts) {
-    const n = mc(t, o.id), b = document.createElement('button');
+    const n = mc(t, o.id), col = document.createElement('div'), b = document.createElement('button'), sel = document.createElement('button');
+    col.className = 'mcol';
     b.className = 'mc glass' + (eco ? ' eco' : '');
     b.innerHTML = `<span class="i">${o.icon}</span><span class="t">${o.name}</span><span class="d">${o.desc}</span><span class="m">${n ? 'OWNED ×' + n + ' · ' : ''}+${Math.round((MUT_POWER - 1) * 100)}% ${eco ? 'PAY' : 'DMG'}</span>`;
-    b.onclick = () => {
-      applyMut(t, o.id);
-      ui.mutQueue = Math.max(0, ui.mutQueue - 1);
-      if (ui.mutQueue > 0) { openMut(t); return; }
-      ui.mutT = null; $('mut').classList.add('hidden');
-      if (ui.sel) $('panel').classList.remove('hidden');
-    };
-    box.append(b);
+    b.onclick = () => pickMut(t, o.id);
+    sel.className = 'btn sm msel';
+    sel.textContent = '📌 Select';
+    sel.title = 'Pick this now and every time this tower mutates';
+    sel.onclick = () => { t.mutSel = o.id; pickMut(t, o.id); };
+    col.append(b, sel);
+    box.append(col);
   }
 }
 // ---------------- Prestige, season finale, Constructors' HQ ----------------
@@ -2720,8 +2720,6 @@ function updateUI(){
   if (ui.hqMode) refreshHQ();
   if (ui.sel) refreshPanel();
   if (ui.mutT) {
-    setText($('mAuto'), `Auto-mut ${S.autoMut ? 'ON' : 'OFF'}`);
-    $('mAuto').classList.toggle('on', S.autoMut);
     const r = $('mReroll'); r.classList.toggle('hidden', hq('draft4') > 0 || hq('reroll') === 0);
     r.disabled = S.rerolls < 1; setText(r, `↻ Reroll (${S.rerolls})`);
   }
@@ -2749,7 +2747,7 @@ $('pUp').onclick = () => upgrade(ui.sel);
 $('pMax').onclick = () => upgradeMax(ui.sel);
 $('pOD').onclick = () => pushLap(ui.sel);
 $('pSell').onclick = () => sell(ui.sel);
-$('pAuto').onclick = $('mAuto').onclick = () => { S.autoMut = !S.autoMut; save(); };
+$('pSel').onclick = () => { ui.sel.mutSel = null; save(); };
 $('mReroll').onclick = () => { if (S.rerolls < 1) return; S.rerolls--; ui.mutOpts = draftOptions(ui.mutT); renderMutOpts(); save(); };
 $('bWave').onclick = startWave;
 $('bSpeed').onclick = () => { S.speed = S.speed % 3 + 1; save(); };

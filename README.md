@@ -50,7 +50,8 @@ The game also updates itself. At start-up it compares its version with the `inde
 | Cancel | Right-click or `Esc` |
 | Start the next lap | `▶` or `Space` |
 | Speed | `1x·2x·3x` |
-| Idle mode | `AUTO`: starts laps and spends gold on the cheapest upgrade; mutations auto-pick |
+| Auto-lap | `AUTO` starts the next lap automatically |
+| Pin a mutation | `📌 Select` under a mutation picks it now and on every later mutation of that tower; `📌 … ✕` in the inspector unpins |
 | Safety Car | `SC`: cars slow by 75% for 6 s, 45 s cooldown |
 | Prestige | `🏆 Prestige` |
 | Save slots | `☰` returns to the home screen |
@@ -69,7 +70,7 @@ The game also updates itself. At start-up it compares its version with the `inde
 
   Locked towers show their rank on the dock.
 - **Tower cap:** you can field 5 towers, plus 1 per prestige rank and 1 per Pit Garage Expansion.
-- **Levels:** every level costs 1.6× the last and gives about +30% power, plus tower perks (extra barrels, more chain jumps, rail pierce, flak fragments and more). The inspector previews the next level's change. Lv3 unlocks target priority. Lv5 unlocks **Push Lap** (+60% fire rate for 4 s, 20 s cooldown) and the first **mutation draft**. You choose 1 of 3 mutations (4 with HQ), and a mutation can be stacked. `MAX` buys every level you can afford, then shows each earned draft one at a time.
+- **Levels:** every level costs 1.6× the last and gives about +30% power, plus tower perks (extra barrels, more chain jumps, rail pierce, flak fragments and more). The inspector previews the next level's change. Lv3 unlocks target priority. Lv5 unlocks **Push Lap** (+60% fire rate for 4 s, 20 s cooldown) and the first **mutation draft**. You choose 1 of 3 mutations (4 with HQ), and a mutation can be stacked. Press **📌 Select** under a mutation to pin it: that tower then takes it automatically every time it mutates, until you unpin it in the inspector. `MAX` buys every level you can afford, then shows each earned draft one at a time (or applies the pinned mutation).
 - **Economy without car money:** kill and lap gold grow slowly (`13.5 × 1.08^lap`). Three towers make money:
   - **Trackside Wind Tunnel:** charges from 30 shots by adjacent towers and pays out at most 3 times a lap.
   - **Pit-Crew Gantry:** every 18 s a 3.5 s PIT window opens. Click it for a full payout; a missed window pays 30%. At most 2 pit stops a lap.
