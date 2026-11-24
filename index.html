@@ -105,8 +105,8 @@ html.overlay .handle{-webkit-app-region:drag}
 .ph{display:flex;align-items:center;gap:7px;margin-bottom:7px;padding-bottom:7px;border-bottom:var(--rule)}
 #pIcon{width:28px;height:28px;flex:none;border-radius:3px;background:#120e4d;border:var(--rule)}
 .pt{flex:1;min-width:0;line-height:1.2}
-.nm{font-weight:800;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.role{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3)}
+.nm{font-weight:800;font-size:11.5px;white-space:nowrap;overflow:hidden}
+.role{font-size:8px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);white-space:nowrap;overflow:hidden}
 .badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:1px 5px;border:var(--rule);border-radius:3px;color:var(--ink)}
 .x{width:20px;height:20px;border-radius:3px;color:var(--ink2);font-size:15px;line-height:20px;text-align:center;overflow:hidden}
 .x:hover{background:var(--ink);color:var(--paper)}
@@ -170,11 +170,11 @@ html.overlay .handle{-webkit-app-region:drag}
 .slot{border:var(--rule);border-radius:4px;background:var(--paper2);padding:5px 7px;display:flex;flex-direction:column;gap:3px;flex:none}
 .sl-top{display:flex;align-items:center;gap:5px}
 .sl-n{font-family:var(--mono);font-size:9px;font-weight:700;width:15px;height:15px;flex:none;display:grid;place-items:center;background:var(--ink);color:var(--paper);border-radius:3px}
-.sl-name{font-weight:800;font-size:11px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-name{font-weight:800;font-size:11px;flex:1;min-width:0;white-space:nowrap;overflow:hidden}
 .sl-name input{width:100%;font:inherit;border:1px solid var(--ink);border-radius:3px;padding:0 3px;background:var(--paper)}
 .sl-ren{color:var(--ink2);font-size:11px;width:18px;height:18px;border-radius:3px;flex:none}.sl-ren:hover{background:var(--paper3)}
 .sl-rank{font-family:var(--mono);font-size:9px;font-weight:700;padding:0 5px;border-radius:3px;background:var(--ochre);border:1px solid var(--ink);flex:none}
-.sl-meta{font-family:var(--mono);font-size:9px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sl-meta{font-family:var(--mono);font-size:9px;color:var(--ink2);white-space:nowrap;overflow:hidden}
 .sl-btns{display:flex;gap:4px}.sl-btns .btn{height:21px;font-size:9.5px;margin:0}.sl-btns .sl-go{flex:2}.sl-btns .sl-exp{flex:0 0 26px}.sl-btns .sl-del{flex:1}
 .slot.empty{background:transparent;border-style:dashed}
 .sl-empty{font-family:var(--mono);font-size:9.5px;color:var(--ink3);text-align:center}
@@ -189,8 +189,16 @@ html.overlay .handle{-webkit-app-region:drag}
 .upd-t{font-weight:900;letter-spacing:3px;font-size:12px}.upd-v{font-family:var(--mono);font-size:11px}.upd-n{font-size:9px;color:var(--ink2)}
 .upd-card .prow .btn.sm{flex:0 0 70px}
 /* ---------- Inspector extras ---------- */
-#panel{max-height:212px;overflow-y:auto;scrollbar-width:none}
-.pdelta{font-family:var(--mono);font-size:8.5px;color:var(--ink2);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#panel{max-height:212px;display:flex;flex-direction:column;overflow:hidden}
+#panel>.ph,#panel>.uprow,#panel>.prow{flex:none}
+.pbody{flex:1;min-height:0;overflow-y:auto;scrollbar-width:thin;margin-right:-4px;padding-right:4px;padding-bottom:6px;-webkit-mask-image:linear-gradient(#000 calc(100% - 12px),transparent);mask-image:linear-gradient(#000 calc(100% - 12px),transparent)}
+#panel .pl .badge{margin-left:5px;font-size:8px;padding:0 4px}
+#panel .btn{white-space:nowrap;overflow:hidden;height:22px}
+#panel .prow{gap:4px}#panel .prow .btn{width:auto;flex:1 1 auto;min-width:0;padding-left:3px;padding-right:3px;font-size:9px}
+#panel .role{letter-spacing:.5px}
+#panel .pdelta{white-space:normal}
+#panel .nm{font-size:10.5px;white-space:normal;line-height:1.15;overflow:visible}
+.pdelta{font-family:var(--mono);font-size:8.5px;color:var(--ink2);margin-bottom:4px;white-space:nowrap;overflow:hidden}
 .pdelta b{color:var(--moss)}
 .uprow{display:flex;gap:5px;margin-bottom:6px}.uprow .btn{margin:0}.uprow #pUp{flex:1}.uprow #pMax{flex:0 0 42px}
 .prio{display:flex;gap:3px;margin-bottom:5px}.prio button{flex:1;height:17px;font-size:8px;font-weight:700;border:1px solid var(--ink);border-radius:3px;background:var(--paper);white-space:nowrap}
@@ -214,7 +222,7 @@ html.overlay .handle{-webkit-app-region:drag}
 .hq-card{display:flex;flex-direction:column;gap:1px;padding:4px 6px;border:var(--rule);border-radius:4px;background:var(--paper2);min-width:0}
 .hq-card .hn{display:flex;align-items:center;gap:4px;font-weight:800;font-size:9.5px;white-space:nowrap;overflow:hidden}
 .hq-card .hn i{font-style:normal;width:15px;height:15px;flex:none;display:grid;place-items:center;border-radius:3px;background:var(--ink);color:var(--paper);font-size:9px}
-.hq-card .hd{font-size:8.5px;color:var(--ink2);line-height:1.25;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hq-card .hd{font-size:8.5px;color:var(--ink2);line-height:1.25;flex:1}
 .hq-card .btn{height:18px;font-size:9px}
 .hq-card.maxed{opacity:.6}
 /* ---------- Prestige ---------- */
@@ -297,7 +305,7 @@ html.overlay .handle{-webkit-app-region:drag}
     <button id="bWave" class="ib go" title="Start next wave (Space)"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 2.8v10.4L13 8z"/></svg></button>
     <div class="seg full">
       <button id="bSpeed" class="ib" title="Game speed">1x</button>
-      <button id="bAuto" class="ib" title="Auto-wave: start the next wave automatically">AUTO</button>
+      <button id="bAuto" class="ib" title="Idle mode: starts laps and spends gold on the cheapest tower upgrade automatically">AUTO</button>
     </div>
     <button id="bSC" class="ib sc full" title="Deploy Safety Car: 75% global slow for 6s (45s cooldown)">SC</button>
     <button id="bPres" class="ib pres full" title="Prestige"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 1.5h7v1.6h2.6v1.6a3 3 0 0 1-2.9 3A4 4 0 0 1 9 10v1.6h2.2v2.9H4.8v-2.9H7V10a4 4 0 0 1-2.2-2.3 3 3 0 0 1-2.9-3V3.1h2.6zM3.4 4.6v.1c0 .7.5 1.3 1.1 1.4V4.6zm9.2 0h-1.1v1.5c.6-.1 1.1-.7 1.1-1.4z"/></svg><span>Prestige</span></button>
@@ -307,8 +315,9 @@ html.overlay .handle{-webkit-app-region:drag}
   <div id="stage" class="full">
     <canvas id="cv"></canvas>
     <div id="panel" class="glass ovl hidden">
-      <div class="ph"><canvas id="pIcon"></canvas><div class="pt"><div id="pName" class="nm"></div><div id="pRole" class="role"></div></div><span id="pTier" class="badge"></span><button id="pClose" class="x" title="Close">×</button></div>
-      <div class="prog"><div class="pl"><span>Level <b id="pLv"></b></span><span id="pNext"></span></div><div class="track"><div id="pBar" class="fill"></div></div></div>
+      <div class="ph"><canvas id="pIcon"></canvas><div class="pt"><div id="pName" class="nm"></div><div id="pRole" class="role fit"></div></div><button id="pClose" class="x" title="Close">×</button></div>
+      <div class="pbody">
+      <div class="prog"><div class="pl"><span>Level <b id="pLv"></b><span id="pTier" class="badge"></span></span><span id="pNext"></span></div><div class="track"><div id="pBar" class="fill"></div></div></div>
       <div class="sg">
         <div class="sc"><span id="pK1"></span><b id="pV1"></b></div>
         <div class="sc"><span id="pK2"></span><b id="pV2"></b></div>
@@ -318,8 +327,9 @@ html.overlay .handle{-webkit-app-region:drag}
       <div id="pMuts" class="muts"></div>
       <div id="pPrio" class="prio"></div>
       <div id="pDelta" class="pdelta"></div>
-      <div class="uprow"><button id="pUp" class="btn up"></button><button id="pMax" class="btn up max" title="Buy every level you can afford">MAX</button></div>
-      <div class="prow"><button id="pSell" class="btn sell"></button><button id="pOD" class="btn sm od" title="Push Lap: +60% fire rate for 4s (20s cooldown, Lv 5+)">Push Lap</button><button id="pAuto" class="btn sm" title="Auto-pick mutations for idle play"></button></div>
+      </div>
+      <div class="uprow"><button id="pUp" class="btn up fit"></button><button id="pMax" class="btn up max fit" title="Buy every level you can afford">MAX</button></div>
+      <div class="prow"><button id="pSell" class="btn sell fit"></button><button id="pOD" class="btn sm od fit" title="Push Lap: +60% fire rate for 4s (20s cooldown, Lv 5+)">Push Lap</button><button id="pAuto" class="btn sm fit" title="Auto-pick mutations for idle play"></button></div>
     </div>
     <div id="mut" class="ovl hidden">
       <div class="mh">✦ MUTATION <span id="mTitle"></span></div>
@@ -533,11 +543,11 @@ const ENEMIES = {
   stealth:  { name:'Night-Race Stealth Prototype', hp:1.8, spd:1.25, armor:.1, gold:2.2, leak:2, size:.22, body:'#14151c', accent:'#8f86ff', stealth:true },
   holo:     { name:'Hologram Decoy Racer', hp:2.2, spd:1.05, armor:.1, gold:2.5, leak:2, size:.22, body:'#5ef0ff', accent:'#ff9bc0', holo:true },
   decoy:    { name:'Hologram Decoy',      hp:.1,  spd:1.8,  armor:0,   gold:.3,  leak:1, size:.16, body:'#bdf7ff', accent:'#ffffff' },
-  escort:   { name:'Armoured Interceptor', hp:1,  spd:.9,   armor:.5,  gold:.5,  leak:2, size:.21, body:'#4a4f58', accent:'#ff653f', heavy:true },
-  boss_arrow:   { name:'Silver Arrow V12',         hp:40, spd:.5,  armor:.25, gold:25, leak:10, size:.4,  body:'#c9ced6', accent:'#00d2be', boss:'arrow' },
-  boss_jugg:    { name:'Scuderia Juggernaut',      hp:55, spd:.38, armor:.3,  gold:30, leak:10, size:.42, body:'#d40000', accent:'#ffe24a', boss:'jugg' },
-  boss_phantom: { name:'Apex Phantom X',           hp:45, spd:.5,  armor:.25, gold:30, leak:10, size:.4,  body:'#22113d', accent:'#b07cff', boss:'phantom' },
-  boss_levi:    { name:'The Grand Prix Leviathan', hp:70, spd:.42, armor:.3,  gold:40, leak:10, size:.44, body:'#1c1c1e', accent:'#d4af37', boss:'levi' },
+  escort:   { name:'Armoured Interceptor', hp:1,  spd:.9,   armor:.5,  gold:.5,  leak:1, size:.21, body:'#4a4f58', accent:'#ff653f', heavy:true },
+  boss_arrow:   { name:'Silver Arrow V12',         hp:16, spd:.5,  armor:.25, gold:25, leak:5, size:.4,  body:'#c9ced6', accent:'#00d2be', boss:'arrow' },
+  boss_jugg:    { name:'Scuderia Juggernaut',      hp:22, spd:.38, armor:.3,  gold:30, leak:5, size:.42, body:'#d40000', accent:'#ffe24a', boss:'jugg' },
+  boss_phantom: { name:'Apex Phantom X',           hp:18, spd:.5,  armor:.25, gold:30, leak:5, size:.4,  body:'#22113d', accent:'#b07cff', boss:'phantom' },
+  boss_levi:    { name:'The Grand Prix Leviathan', hp:28, spd:.42, armor:.3,  gold:40, leak:5, size:.44, body:'#1c1c1e', accent:'#d4af37', boss:'levi' },
 };
 const WEATHERS = { sun:{ name:'Clear Sun', icon:'☀' }, rain:{ name:'Torrential Rain', icon:'☂' }, night:{ name:'Night Race', icon:'☾' } };
 const HOTZONES = { drs:{ name:'DRS Straight Pad', icon:'»', c:'#5ef0ff', desc:'+40% attack speed' }, stand:{ name:'Elevated Grandstand', icon:'▲', c:'#ffc85c', desc:'+50% range, +25% crit' }, vip:{ name:'VIP Paddock Tile', icon:'$', c:'#7fd18b', desc:'+100% payout' } };
@@ -807,7 +817,7 @@ function nextPerk(t){
 // ================= Waves =================
 const seasonMult = () => Math.pow(1.35, S.season - 1);
 const hpScale = w => 15 * Math.pow(1.18, w - 1) * seasonMult();
-const goldScale = w => 4.5 * Math.pow(1.08, w - 1);    // nerfed: slower growth than the old 5 * 1.115^w
+const goldScale = w => 13.5 * Math.pow(1.08, w - 1);   // slower growth than the old 5 * 1.115^w
 const isBossWave = w => w % 10 === 0 || w === SEASON_LEN;
 function bossFor(w){
   if (w === SEASON_LEN || w >= 50) return 'boss_levi';
@@ -1473,6 +1483,7 @@ function update(dt){
     if (S.spawnT <= 0) { const it = S.q.shift(); spawnEnemy(it.ty); S.spawnT = S.q.length ? S.q[0].gap : 0; }
   }
   if (!S.waveActive && S.auto && !ui.season) { S.autoT -= dt; if (S.autoT <= 0) startWave(); }
+  if (S.auto) autoUpgrade(dt);
   applyBuffs();
   applyDraft();
   updLighting();
@@ -1578,6 +1589,15 @@ function levelUp(t){
   addFx({ k:'ring', x:t.x + .5, y:t.y + .5, r:1.4, c:'#ffc85c', t:.5, life:.5, w:2.5 });
   burst(t.x + .5, t.y + .5, '#ffc85c', 10, 2);
   return t.lv % 5 === 0;
+}
+// Idle play: while AUTO is on, buy one level on the cheapest tower every half second; drafts auto-pick.
+function autoUpgrade(dt){
+  ui.autoUpT = (ui.autoUpT || 0) - dt;
+  if (ui.autoUpT > 0 || !S.towers.length) return;
+  ui.autoUpT = .5;
+  const t = S.towers.reduce((a, x) => upCost(x) < upCost(a) ? x : a);
+  if (S.gold < upCost(t)) return;
+  if (levelUp(t)) applyMut(t, autoPick(t));
 }
 function upgrade(t){
   if (S.gold < upCost(t)) return;
@@ -2387,7 +2407,15 @@ function drawLapHud(){
 }
 
 // ================= UI =================
-function setText(el, v){ if (el._v !== v) { el._v = v; el.textContent = v; } }
+function setText(el, v){ if (el._v !== v) { el._v = v; el.textContent = v; if (el.classList.contains('fit')) fitText(el); } }
+// Shrink a label's font until its text fits on one line (no ellipsis anywhere).
+function fitText(el){
+  if (!el.offsetParent) return;
+  el.style.fontSize = '';
+  let px = parseFloat(getComputedStyle(el).fontSize);
+  while (el.scrollWidth > el.clientWidth + .5 && px > 6) { px -= .5; el.style.fontSize = px + 'px'; }
+}
+function fitAll(root){ for (const el of root.querySelectorAll('.fit')) fitText(el); }
 function iconCanvas(cvs, type, size, tier){
   cvs.width = cvs.height = size * RS;
   const g = cvs.getContext('2d');
@@ -2437,6 +2465,7 @@ function openPanel(t){
   p.classList.remove('hidden');
   $('pMuts')._k = null; $('pPrio')._k = null;
   refreshPanel();
+  fitAll(p);
 }
 function closePanel(){ ui.sel = null; $('panel').classList.add('hidden'); }
 function refreshPanel(){
@@ -2477,7 +2506,7 @@ function refreshPanel(){
   const pd = $('pDelta'); if (pd._v !== delta) { pd._v = delta; pd.innerHTML = delta; }
   setText($('pV4'), fmt(t.earned));
   const c = upCost(t), up = $('pUp'), mutNext = (t.lv + 1) % 5 === 0;
-  setText(up, `${mutNext ? '✦ Mutate' : '▲ Upgrade'} → Lv ${t.lv + 1} · $${fmt(c)}`);
+  setText(up, `${mutNext ? '✦' : '▲'} Lv ${t.lv + 1} · $${fmt(c)}`);
   up.classList.toggle('mut', mutNext);
   up.disabled = S.gold < c;
   $('pMax').disabled = S.gold < c;
@@ -2486,8 +2515,8 @@ function refreshPanel(){
   od.classList.toggle('hidden', econ);
   od.disabled = t.lv < 5 || t.odCD > 0;
   od.classList.toggle('on', t.odT > 0);
-  setText(od, t.lv < 5 ? 'Push · Lv5' : t.odT > 0 ? 'PUSHING' : t.odCD > 0 ? `Push ${Math.ceil(t.odCD)}s` : 'Push Lap');
-  setText($('pAuto'), `Auto-mut ${S.autoMut ? 'ON' : 'OFF'}`);
+  setText(od, t.lv < 5 ? 'Push Lv5' : t.odT > 0 ? 'PUSHING' : t.odCD > 0 ? `Push ${Math.ceil(t.odCD)}s` : 'Push');
+  setText($('pAuto'), `Auto ${S.autoMut ? 'ON' : 'OFF'}`);
   $('pAuto').classList.toggle('on', S.autoMut);
 }
 // ---------------- Mutation drafts (shown one by one for every earned pick) ----------------
@@ -2548,12 +2577,12 @@ function closeSeasonEnd(){ $('season').classList.add('hidden'); }
 const hqCards = HQ.map(u => {
   const el = document.createElement('div');
   el.className = 'hq-card';
-  el.innerHTML = `<div class="hn"><i>${u.icon}</i><span>${u.name}</span></div><div class="hd"></div><button class="btn"></button>`;
+  el.innerHTML = `<div class="hn"><i>${u.icon}</i><span>${u.name}</span></div><div class="hd"></div><button class="btn fit"></button>`;
   el.querySelector('button').onclick = () => buyHQ(u.id);
   $('hqGrid').append(el);
   return { u, el, desc:el.querySelector('.hd'), btn:el.querySelector('button') };
 });
-function openHQ(mode){ ui.hqMode = mode; closePanel(); closePrestige(); $('hq').classList.remove('hidden'); refreshHQ(); }
+function openHQ(mode){ ui.hqMode = mode; closePanel(); closePrestige(); $('hq').classList.remove('hidden'); refreshHQ(); fitAll($('hq')); }
 function closeHQ(){ ui.hqMode = null; $('hq').classList.add('hidden'); }
 function refreshHQ(){
   setText($('hqCP'), String(S.cp));
@@ -2573,8 +2602,8 @@ function openHome(){
   if (S) save();
   ui.home = true; closePanel(); closePrestige(); closeHQ(); tip.classList.add('hidden');
   if (ui.min) { ui.min = false; wEl.classList.remove('min'); placeInPage(); fitWindow(); }
-  renderHome();
   $('home').classList.remove('hidden');
+  renderHome();
 }
 function closeHome(){ if (!S) return; ui.home = false; $('home').classList.add('hidden'); }
 function homeMsg(m){ setText($('hmMsg'), m); }
@@ -2590,8 +2619,8 @@ function renderHome(){
     const d = readSlot(n), el = document.createElement('div');
     if (d) {
       el.className = 'slot';
-      el.innerHTML = `<div class="sl-top"><span class="sl-n">${n}</span><span class="sl-name"></span><button class="sl-ren" title="Rename">✎</button><span class="sl-rank" title="${rankName(d.prestige)}">P${d.prestige}</span></div>
-        <div class="sl-meta">Season ${d.season} · Lap ${d.run.wave}/${SEASON_LEN} · Best ${d.best} · ${d.cp} CP · $${fmt(d.run.gold)}</div>
+      el.innerHTML = `<div class="sl-top"><span class="sl-n">${n}</span><span class="sl-name fit"></span><button class="sl-ren" title="Rename">✎</button><span class="sl-rank" title="${rankName(d.prestige)}">P${d.prestige}</span></div>
+        <div class="sl-meta fit">Season ${d.season} · Lap ${d.run.wave}/${SEASON_LEN} · Best ${d.best} · ${d.cp} CP · $${fmt(d.run.gold)}</div>
         <div class="sl-btns"><button class="btn up sl-go">▶ Continue</button><button class="btn sm sl-exp" title="Export this save">⇪</button><button class="btn sell sl-del">Delete</button></div>`;
       el.querySelector('.sl-name').textContent = d.name;
       el.querySelector('.sl-go').onclick = () => { openSlot(n); closeHome(); };
@@ -2618,6 +2647,7 @@ function renderHome(){
     }
     box.append(el);
   }
+  fitAll(box);
 }
 function exportSlot(n){
   const d = readSlot(n);
