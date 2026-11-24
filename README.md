@@ -59,8 +59,8 @@ The game also updates itself. At start-up it compares its version with the `inde
 - **Five save slots:** the home screen lists five garage slots. Each has a name, season, lap, best lap, CP and gold. You can rename, export or delete a slot (deleting asks twice) and import a save into the first empty slot. **Continue Last Session** reopens the slot you played last. Old single saves move into Slot 1 as "Legacy Team".
 - **Random circuits:** every run gets a new winding 12×7 Grand Prix layout with kerbs, gravel traps, a starting grid under a five-light gantry and a chequered finish. Two or three **hot-zone tiles** sit next to the track: **DRS** (+40% attack speed), **Grandstand** (+50% range, +25% crit chance) and **VIP** (+100% kill payout).
 - **19 trackside towers, unlocked by prestige rank:**
-  - P0: Wheel Gun $100, Marshal $350, Tyres $1K, Wind Tunnel $900, ERS $3.6K
-  - P1: Fuel $11K, Radar $32K, Pit Crew $90K, Timing $85K
+  - P0: Wheel Gun $100, Marshal $350, Tyres $1K, Wind Tunnel $1.1K, ERS $3.6K
+  - P1: Fuel $11K, Radar $32K, Pit Crew $90K, Timing $100K
   - P2: Mortar $240K, Race Control $650K, EMP $1.8M
   - P3: Singularity $5.5M, Solar $18M, Orbital $45M
   - P5: Tachyon $180M, Reactor $650M
