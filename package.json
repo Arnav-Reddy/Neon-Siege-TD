@@ -8,16 +8,18 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "test": "playwright test",
     "dist": "electron-builder"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.1",
     "electron": "45.4.1",
-    "electron-builder": "26.0.12"
+    "electron-builder": "26.18.0"
   },
   "build": {
     "appId": "com.arnavreddy.neonsiegetd",
     "productName": "Neon Siege TD",
-    "files": ["main.js", "preload.js", "build/icon.png"],
+    "files": ["main.js", "preload.js", "index.html", "build/icon.png"],
     "directories": { "buildResources": "build" },
     "afterPack": "./build/afterPack.js",
     "win": { "target": ["nsis", "portable"] },

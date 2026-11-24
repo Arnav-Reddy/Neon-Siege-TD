@@ -6,7 +6,7 @@ A small incremental tower defense game set on a Formula 1-style circuit. It floa
 
 ## Download
 
-Go to [**Releases**](https://github.com/Arnav-Reddy/tower-defense-mini-game-/releases/latest) and, under **Assets**, download the file for your system. Don't use the "Source code (zip)" links: those contain the project files, not the app.
+Go to [**Releases**](https://github.com/Arnav-Reddy/Neon-Siege-TD/releases/latest) and, under **Assets**, download the file for your system. Don't use the "Source code (zip)" links: those contain the project files, not the app.
 
 | System | File | First launch |
 | --- | --- | --- |
@@ -17,9 +17,9 @@ Go to [**Releases**](https://github.com/Arnav-Reddy/tower-defense-mini-game-/rel
 ## Using the overlay
 
 - The game opens as a borderless widget in the bottom-right corner. There's no taskbar or Dock entry.
-- **Move it:** drag the stat bar (or the ⋮⋮ grip) to put it anywhere. It snaps to the nearest screen corner, and minimizing or resizing keeps that corner fixed.
+- **Move it:** drag the stat bar (or the ⋮⋮ grip) to put it anywhere. It doesn't snap into place: after you drag it, the nearest screen corner becomes its anchor, so minimizing or resizing keeps that corner fixed.
 - **Resize it:** drag the corner grip (opposite the corner it's anchored to) to scale it from 60% to 250%. Double-click the grip to reset to 100%. Size and position are remembered.
-- **Show or hide:** press `Ctrl+Shift+T` (`Cmd+Shift+T` on macOS) from any app, or click the tray / menu-bar icon.
+- **Show or hide:** press `Ctrl+Shift+Alt+T` (`Cmd+Shift+Alt+T` on macOS) from any app. Left-click the tray / menu-bar icon to toggle the widget; right-click the icon to open its menu.
 - **Quit:** right-click the tray icon and choose **Quit**.
 - **Shrink:** the `⌄` button shrinks the widget to a small pill. The window shrinks with it, so it covers nothing else.
 
@@ -27,11 +27,11 @@ It floats over full-screen browsers, videos and apps that use borderless or wind
 
 ## Play in a browser instead
 
-Play it live at **https://arnav-reddy.github.io/Tower-Defense-Mini-Game-/**, or open `index.html` in any modern browser. The whole game is that one file.
+Play it live at **https://arnav-reddy.github.io/Neon-Siege-TD/**, or open `index.html` in any modern browser. The whole game is that one file.
 
 ## Updates
 
-The desktop app (v1.0.2 and later) loads the game live from that page. Every update pushed to `main` reaches your installed app the next time you open it, with no new download. You only need to download a new release when the desktop shell itself changes. The app needs an internet connection to start.
+The desktop app (v1.0.2 and later) loads the game live from that page. Every update pushed to `main` reaches your installed app the next time you open it, with no new download. You only need to download a new release when the desktop shell itself changes. The app also bundles a local copy of the game and falls back to it when GitHub Pages is unreachable or returns an error. For development, `npm start -- --local` runs the in-repo `index.html` directly.
 
 The game also updates itself. At start-up it compares its version with the `index.html` on GitHub. When a newer version exists, an **Update** box offers **Update & Reload Now** or **Later**. The new version is cached in the browser and loads instantly from then on. You can check by hand with **⟳ Check updates** on the home screen, and change the update URL with **⚙**.
 

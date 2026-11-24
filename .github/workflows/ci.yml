@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1 # browsers come from the explicit install below
+      - run: npx playwright install --with-deps chromium
+      - name: Syntax check
+        shell: bash
+        run: |
+          node --check main.js preload.js build/afterPack.js
+          # the update bootstrap (first <script>) and the inert game source (<script id="game-src">)
+          S=$(grep -n '<script>' index.html | head -1 | cut -d: -f1)
+          E=$(grep -n '</script>' index.html | head -1 | cut -d: -f1)
+          sed -n "$((S+1)),$((E-1))p" index.html > /tmp/boot.js
+          node --check /tmp/boot.js
+          node -e "const s=require('fs').readFileSync('index.html','utf8');const a=s.indexOf('id=\"game-src\">')+14;require('fs').writeFileSync('/tmp/game.js',s.slice(a,s.indexOf('</script>',a)))"
+          node --check /tmp/game.js
+      - run: npm test
+      - run: npm audit --audit-level=high
