@@ -4,7 +4,7 @@ const { app, BrowserWindow, screen, ipcMain, globalShortcut, Tray, Menu, nativeI
 const path = require('path');
 const fs = require('fs');
 
-const WIDTH = 420, HEIGHT = 344, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+T';
+const WIDTH = 440, HEIGHT = 344, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+T';
 // The game is loaded live from GitHub Pages, so every push to main reaches the installed app
 // on its next launch without a new download. Only changes to this shell need a new release.
 const GAME_URL = 'https://arnav-reddy.github.io/Tower-Defense-Mini-Game-/';
