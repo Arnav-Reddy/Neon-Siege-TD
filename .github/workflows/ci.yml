@@ -11,6 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Game version bumped when the game changed
+        # The in-game updater only offers a new build when app-version goes up.
+        shell: bash
+        run: |
+          BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+          if [ -z "$BASE" ] || ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then echo "No base commit to compare"; exit 0; fi
+          if git diff --quiet "$BASE" HEAD -- index.html; then echo "index.html unchanged"; exit 0; fi
+          OLD=$(git show "$BASE:index.html" | grep -m1 -o '<meta name="app-version" content="[0-9.]*"')
+          NEW=$(grep -m1 -o '<meta name="app-version" content="[0-9.]*"' index.html)
+          if [ "$OLD" = "$NEW" ]; then echo "::error::index.html changed but app-version was not bumped ($NEW)"; exit 1; fi
+          echo "app-version: $OLD -> $NEW"
       - uses: actions/setup-node@v4
         with:
           node-version: 22
