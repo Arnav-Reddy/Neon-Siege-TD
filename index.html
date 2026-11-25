@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.5.3">
+<meta name="app-version" content="2.5.4">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -1609,6 +1609,7 @@ function pushLap(t){ if (t.lv < 5 || t.odCD > 0) return; t.odT = 4; t.odCD = 20;
 // ================= Player actions =================
 function place(type, x, y){
   const d = TOWERS[type], c = costOf(type);
+  if (isPath(x, y) || towerAt(x, y)) return;          // only free build pads
   if (d.pr > S.prestige) { S.banner = { s:`LOCKED · REACH PRESTIGE ${d.pr}`, c:'#ff653f', t:1.6 }; return; }
   if (S.towers.length >= towerCap()) { S.banner = { s:`TOWER CAP ${towerCap()} REACHED`, c:'#ff653f', t:1.6 }; return; }
   if (S.gold < c) return;
