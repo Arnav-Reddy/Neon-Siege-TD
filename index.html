@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.6.0">
+<meta name="app-version" content="2.7.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -98,6 +98,14 @@ html.overlay .handle{-webkit-app-region:drag}
 #stage{position:relative;width:384px;height:224px;margin:7px auto 0;flex:none;border:var(--rule);border-radius:4px;overflow:hidden;box-sizing:content-box}
 #cv{display:block;width:384px;height:224px;cursor:crosshair}
 .ovl{position:absolute;z-index:5;animation:pop .14s ease-out}
+#hint{pointer-events:none;opacity:.94;position:absolute;z-index:6;left:8px;right:8px;top:6px;display:flex;align-items:center;gap:7px;padding:5px 6px 5px 8px;border:var(--rule);border-radius:4px;background:var(--paper);font-size:10px;font-weight:700;box-shadow:var(--shadow-sm)}
+#hintN{flex:none;font-family:var(--mono);font-size:8.5px;padding:1px 4px;border-radius:2px;background:var(--ochre);color:var(--ink)}
+#hintTxt{flex:1;min-width:0}
+#hintX{pointer-events:auto}   /* the tip bar lets clicks through to the pads under it, except Skip */
+.crash{margin-top:8px;text-align:left;font-size:10px;line-height:1.45;border:var(--rule);border-radius:4px;padding:6px 9px;background:var(--paper2)}
+.crash .ct{font-weight:900;letter-spacing:1.5px;font-size:8.5px;text-transform:uppercase;color:var(--ink3)}
+.crash ul{margin:2px 0 4px;padding-left:14px}.crash .cl{color:var(--ember);font-weight:800}
+.crash .ch{color:var(--ink2)}
 #pausedTag{position:absolute;z-index:6;left:50%;top:76%;transform:translate(-50%,-50%);padding:6px 12px;border:var(--rule);border-radius:4px;background:var(--paper);font-weight:900;letter-spacing:2px;font-size:11px;pointer-events:none}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
@@ -318,6 +326,7 @@ html.overlay .handle{-webkit-app-region:drag}
   </div>
   <div id="stage" class="full">
     <div id="pausedTag" class="hidden">❚❚ PAUSED · press P</div>
+    <div id="hint" class="hidden"><span id="hintN"></span><span id="hintTxt"></span><button id="hintX" class="x" title="Skip the tips">×</button></div>
     <canvas id="cv"></canvas>
     <div id="panel" class="glass ovl hidden">
       <div class="ph"><canvas id="pIcon"></canvas><div class="pt"><div id="pName" class="nm"></div><div id="pRole" class="role fit"></div></div><button id="pClose" class="x" title="Close">×</button></div>
@@ -331,6 +340,7 @@ html.overlay .handle{-webkit-app-region:drag}
       </div>
       <div id="pMuts" class="muts"></div>
       <div id="pPrio" class="prio"></div>
+      <div id="pShare" class="pdelta"></div>
       <div id="pDelta" class="pdelta"></div>
       </div>
       <div class="uprow"><button id="pUp" class="btn up fit" title="Upgrade (U)"></button><button id="pMax" class="btn up max fit" title="Buy every level you can afford (M)">MAX</button></div>
@@ -645,35 +655,35 @@ const G = { aura:0, slow:0 }; // circuit-wide effects recomputed every step
 
 function makeTower(type, x, y, paid){
   return { type, x, y, lv:1, kills:0, earned:0, muts:[], invested:paid, cd:0, buff:1, aura:0, haste:0, lock:0, target:null, extra:[], beams:[],
-    harvest:0, pulses:0, vscT:15, fieldR:0, prio:'first', odT:0, odCD:0, jamT:0, shots:0, charge:0, pays:0, pitCycle:0, pitWin:0, pitStop:0, pitFull:false, pitsDone:0, mutSel:null, ang:-Math.PI / 2, recoil:0, flash:0 };
+    harvest:0, pulses:0, vscT:15, fieldR:0, prio:'first', odT:0, odCD:0, jamT:0, shots:0, charge:0, pays:0, pitCycle:0, pitWin:0, pitStop:0, pitFull:false, pitsDone:0, mutSel:null, dmg:0, ang:-Math.PI / 2, recoil:0, flash:0 };
 }
 function makeState(d){
   const r = d.run;
   return {
     slot:d.slot, name:d.name, created:d.created, season:d.season, prestige:d.prestige, cp:d.cp, hq:{ ...d.hq }, best:d.best,
-    speed:d.speed, auto:d.auto,
+    speed:d.speed, auto:d.auto, tips:d.tips ?? 3,       // saves from before the tips skip them
     seed:r.seed, gold:r.gold, lives:r.lives, wave:r.wave, endless:r.endless, rerolls:r.rerolls, bossKills:r.bossKills, carKills:r.carKills, runEarned:r.runEarned, resist:r.resist,
-    towers:r.towers.filter(t => Object.hasOwn(TOWER_INDEX, t.id)).map(t => ({ ...makeTower(TOWER_INDEX[t.id], t.x, t.y, t.invested), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), prio:t.prio, mutSel:t.mutSel || null })),
+    towers:r.towers.filter(t => Object.hasOwn(TOWER_INDEX, t.id)).map(t => ({ ...makeTower(TOWER_INDEX[t.id], t.x, t.y, t.invested), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), prio:t.prio, mutSel:t.mutSel || null, dmg:t.dmg || 0 })),
     waveActive:false, enemies:[], projs:[], hazards:[], fx:[], parts:[], drones:[], detQ:[], q:[], nextQ:null, waveTotal:0, lightsT:0, goT:0, spawnT:0, autoT:1.5, time:0,
     inc:new Array(10).fill(0), incI:0, incT:0, dmgCat:{}, scT:0, scCD:0, boss:null, lap:null,
-    over:r.lives <= 0, banner:null, coreFlash:0, hot:[],
+    over:r.lives <= 0, banner:null, coreFlash:0, hot:[], leaks:r.leaks || {},
   };
 }
 function freshRun(career){
   return { seed:randSeed(), gold:startGoldFor(career.hq.gold || 0), lives:BASE_LIVES, wave:0, endless:false, rerolls:career.hq.reroll || 0,
-    bossKills:0, carKills:0, runEarned:0, resist:null, towers:[] };
+    bossKills:0, carKills:0, runEarned:0, resist:null, towers:[], leaks:{} };
 }
 function newCareer(slot, name){
-  const c = { v:3, slot, name:name || `Team ${slot}`, created:Date.now(), season:1, prestige:0, cp:0, hq:{}, best:0, speed:1, auto:false };
+  const c = { v:3, slot, name:name || `Team ${slot}`, created:Date.now(), season:1, prestige:0, cp:0, hq:{}, best:0, speed:1, auto:false, tips:0 };
   c.run = freshRun(c);
   return c;
 }
 function serialize(){
   // Mid-lap, save the run as it was when the lap started (minus what was earned since); spending stays spent.
   const L = S.waveActive ? S.lap : { gold:0, cp:0, lives:S.lives, bossKills:S.bossKills, carKills:S.carKills };
-  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp - L.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto,
-    run:{ seed:S.seed, gold:S.gold - L.gold, lives:L.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:L.bossKills, carKills:L.carKills, runEarned:S.runEarned - L.gold, resist:S.resist,
-      towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested, prio:t.prio, mutSel:t.mutSel })) } };
+  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp - L.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto, tips:S.tips,
+    run:{ seed:S.seed, gold:S.gold - L.gold, lives:L.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:L.bossKills, carKills:L.carKills, runEarned:S.runEarned - L.gold, resist:S.resist, leaks:S.leaks,
+      towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested, prio:t.prio, mutSel:t.mutSel, dmg:t.dmg })) } };
 }
 function save(){
   savePrefs();
@@ -966,6 +976,7 @@ function hit(e, amt, src, mode){
   if (e.shield > 0 && mode !== 'pierce') { const a = Math.min(e.shield, dmg); e.shield -= a; dmg -= a; }
   e.hp -= dmg;
   const dealt = Math.min(amt * m, before);
+  if (src) src.dmg += dealt;
   if (cat) S.dmgCat[cat] = (S.dmgCat[cat] || 0) + dealt;
   if (e.holo && !e.split && e.hp > 0 && e.hp < e.maxHp * .5) holoSplit(e);
   if (e.boss && e.hp > 0) bossPhases(e);
@@ -1386,6 +1397,8 @@ function updEnemy(e, dt){
   if (e.dist >= P.len) {
     e.dead = true;
     const lost = Math.max(1, Math.ceil(d.leak * (.5 + .5 * Math.max(0, e.hp) / e.maxHp)));
+    const lk = S.leaks[e.type] || (S.leaks[e.type] = { n:0, lives:0, lap:0 });
+    lk.n++; lk.lives += lost; lk.lap = S.wave;
     S.lives -= lost;
     if (S.boss === e) S.boss = null;
     const [fx, fy] = P.pts[P.pts.length - 1];
@@ -1542,11 +1555,36 @@ function update(dt){
   if (S.coreFlash > 0) S.coreFlash -= dt;
   if (S.waveActive && !S.over && S.lightsT <= 0 && !S.q.length && !S.enemies.length) endWave();
 }
+const CRASH_HINTS = {
+  boss:'Bosses pit to heal at 50% behind a shield: stack burst damage (Tyres, Radar Gun) and click jammed towers to reboot them.',
+  escort:'Boss escorts are armoured: Radar Gun pierces them and the Fuel Sprayer shreds armour.',
+  stealth:'Stealth cars are invisible to long-range towers until lit: add an EMP Gantry or a Timing Beam.',
+  van:'Support Vans heal the pack: give a Lv 3+ tower the "Support Vans" target priority.',
+  holo:'Holograms split into decoys at half health: splash towers (Tyres, Mortar) clean them up.',
+  armor:'Armoured cars shrug off small hits: upgrade your biggest gun, or let the Fuel Sprayer shred their armour.',
+  fast:'Fast cars slip through: put a Marshal Post slow near the end of the track.',
+  any:'Upgrade your strongest tower before adding more, and keep a slow near the finish.',
+};
+function crashHint(type){
+  const d = ENEMIES[type];
+  if (d.boss) return CRASH_HINTS.boss;
+  if (type === 'escort' || type === 'stealth' || type === 'van') return CRASH_HINTS[type];
+  if (type === 'holo' || type === 'decoy') return CRASH_HINTS.holo;
+  if (d.armor >= .3) return CRASH_HINTS.armor;
+  if (d.spd >= 1.2) return CRASH_HINTS.fast;
+  return CRASH_HINTS.any;
+}
+function crashSummary(){
+  const rows = Object.entries(S.leaks).sort((a, b) => b[1].lives - a[1].lives);
+  if (!rows.length) return '';
+  const list = rows.slice(0, 3).map(([ty, l]) => `<li><b>${l.n}×</b> ${ENEMIES[ty].name} <span class="cl">−${l.lives} ♥</span></li>`).join('');
+  return `<div class="crash"><div class="ct">What got through</div><ul>${list}</ul><div class="ch">💡 ${crashHint(rows[0][0])}</div></div>`;
+}
 function gameOver(){
   S.over = true;
   closePanel(); closePrestige();
   $('mut').classList.add('hidden');
-  $('oTxt').innerHTML = `Crashed out on lap <b>${S.wave}</b> of Season <b>${S.season}</b><br><span style="color:#8783b6">Your Championship Points, rank and HQ upgrades are safe.</span>`;
+  $('oTxt').innerHTML = `Crashed out on lap <b>${S.wave}</b> of Season <b>${S.season}</b><br><span style="color:#8783b6">Your Championship Points, rank and HQ upgrades are safe.</span>${crashSummary()}`;
   setText($('oNew'), prestigeReady() ? `🏆 Prestige to P${S.prestige + 1}` : `Restart Season ${S.season}`);
   $('oNew').classList.toggle('asc', prestigeReady());
   $('over').classList.remove('hidden');
@@ -2173,6 +2211,8 @@ function drawRange(x, y, r, col){
   ctx.setLineDash([4, 4]); ctx.lineDashOffset = -performance.now() / 60;
   ctx.strokeStyle = rgba(col, .6); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
 }
+// Tags sit above the hovered pad, or below it on the top row (where the tip bar is).
+const labelY = ty => ty === 0 ? (ty + 1) * TS + 20 : ty * TS - 3;
 // A small paper tag with text, centred on x with its bottom at y (canvas pixels), kept inside the track area.
 function label(c, text, x, y, col){
   c.font = "800 9px 'Titillium Web',sans-serif";
@@ -2244,7 +2284,7 @@ function render(now){
       ctx.fillStyle = ok ? 'rgba(156,194,90,.16)' : 'rgba(232,103,74,.18)'; ctx.fill();
       ctx.strokeStyle = ok ? 'rgba(156,194,90,.7)' : 'rgba(232,103,74,.7)'; ctx.lineWidth = 1; ctx.stroke();
       if (free) { ctx.globalAlpha = .55; drawTower(ctx, t.type, (hv.x + .5) * TS, (hv.y + .5) * TS, TS, -Math.PI / 2, t.muts.length, now, 0, t.lv); ctx.globalAlpha = 1; }
-      label(ctx, `MOVE $${fmt(moveFee(t))}`, (hv.x + .5) * TS, hv.y * TS - 3, ok ? '#16115e' : '#ff653f');
+      label(ctx, `MOVE $${fmt(moveFee(t))}`, (hv.x + .5) * TS, labelY(hv.y), ok ? '#16115e' : '#ff653f');
     } else if (ui.build !== null) {
       const ok = free && S.gold >= TOWERS[ui.build].cost;
       rr(ctx, hv.x * TS + 2, hv.y * TS + 2, TS - 4, TS - 4, 5);
@@ -2252,7 +2292,9 @@ function render(now){
       ctx.strokeStyle = ok ? 'rgba(156,194,90,.7)' : 'rgba(232,103,74,.7)'; ctx.lineWidth = 1; ctx.stroke();
       if (free) {
         const bd = TOWERS[ui.build];
-        if (bd.kind !== 'rail') drawRange(hv.x + .5, hv.y + .5, bd.range, ok ? bd.color : '#ff653f');
+        const pv = makeTower(ui.build, hv.x, hv.y, 0);
+        if (bd.kind !== 'rail') drawRange(hv.x + .5, hv.y + .5, isMint(pv) ? bd.range : stats(pv).range, ok ? bd.color : '#ff653f');
+        label(ctx, isMint(pv) ? `${bd.short} · ECONOMY` : `${fmt(dpsOf(pv, stats(pv)))} DPS · range ${stats(pv).range > 50 ? '∞' : stats(pv).range.toFixed(1)}`, (hv.x + .5) * TS, labelY(hv.y), ok ? '#16115e' : '#ff653f');
         ctx.globalAlpha = .55; drawTower(ctx, ui.build, (hv.x + .5) * TS, (hv.y + .5) * TS, TS, -Math.PI / 2, 0, now, 0); ctx.globalAlpha = 1;
       }
     } else if (free) {
@@ -2546,6 +2588,9 @@ function refreshPanel(){
   setText($('pLv'), String(t.lv));
   setText($('pNext'), `✦ at Lv ${(Math.floor(t.lv / 5) + 1) * 5}`);
   $('pBar').style.width = (t.lv % 5) * 20 + '%';
+  const teamDmg = S.towers.reduce((a, x) => a + x.dmg, 0);
+  $('pShare').classList.toggle('hidden', econ);
+  if (!econ) setText($('pShare'), teamDmg > 0 ? `Damage share: ${Math.round(t.dmg / teamDmg * 100)}% of the team · ${fmt(t.dmg)} dealt this run` : 'Damage share: no damage dealt yet this run');
   let delta;
   if (econ) {
     const now = d.id === 'solar' ? solarPay(t) : econPay(t), next = d.id === 'solar' ? solarPay(t, t.lv + 1) : econPay(t, t.lv + 1);
@@ -2755,8 +2800,21 @@ function showUpdate(v){ setText($('updFrom'), APP_VERSION); setText($('updTo'), 
 $('hmCheck').onclick = () => { homeMsg('Checking…'); checkUpdates(true); };
 $('updLater').onclick = () => { updDismissed = true; $('upd').classList.add('hidden'); };
 $('updGo').onclick = () => { save(); localStorage.setItem(CACHE_KEY, latestHtml); location.reload(); };
+// First-run tips: each step finishes when the player does it.
+const TIPS = [
+  { t:'Pick a tower in the dock, then click a free green pad to build it.', done:() => S.towers.length > 0 },
+  { t:'Press ▶ (or Space) to start the lap.', done:() => S.wave > 0 },
+  { t:'Click your tower, then Upgrade (U) to make it stronger.', done:() => S.towers.some(t => t.lv > 1) },
+];
+function updateTips(){
+  while (S.tips < TIPS.length && TIPS[S.tips].done()) { S.tips++; save(); }
+  const show = S.tips < TIPS.length && !ui.home && !S.over;
+  $('hint').classList.toggle('hidden', !show);
+  if (show) { setText($('hintN'), `TIP ${S.tips + 1}/${TIPS.length}`); setText($('hintTxt'), TIPS[S.tips].t); }
+}
 function updateUI(){
   if (!S) return;
+  updateTips();
   setText($('sWave'), S.endless || S.wave > SEASON_LEN ? String(S.wave) : `${S.wave}/${SEASON_LEN}`);
   setText($('sGold'), fmt(S.gold));
   setText($('sRate'), `+${fmt(incomeRate())}/s`);
@@ -2826,6 +2884,7 @@ $('pMax').onclick = () => upgradeMax(ui.sel);
 $('pOD').onclick = () => pushLap(ui.sel);
 $('pSell').onclick = () => sell(ui.sel);
 $('pSel').onclick = () => { ui.sel.mutSel = null; save(); };
+$('hintX').onclick = () => { S.tips = TIPS.length; save(); };
 $('mReroll').onclick = () => { if (S.rerolls < 1) return; S.rerolls--; ui.mutOpts = draftOptions(ui.mutT); renderMutOpts(); save(); };
 $('bWave').onclick = startWave;
 $('bSpeed').onclick = () => { S.speed = S.speed % 3 + 1; save(); };
