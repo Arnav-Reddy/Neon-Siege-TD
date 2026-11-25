@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.7.0">
+<meta name="app-version" content="2.8.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -106,6 +106,15 @@ html.overlay .handle{-webkit-app-region:drag}
 .crash .ct{font-weight:900;letter-spacing:1.5px;font-size:8.5px;text-transform:uppercase;color:var(--ink3)}
 .crash ul{margin:2px 0 4px;padding-left:14px}.crash .cl{color:var(--ember);font-weight:800}
 .crash .ch{color:var(--ink2)}
+#away{position:absolute;z-index:7;left:50%;top:38%;transform:translate(-50%,-50%);width:78%;padding:8px 10px;border:var(--rule);border-radius:5px;background:var(--paper);box-shadow:var(--shadow);text-align:center;font-size:10px;display:flex;flex-direction:column;gap:5px;align-items:center}
+#awayHead{font-weight:900;letter-spacing:1.5px;font-size:10px;text-transform:uppercase}
+#awayTxt{color:var(--ink2);line-height:1.4}#away .btn{width:80px;margin:0}
+.nudge{font-size:9px;padding:3px 6px;border:1px dashed var(--ember);border-radius:3px;color:var(--ink);background:#fff1e6;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nudge .btn{width:auto;height:20px;margin:0;padding:0 8px}
+#season .nudge{padding:1px 6px}#season .nudge .btn{height:16px;font-size:8.5px}#season .ss-break{gap:2px}
+.sl-autos{display:flex;flex-direction:column;gap:3px;margin-top:3px}.sl-autos .btn{height:20px;margin:0;font-size:9px;text-align:left;padding:0 6px}
+.sl-none{font-size:9px;color:var(--ink3)}
+.sl-btns .sl-auto{flex:0 0 26px}
 #pausedTag{position:absolute;z-index:6;left:50%;top:76%;transform:translate(-50%,-50%);padding:6px 12px;border:var(--rule);border-radius:4px;background:var(--paper);font-weight:900;letter-spacing:2px;font-size:11px;pointer-events:none}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
@@ -326,6 +335,7 @@ html.overlay .handle{-webkit-app-region:drag}
   </div>
   <div id="stage" class="full">
     <div id="pausedTag" class="hidden">❚❚ PAUSED · press P</div>
+    <div id="away" class="hidden"><div id="awayHead"></div><div id="awayTxt"></div><button id="awayOk" class="btn sm">OK</button></div>
     <div id="hint" class="hidden"><span id="hintN"></span><span id="hintTxt"></span><button id="hintX" class="x" title="Skip the tips">×</button></div>
     <canvas id="cv"></canvas>
     <div id="panel" class="glass ovl hidden">
@@ -378,6 +388,7 @@ html.overlay .handle{-webkit-app-region:drag}
         <div class="sc"><span>Gold earned</span><b id="ssGold"></b></div>
       </div>
       <div id="ssBreak" class="ss-break"></div>
+      <div id="ssBackup" class="nudge hidden">💾 3 seasons since your last backup. <button id="ssExport" class="btn sm">⇪ Export save</button></div>
       <div class="se-btns"><button id="ssNext" class="btn up"></button><button id="ssKeep" class="btn sm">∞ Keep racing</button><button id="ssPres" class="btn asc"></button></div>
     </div>
     <div id="hq" class="ovl hidden">
@@ -662,6 +673,7 @@ function makeState(d){
   return {
     slot:d.slot, name:d.name, created:d.created, season:d.season, prestige:d.prestige, cp:d.cp, hq:{ ...d.hq }, best:d.best,
     speed:d.speed, auto:d.auto, tips:d.tips ?? 3,       // saves from before the tips skip them
+    stats:d.stats ?? { playSec:0, kills:0, byTower:{} }, milestones:d.milestones ?? [], backupSince:d.backupSince ?? 0,
     seed:r.seed, gold:r.gold, lives:r.lives, wave:r.wave, endless:r.endless, rerolls:r.rerolls, bossKills:r.bossKills, carKills:r.carKills, runEarned:r.runEarned, resist:r.resist,
     towers:r.towers.filter(t => Object.hasOwn(TOWER_INDEX, t.id)).map(t => ({ ...makeTower(TOWER_INDEX[t.id], t.x, t.y, t.invested), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), prio:t.prio, mutSel:t.mutSel || null, dmg:t.dmg || 0 })),
     waveActive:false, enemies:[], projs:[], hazards:[], fx:[], parts:[], drones:[], detQ:[], q:[], nextQ:null, waveTotal:0, lightsT:0, goT:0, spawnT:0, autoT:1.5, time:0,
@@ -674,14 +686,14 @@ function freshRun(career){
     bossKills:0, carKills:0, runEarned:0, resist:null, towers:[], leaks:{} };
 }
 function newCareer(slot, name){
-  const c = { v:3, slot, name:name || `Team ${slot}`, created:Date.now(), season:1, prestige:0, cp:0, hq:{}, best:0, speed:1, auto:false, tips:0 };
+  const c = { v:3, slot, name:name || `Team ${slot}`, created:Date.now(), season:1, prestige:0, cp:0, hq:{}, best:0, speed:1, auto:false, tips:0, stats:{ playSec:0, kills:0, byTower:{} }, milestones:[], backupSince:0 };
   c.run = freshRun(c);
   return c;
 }
 function serialize(){
   // Mid-lap, save the run as it was when the lap started (minus what was earned since); spending stays spent.
   const L = S.waveActive ? S.lap : { gold:0, cp:0, lives:S.lives, bossKills:S.bossKills, carKills:S.carKills };
-  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp - L.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto, tips:S.tips,
+  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp - L.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto, tips:S.tips, stats:S.stats, milestones:S.milestones, backupSince:S.backupSince,
     run:{ seed:S.seed, gold:S.gold - L.gold, lives:L.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:L.bossKills, carKills:L.carKills, runEarned:S.runEarned - L.gold, resist:S.resist, leaks:S.leaks,
       towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested, prio:t.prio, mutSel:t.mutSel, dmg:t.dmg })) } };
 }
@@ -732,12 +744,29 @@ function openSlot(n){
   if (S.over) gameOver();
   save();
 }
+const AUTO_KEY = n => SLOT_KEY(n) + '.auto', AUTO_KEEP = 3;
+function readAutos(n){
+  const raw = localStorage.getItem(AUTO_KEY(n));
+  if (!raw) return [];
+  try { return JSON.parse(raw); } catch { localStorage.removeItem(AUTO_KEY(n)); return []; }
+}
+function autosave(label){
+  const list = readAutos(S.slot);
+  list.unshift({ t:Date.now(), label, data:serialize() });
+  localStorage.setItem(AUTO_KEY(S.slot), JSON.stringify(list.slice(0, AUTO_KEEP)));
+}
+function restoreAutosave(n, i){
+  const e = readAutos(n)[i];
+  if (S && S.slot === n) S = null;                // drop the in-memory run so it cannot save over the restore
+  localStorage.setItem(SLOT_KEY(n), JSON.stringify(e.data));
+}
 function createSlot(n, name){
   localStorage.setItem(SLOT_KEY(n), JSON.stringify(newCareer(n, name)));
   openSlot(n);
 }
 function deleteSlot(n){
   localStorage.removeItem(SLOT_KEY(n));
+  localStorage.removeItem(AUTO_KEY(n));
   if (localStorage.getItem(LAST_KEY) === String(n)) localStorage.removeItem(LAST_KEY);
 }
 function renameSlot(n, name){
@@ -911,6 +940,7 @@ function endWave(){
     if (d.id === 'dyson' && mc(t, 'dy_ascend')) { S.cp += 2 * mc(t, 'dy_ascend'); addText(t.x + .5, t.y - .3, `+${2 * mc(t, 'dy_ascend')} CP`, '#ffc85c', true); }
   }
   S.best = Math.max(S.best, S.wave);
+  if (S.wave % 5 === 0) autosave(`Season ${S.season} · lap ${S.wave}`);
   if (S.endless && (S.wave - SEASON_LEN) % 3 === 0) { S.cp += 1; addText(W / TS / 2, 1, '+1 CP · endless', '#ffc85c', true); }
   S.nextQ = buildWave(S.wave + 1);
   S.banner = { s:`LAP ${S.wave} COMPLETE  +$${fmt(clear + paid)}`, c:'#7fd18b', t:2 };
@@ -996,6 +1026,8 @@ function kill(e, src){
   const g = e.gold * vip * night * merchMult(src);
   earn(g);
   S.carKills++;
+  S.stats.kills++;
+  if (src) { const id = TOWERS[src.type].id; S.stats.byTower[id] = (S.stats.byTower[id] || 0) + 1; }
   if (src) { src.kills++; src.earned += g; }
   if (e.antiT > 0 && e.antiSrc) S.detQ.push({ x:e.x, y:e.y, maxHp:e.maxHp, boss:e.boss, src:e.antiSrc });
   const fire = e.pT > 0 && e.pSrc ? mc(e.pSrc, 'venom_fire') : 0;
@@ -1599,6 +1631,7 @@ const prestigeCP = () => 5 + 3 * S.prestige;
 const seasonCP = () => 4 + 2 * (S.season - 1);
 const nextUnlocks = () => TOWERS.filter(d => d.pr === S.prestige + 1).map(d => d.name);
 function seasonFinale(){
+  S.backupSince++;
   const cp = seasonCP();
   S.cp += cp;
   ui.season = { num:S.season, cp, laps:S.wave, bosses:S.bossKills, cars:S.carKills, gold:S.runEarned };
@@ -1612,6 +1645,7 @@ function newRun(){
   d.run = freshRun(d);
   S = makeState(d);
   S.auto = false; S.speed = 1;                // a new run never starts laps by itself
+  autosave(`Season ${S.season} · start`);
   setMap(S.seed);
   ui.build = null; ui.sel = null; ui.season = null;
   closePanel(); closePrestige(); closeSeasonEnd();
@@ -2677,6 +2711,7 @@ function refreshPrestige(){
   setText(go, ready ? `🏆 Prestige · resets run` : `🔒 Clear lap ${need}`);
 }
 function openSeasonEnd(){
+  $('ssBackup').classList.toggle('hidden', S.backupSince < BACKUP_EVERY);
   const r = ui.season;
   setText($('ssNum'), String(r.num)); setText($('ssCP'), String(r.cp));
   setText($('ssLaps'), String(r.laps)); setText($('ssCars'), fmt(r.cars)); setText($('ssBoss'), String(r.bosses)); setText($('ssGold'), fmt(r.gold));
@@ -2734,10 +2769,28 @@ function renderHome(){
       el.className = 'slot';
       el.innerHTML = `<div class="sl-top"><span class="sl-n">${n}</span><span class="sl-name fit"></span><button class="sl-ren" title="Rename">✎</button><span class="sl-rank" title="${rankName(d.prestige)}">P${d.prestige}</span></div>
         <div class="sl-meta fit">Season ${d.season} · Lap ${d.run.wave}/${SEASON_LEN} · Best ${d.best} · ${d.cp} CP · $${fmt(d.run.gold)}</div>
-        <div class="sl-btns"><button class="btn up sl-go">▶ Continue</button><button class="btn sm sl-exp" title="Export this save">⇪</button><button class="btn sell sl-del">Delete</button></div>`;
+        <div class="sl-meta sl-stats fit">${careerLine(d)}</div>
+        ${(d.backupSince || 0) >= BACKUP_EVERY ? `<div class="nudge">💾 ${d.backupSince} seasons since your last backup: press ⇪ to export</div>` : ''}
+        <div class="sl-autos hidden"></div>
+        <div class="sl-btns"><button class="btn up sl-go">▶ Continue</button><button class="btn sm sl-exp" title="Export this save">⇪</button><button class="btn sm sl-auto" title="Autosaves: restore an earlier snapshot">↺</button><button class="btn sell sl-del">Delete</button></div>`;
       el.querySelector('.sl-name').textContent = d.name;
       el.querySelector('.sl-go').onclick = () => { openSlot(n); closeHome(); };
-      el.querySelector('.sl-exp').onclick = () => exportSlot(n);
+      el.querySelector('.sl-exp').onclick = () => { exportSlot(n); renderHome(); };
+      el.querySelector('.sl-auto').onclick = () => {
+        const box = el.querySelector('.sl-autos'), list = readAutos(n);
+        box.classList.toggle('hidden');
+        box.innerHTML = list.length ? '' : '<span class="sl-none">No autosaves yet: one is taken every 5 laps and at each season start.</span>';
+        list.forEach((a, i) => {
+          const b = document.createElement('button'); b.className = 'btn sm';
+          const label = `${a.label} · ${new Date(a.t).toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })}`;
+          b.textContent = label;
+          b.onclick = () => {
+            if (!b._armed) { b._armed = true; b.textContent = 'Restore? This replaces the current progress'; setTimeout(() => { b._armed = false; b.textContent = label; }, 3000); return; }
+            restoreAutosave(n, i); renderHome(); homeMsg(`Slot ${n} restored to "${a.label}"`);
+          };
+          box.append(b);
+        });
+      };
       const del = el.querySelector('.sl-del');
       del.onclick = () => {
         if (del._armed) { if (S && S.slot === n) S = null; deleteSlot(n); renderHome(); homeMsg(`Slot ${n} deleted`); return; }
@@ -2762,8 +2815,17 @@ function renderHome(){
   }
   fitAll(box);
 }
+const BACKUP_EVERY = 3;   // seasons between backup reminders
+function careerLine(d){
+  const st = d.stats;
+  if (!st) return 'Career stats start with your next race';
+  const fav = Object.entries(st.byTower).sort((a, b) => b[1] - a[1])[0];
+  return `⏱ ${fmtDur(st.playSec)} · 🏁 best lap ${d.best} · ${fmt(st.kills)} kills · ★ ${fav ? TOWERS[TOWER_INDEX[fav[0]]].short : '—'} · 🏅 ${(d.milestones || []).length}/${MILESTONES.length}`;
+}
 function exportSlot(n){
+  if (S && S.slot === n) { S.backupSince = 0; save(); }
   const d = readSlot(n);
+  d.backupSince = 0; localStorage.setItem(SLOT_KEY(n), JSON.stringify(d));
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(d, null, 1)], { type:'application/json' }));
   a.download = `neon-siege-slot${n}-${d.name.replace(/[^\w-]+/g, '_')}.json`;
@@ -2806,6 +2868,23 @@ const TIPS = [
   { t:'Press ▶ (or Space) to start the lap.', done:() => S.wave > 0 },
   { t:'Click your tower, then Upgrade (U) to make it stronger.', done:() => S.towers.some(t => t.lv > 1) },
 ];
+const MILESTONES = [
+  { id:'boss',     name:'First boss down',               cp:1, done:() => S.bossKills > 0 },
+  { id:'mut',      name:'First mutation',                cp:1, done:() => S.towers.some(t => t.muts.length > 0) },
+  { id:'five',     name:'Five different towers at once', cp:1, done:() => new Set(S.towers.map(t => t.type)).size >= 5 },
+  { id:'million',  name:'$1M earned in one run',         cp:1, done:() => S.runEarned >= 1e6 },
+  { id:'lv25',     name:'A tower reaches Lv 25',         cp:2, done:() => S.towers.some(t => t.lv >= 25) },
+  { id:'finale',   name:'Reached the lap-24 finale',     cp:2, done:() => S.best >= SEASON_LEN },
+  { id:'prestige', name:'First prestige',                cp:2, done:() => S.prestige > 0 },
+];
+function updateMilestones(){
+  for (const m of MILESTONES) {
+    if (S.milestones.includes(m.id) || !m.done()) continue;
+    S.milestones.push(m.id); S.cp += m.cp;
+    S.banner = { s:`🏅 MILESTONE · ${m.name.toUpperCase()} · +${m.cp} CP`, c:'#ffc85c', t:2.6 };
+    save();
+  }
+}
 function updateTips(){
   while (S.tips < TIPS.length && TIPS[S.tips].done()) { S.tips++; save(); }
   const show = S.tips < TIPS.length && !ui.home && !S.over;
@@ -2815,6 +2894,7 @@ function updateTips(){
 function updateUI(){
   if (!S) return;
   updateTips();
+  updateMilestones();
   setText($('sWave'), S.endless || S.wave > SEASON_LEN ? String(S.wave) : `${S.wave}/${SEASON_LEN}`);
   setText($('sGold'), fmt(S.gold));
   setText($('sRate'), `+${fmt(incomeRate())}/s`);
@@ -2885,6 +2965,8 @@ $('pOD').onclick = () => pushLap(ui.sel);
 $('pSell').onclick = () => sell(ui.sel);
 $('pSel').onclick = () => { ui.sel.mutSel = null; save(); };
 $('hintX').onclick = () => { S.tips = TIPS.length; save(); };
+$('awayOk').onclick = () => $('away').classList.add('hidden');
+$('ssExport').onclick = () => { exportSlot(S.slot); $('ssBackup').classList.add('hidden'); };
 $('mReroll').onclick = () => { if (S.rerolls < 1) return; S.rerolls--; ui.mutOpts = draftOptions(ui.mutT); renderMutOpts(); save(); };
 $('bWave').onclick = startWave;
 $('bSpeed').onclick = () => { S.speed = S.speed % 3 + 1; save(); };
@@ -3040,16 +3122,28 @@ placeInPage();
 openHome();
 checkUpdates(false);
 let last = performance.now(), acc = 0, lastSave = 0;
-const CATCHUP_MAX = 300, CATCHUP_PER_FRAME = 2;  // seconds
+const CATCHUP_MAX = 300, CATCHUP_PER_FRAME = 2, AWAY_MIN = 10;  // seconds
+function fmtDur(sec){ sec = Math.round(sec); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s2 = sec % 60; return h ? `${h}h ${m}m` : m ? `${m}m ${s2}s` : `${s2}s`; }
+function showAway(){
+  const a = ui.away; ui.away = null;
+  const caught = Math.min(a.sec, CATCHUP_MAX);
+  setText($('awayHead'), `While you were away · ${fmtDur(a.sec)}`);
+  setText($('awayTxt'), `${S.wave - a.wave} laps · +$${fmt(S.runEarned - a.gold)} · ${S.carKills - a.kills} cars beaten · ${a.lives - S.lives > 0 ? '−' + (a.lives - S.lives) + ' ♥' : 'no lives lost'}${a.sec > CATCHUP_MAX ? ` · caught up ${fmtDur(caught)} (the limit)` : ''}`);
+  $('away').classList.remove('hidden');
+}
 function frame(now){
   const raw = (now - last) / 1000, dt = Math.min(raw, .25);
   last = now;
   ui.shake *= Math.exp(-dt * 12);
   if (S && !ui.home && !S.over && !ui.mutT && !ui.season && !ui.pres && !ui.hqMode && !ui.paused) {
-    ui.catchup = Math.min(CATCHUP_MAX, (ui.catchup || 0) + raw - dt);
+    const gap = raw - dt;
+    if (gap > AWAY_MIN) { ui.away = ui.away || { sec:0, gold:S.runEarned, wave:S.wave, kills:S.carKills, lives:S.lives }; ui.away.sec += gap; }
+    ui.catchup = Math.min(CATCHUP_MAX, (ui.catchup || 0) + gap);
     const extra = Math.min(ui.catchup, CATCHUP_PER_FRAME);
     ui.catchup -= extra;
     acc += dt + extra;
+    S.stats.playSec += dt;
+    if (ui.away && ui.catchup === 0) showAway();
     while (acc >= STEP) { for (let i = 0; i < S.speed; i++) update(STEP); acc -= STEP; }
   } else acc = 0;
   if (S && !ui.min) render(now / 1000);
