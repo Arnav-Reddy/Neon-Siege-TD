@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.5.4">
+<meta name="app-version" content="2.6.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -98,6 +98,7 @@ html.overlay .handle{-webkit-app-region:drag}
 #stage{position:relative;width:384px;height:224px;margin:7px auto 0;flex:none;border:var(--rule);border-radius:4px;overflow:hidden;box-sizing:content-box}
 #cv{display:block;width:384px;height:224px;cursor:crosshair}
 .ovl{position:absolute;z-index:5;animation:pop .14s ease-out}
+#pausedTag{position:absolute;z-index:6;left:50%;top:76%;transform:translate(-50%,-50%);padding:6px 12px;border:var(--rule);border-radius:4px;background:var(--paper);font-weight:900;letter-spacing:2px;font-size:11px;pointer-events:none}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
 /* ---------- Inspector ---------- */
@@ -305,9 +306,9 @@ html.overlay .handle{-webkit-app-region:drag}
       <i class="sep"></i>
       <span class="st st-t" title="Towers placed / max towers"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M3 14h10v-2H11V6l1-2V2H4v2l1 2v6H3z"/></svg><span id="sTowers">0/5</span></span>
     </div>
-    <button id="bWave" class="ib go" title="Start next wave (Space)"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 2.8v10.4L13 8z"/></svg></button>
+    <button id="bWave" class="ib go" title="Start next lap (Space) · pause with P"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 2.8v10.4L13 8z"/></svg></button>
     <div class="seg full">
-      <button id="bSpeed" class="ib" title="Game speed">1x</button>
+      <button id="bSpeed" class="ib" title="Game speed (P pauses)">1x</button>
       <button id="bAuto" class="ib" title="Auto-lap: start the next lap automatically">AUTO</button>
     </div>
     <button id="bSC" class="ib sc full" title="Deploy Safety Car: 75% global slow for 6s (45s cooldown)">SC</button>
@@ -316,6 +317,7 @@ html.overlay .handle{-webkit-app-region:drag}
     <button id="bMin" class="ib" title="Minimize to pill / expand"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path id="bMinPath" d="m4 6 4 4 4-4"/></svg></button>
   </div>
   <div id="stage" class="full">
+    <div id="pausedTag" class="hidden">❚❚ PAUSED · press P</div>
     <canvas id="cv"></canvas>
     <div id="panel" class="glass ovl hidden">
       <div class="ph"><canvas id="pIcon"></canvas><div class="pt"><div id="pName" class="nm"></div><div id="pRole" class="role fit"></div></div><button id="pClose" class="x" title="Close">×</button></div>
@@ -331,8 +333,8 @@ html.overlay .handle{-webkit-app-region:drag}
       <div id="pPrio" class="prio"></div>
       <div id="pDelta" class="pdelta"></div>
       </div>
-      <div class="uprow"><button id="pUp" class="btn up fit"></button><button id="pMax" class="btn up max fit" title="Buy every level you can afford">MAX</button></div>
-      <div class="prow"><button id="pSell" class="btn sell fit"></button><button id="pOD" class="btn sm od fit" title="Push Lap: +60% fire rate for 4s (20s cooldown, Lv 5+)">Push Lap</button><button id="pSel" class="btn sm fit" title="Pinned mutation: applied automatically on every mutation of this tower. Click to unpin."></button></div>
+      <div class="uprow"><button id="pUp" class="btn up fit" title="Upgrade (U)"></button><button id="pMax" class="btn up max fit" title="Buy every level you can afford (M)">MAX</button></div>
+      <div class="prow"><button id="pSell" class="btn sell fit" title="Sell (S) · drag a tower to another pad to move it"></button><button id="pOD" class="btn sm od fit" title="Push Lap: +60% fire rate for 4s (20s cooldown, Lv 5+)">Push Lap</button><button id="pSel" class="btn sm fit" title="Pinned mutation: applied automatically on every mutation of this tower. Click to unpin."></button></div>
     </div>
     <div id="mut" class="ovl hidden">
       <div class="mh">✦ MUTATION <span id="mTitle"></span></div>
@@ -1607,6 +1609,17 @@ function deploySafetyCar(){
 function pushLap(t){ if (t.lv < 5 || t.odCD > 0) return; t.odT = 4; t.odCD = 20; burst(t.x + .5, t.y + .5, '#ff653f', 14, 2); }
 
 // ================= Player actions =================
+const moveFee = t => Math.ceil(t.invested * .05);
+function moveTower(t, x, y){
+  if (isPath(x, y) || towerAt(x, y)) return false;
+  const fee = moveFee(t);
+  if (S.gold < fee) { S.banner = { s:`MOVING COSTS $${fmt(fee)}`, c:'#ff653f', t:1.4 }; return false; }
+  S.gold -= fee; t.x = x; t.y = y; t.target = null;
+  addFx({ k:'ring', x:x + .5, y:y + .5, r:.9, c:TOWERS[t.type].color, t:.4, life:.4, w:2 });
+  addText(x + .5, y + .1, `MOVED −$${fmt(fee)}`, '#ffc85c');
+  save();
+  return true;
+}
 function place(type, x, y){
   const d = TOWERS[type], c = costOf(type);
   if (isPath(x, y) || towerAt(x, y)) return;          // only free build pads
@@ -2160,6 +2173,14 @@ function drawRange(x, y, r, col){
   ctx.setLineDash([4, 4]); ctx.lineDashOffset = -performance.now() / 60;
   ctx.strokeStyle = rgba(col, .6); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]);
 }
+// A small paper tag with text, centred on x with its bottom at y (canvas pixels), kept inside the track area.
+function label(c, text, x, y, col){
+  c.font = "800 9px 'Titillium Web',sans-serif";
+  const w = c.measureText(text).width + 8, h = 13;
+  const lx = Math.max(1, Math.min(W - w - 1, x - w / 2)), ly = Math.max(1, y - h);
+  rr(c, lx, ly, w, h, 3); c.fillStyle = '#fff4dc'; c.fill(); c.strokeStyle = '#16115e'; c.lineWidth = 1; c.stroke();
+  c.fillStyle = col; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(text, lx + w / 2, ly + h / 2 + .5);
+}
 
 function drawDynamicMap(now){
   ctx.drawImage(bg, 0, 0, W, H);
@@ -2217,7 +2238,14 @@ function render(now){
   const hv = ui.hover;
   if (hv && !S.over) {
     const free = !isPath(hv.x, hv.y) && !towerAt(hv.x, hv.y);
-    if (ui.build !== null) {
+    if (ui.dragT && (hv.x !== ui.dragT.x || hv.y !== ui.dragT.y)) {
+      const t = ui.dragT, ok = free && S.gold >= moveFee(t);
+      rr(ctx, hv.x * TS + 2, hv.y * TS + 2, TS - 4, TS - 4, 5);
+      ctx.fillStyle = ok ? 'rgba(156,194,90,.16)' : 'rgba(232,103,74,.18)'; ctx.fill();
+      ctx.strokeStyle = ok ? 'rgba(156,194,90,.7)' : 'rgba(232,103,74,.7)'; ctx.lineWidth = 1; ctx.stroke();
+      if (free) { ctx.globalAlpha = .55; drawTower(ctx, t.type, (hv.x + .5) * TS, (hv.y + .5) * TS, TS, -Math.PI / 2, t.muts.length, now, 0, t.lv); ctx.globalAlpha = 1; }
+      label(ctx, `MOVE $${fmt(moveFee(t))}`, (hv.x + .5) * TS, hv.y * TS - 3, ok ? '#16115e' : '#ff653f');
+    } else if (ui.build !== null) {
       const ok = free && S.gold >= TOWERS[ui.build].cost;
       rr(ctx, hv.x * TS + 2, hv.y * TS + 2, TS - 4, TS - 4, 5);
       ctx.fillStyle = ok ? 'rgba(156,194,90,.16)' : 'rgba(232,103,74,.18)'; ctx.fill();
@@ -2736,7 +2764,7 @@ function updateUI(){
   setText($('sTowers'), `${S.towers.length}/${towerCap()}`);
   const bw = $('bWave');
   bw.disabled = S.waveActive || S.over || !!ui.season;
-  bw.title = S.waveActive ? `Lap ${S.wave} in progress` : `Start lap ${S.wave + 1} (Space)`;
+  bw.title = (S.waveActive ? `Lap ${S.wave} in progress` : `Start lap ${S.wave + 1} (Space)`) + ' · P pauses';
   setText($('bSpeed'), S.speed + 'x');
   $('bSpeed').classList.toggle('on', S.speed > 1);
   $('bAuto').classList.toggle('on', S.auto);
@@ -2771,9 +2799,19 @@ function tileOf(ev){
   return { x: Math.floor((ev.clientX - r.left) / r.width * COLS), y: Math.floor((ev.clientY - r.top) / r.height * ROWS) };
 }
 cv.addEventListener('mousemove', ev => { ui.hover = tileOf(ev); });
+// Press on a tower and release over a free pad to move it; releasing on the same tile is a normal click.
+cv.addEventListener('pointerdown', ev => { if (ev.button !== 0 || !S || S.over) return; const { x, y } = tileOf(ev); ui.dragT = towerAt(x, y) || null; });
+cv.addEventListener('pointerup', ev => {
+  const t = ui.dragT; ui.dragT = null;
+  if (!t || !S) return;
+  const { x, y } = tileOf(ev);
+  if (x === t.x && y === t.y) return;
+  if (moveTower(t, x, y)) { ui.moved = true; if (ui.sel === t) refreshPanel(); }
+});
 cv.addEventListener('mouseleave', () => { ui.hover = null; });
 cv.addEventListener('contextmenu', ev => { ev.preventDefault(); ui.build = null; closePanel(); });
 cv.addEventListener('click', ev => {
+  if (ui.moved) { ui.moved = false; return; }   // that press was a move, not a click
   if (!S || S.over) return;
   const { x, y } = tileOf(ev), t = towerAt(x, y);
   if (t && t.jamT > 0) { t.jamT = Math.max(0, t.jamT - 1); burst(t.x + .5, t.y + .5, '#7fe0ff', 6, 1.5); return; } // click to reboot early
@@ -2815,6 +2853,13 @@ document.addEventListener('keydown', ev => {
   if (ev.code === 'Space') {
     if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
     ev.preventDefault(); startWave(); return;
+  }
+  const k = ev.key.toLowerCase();
+  if (k === 'p') { ui.paused = !ui.paused; $('pausedTag').classList.toggle('hidden', !ui.paused); return; }
+  if (ui.sel && !ui.mutT && !S.over) {
+    if (k === 'u') { upgrade(ui.sel); return; }
+    if (k === 'm') { upgradeMax(ui.sel); return; }
+    if (k === 's') { sell(ui.sel); return; }
   }
   const i = HOTKEYS.indexOf(ev.key);
   if (i >= 0 && !S.over && TOWERS[i].pr <= S.prestige) { ui.build = ui.build === i ? null : i; closePanel(); }
@@ -2941,7 +2986,7 @@ function frame(now){
   const raw = (now - last) / 1000, dt = Math.min(raw, .25);
   last = now;
   ui.shake *= Math.exp(-dt * 12);
-  if (S && !ui.home && !S.over && !ui.mutT && !ui.season && !ui.pres && !ui.hqMode) {
+  if (S && !ui.home && !S.over && !ui.mutT && !ui.season && !ui.pres && !ui.hqMode && !ui.paused) {
     ui.catchup = Math.min(CATCHUP_MAX, (ui.catchup || 0) + raw - dt);
     const extra = Math.min(ui.catchup, CATCHUP_PER_FRAME);
     ui.catchup -= extra;
