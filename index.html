@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.8.0">
+<meta name="app-version" content="2.9.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -115,6 +115,9 @@ html.overlay .handle{-webkit-app-region:drag}
 .sl-autos{display:flex;flex-direction:column;gap:3px;margin-top:3px}.sl-autos .btn{height:20px;margin:0;font-size:9px;text-align:left;padding:0 6px}
 .sl-none{font-size:9px;color:var(--ink3)}
 .sl-btns .sl-auto{flex:0 0 26px}
+#errBar{position:absolute;z-index:40;left:6px;right:6px;top:6px;display:flex;align-items:center;gap:7px;padding:6px 8px;border:1.5px solid var(--ember);border-radius:5px;background:#fff1e6;box-shadow:var(--shadow);font-size:10px}
+#errBar b{flex:none;color:var(--ember)}#errMsg{flex:1;min-width:0;color:var(--ink2);font-family:var(--mono);font-size:9px;overflow-wrap:anywhere}
+#errBar .btn{flex:none;width:auto;height:22px;margin:0;padding:0 10px;background:var(--ember);color:var(--paper)}
 #pausedTag{position:absolute;z-index:6;left:50%;top:76%;transform:translate(-50%,-50%);padding:6px 12px;border:var(--rule);border-radius:4px;background:var(--paper);font-weight:900;letter-spacing:2px;font-size:11px;pointer-events:none}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
@@ -425,6 +428,7 @@ html.overlay .handle{-webkit-app-region:drag}
     </div>
     <div id="hmMsg" class="hm-msg"></div>
   </div>
+  <div id="errBar" class="hidden"><b>⚠ Something went wrong</b><span id="errMsg"></span><button id="errReload" class="btn sm" onclick="location.reload()">Reload</button></div>
   <div id="upd" class="hidden"><div class="upd-card">
     <div class="upd-t">⬆ UPDATE AVAILABLE</div>
     <div class="upd-v">Installed <b>v<span id="updFrom"></span></b> → Latest <b>v<span id="updTo"></span></b></div>
@@ -436,6 +440,15 @@ html.overlay .handle{-webkit-app-region:drag}
 </div>
 <script type="text/plain" id="game-src">
 'use strict';
+// ================= Errors are shown, never silent =================
+// Anything that throws (including inside the frame loop, which then stops) puts up a bar with a Reload button.
+// Reload does not save first: a broken state must not overwrite the last good save (saved every 10 s + autosaves).
+function showCrash(msg){
+  document.getElementById('errMsg').textContent = msg;
+  document.getElementById('errBar').classList.remove('hidden');
+}
+window.addEventListener('error', e => showCrash(e.message || String(e.error)));
+window.addEventListener('unhandledrejection', e => showCrash(e.reason && e.reason.message ? e.reason.message : String(e.reason)));
 // ================= Constants =================
 const COLS = 12, ROWS = 7, TS = 32, W = COLS * TS, H = ROWS * TS;
 const STEP = 1 / 60;
