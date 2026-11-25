@@ -161,3 +161,19 @@ test('home screen can be moved and resized from every edge, at any zoom', async 
     await expect(page.locator('#home .hm-ttl.handle')).toBeVisible();
   }
 });
+
+test('a new season, restart or prestige never starts laps by itself', async () => {
+  await newSave();
+  const finale = () => page.evaluate(() => {
+    S.auto = true; S.speed = 3; S.enemies = []; S.q = []; S.wave = 24; S.waveActive = true;
+    S.lap = { gold:0, cp:0, lives:S.lives, bossKills:S.bossKills, carKills:S.carKills }; S.boss = null; endWave();
+  });
+  for (const go of ['nextSeason()', 'restartSeason()', 'S.best = 24; doPrestige()']) {
+    await finale();
+    await page.evaluate(code => { closeSeasonEnd(); ui.season = null; eval(code); }, go);
+    await page.waitForTimeout(1500);
+    const s = await page.evaluate(() => ({ auto:S.auto, speed:S.speed, wave:S.wave, waveActive:S.waveActive, time:S.time }));
+    expect(s).toMatchObject({ auto:false, speed:1, wave:0, waveActive:false });
+    if (go.includes('doPrestige')) expect(s.time).toBe(0);   // paused behind the HQ sheet
+  }
+});

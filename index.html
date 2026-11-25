@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.5.2">
+<meta name="app-version" content="2.5.3">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -1571,6 +1571,7 @@ function newRun(){
   const d = serialize();
   d.run = freshRun(d);
   S = makeState(d);
+  S.auto = false; S.speed = 1;                // a new run never starts laps by itself
   setMap(S.seed);
   ui.build = null; ui.sel = null; ui.season = null;
   closePanel(); closePrestige(); closeSeasonEnd();
@@ -2809,7 +2810,7 @@ $('bMin').onclick = () => {
 document.addEventListener('keydown', ev => {
   if (!S || ui.home) return;
   if (ev.key === 'Escape') { ui.build = null; closePanel(); closePrestige(); if (ui.hqMode) closeHQ(); return; }
-  if (ui.pres) return;                      // the race is paused behind the prestige sheet
+  if (ui.pres || ui.hqMode) return;         // the race is paused behind the prestige and HQ sheets
   if (ev.code === 'Space') {
     if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
     ev.preventDefault(); startWave(); return;
@@ -2939,7 +2940,7 @@ function frame(now){
   const raw = (now - last) / 1000, dt = Math.min(raw, .25);
   last = now;
   ui.shake *= Math.exp(-dt * 12);
-  if (S && !ui.home && !S.over && !ui.mutT && !ui.season && !ui.pres) {
+  if (S && !ui.home && !S.over && !ui.mutT && !ui.season && !ui.pres && !ui.hqMode) {
     ui.catchup = Math.min(CATCHUP_MAX, (ui.catchup || 0) + raw - dt);
     const extra = Math.min(ui.catchup, CATCHUP_PER_FRAME);
     ui.catchup -= extra;
