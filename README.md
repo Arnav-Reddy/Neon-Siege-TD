@@ -31,7 +31,7 @@ Play it live at **https://arnav-reddy.github.io/Neon-Siege-TD/**, or open `index
 
 ## Updates
 
-The desktop app (v1.0.2 and later) loads the game live from that page. Every update pushed to `main` reaches your installed app the next time you open it, with no new download. You only need to download a new release when the desktop shell itself changes. The app also bundles a local copy of the game and falls back to it when GitHub Pages is unreachable or returns an error. For development, `npm start -- --local` runs the in-repo `index.html` directly.
+The desktop app (v1.0.2 and later) loads the game live from that page. Every update pushed to `main` reaches your installed app the next time you open it, with no new download. From v1.0.5 the desktop app also updates itself: on Windows (installer) and Linux it downloads new releases in the background and installs them when you quit (or choose **Restart to update** in the tray menu). On macOS and with the Windows portable .exe it tells you a new version is out and opens its download page in one click, because macOS only lets apps signed with a paid Apple Developer certificate replace themselves. The app also bundles a local copy of the game and falls back to it when GitHub Pages is unreachable or returns an error. For development, `npm start -- --local` runs the in-repo `index.html` directly.
 
 The game also updates itself. At start-up it compares its version with the `index.html` on GitHub. When a newer version exists, an **Update** box offers **Update & Reload Now** or **Later**. The new version is cached in the browser and loads instantly from then on. You can check by hand with **⟳ Check updates** on the home screen, and change the update URL with **⚙**.
 

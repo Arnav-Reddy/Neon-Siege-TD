@@ -1,6 +1,7 @@
 // Desktop overlay shell: a transparent, frameless, always-on-top window that floats above other
 // apps (including full-screen ones). The page drags it via native drag regions and sizes it to the widget.
-const { app, BrowserWindow, screen, ipcMain, globalShortcut, Tray, Menu, nativeImage } = require('electron');
+const { app, BrowserWindow, screen, ipcMain, globalShortcut, Tray, Menu, nativeImage, Notification, shell } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const fs = require('fs');
 
@@ -13,7 +14,54 @@ const LOCAL_GAME = 'file://' + path.join(__dirname, 'index.html');
 const GAME_URL = LOCAL
   ? LOCAL_GAME
   : 'https://arnav-reddy.github.io/Neon-Siege-TD/';
-let win, tray, saveTimer;
+let win, tray, saveTimer, menu, hotkeyOk = true;
+let shellUpdate = null;   // { version, ready } once a newer desktop release is found
+
+// ---- Desktop shell auto-update (GitHub Releases) ----
+// Windows (installer) and Linux AppImage: download in the background, install on quit.
+// macOS (ad-hoc signed, so the OS refuses self-replacement) and the Windows portable .exe:
+// announce the new version and open its download page in one click.
+const RELEASES_URL = 'https://github.com/Arnav-Reddy/Neon-Siege-TD/releases/latest';
+const SELF_INSTALL = process.platform !== 'darwin' && !process.env.PORTABLE_EXECUTABLE_DIR;
+const UPDATE_EVERY_MS = 6 * 60 * 60 * 1000;
+function notify(body, onClick){
+  if (!Notification.isSupported()) return;
+  const n = new Notification({ title: 'Neon Siege TD', body });
+  if (onClick) n.on('click', onClick);
+  n.show();
+}
+function setupShellUpdates(){
+  if (!app.isPackaged && !process.env.TDM_UPDATE_TEST) return;   // dev runs never update themselves
+  if (process.env.TDM_UPDATE_TEST) autoUpdater.forceDevUpdateConfig = true;
+  autoUpdater.autoDownload = SELF_INSTALL;
+  autoUpdater.autoInstallOnAppQuit = SELF_INSTALL;
+  autoUpdater.on('update-available', info => {
+    shellUpdate = { version: info.version, ready: false };
+    buildMenu();
+    if (!SELF_INSTALL) notify(`Version ${info.version} is available. Click to download it.`, () => shell.openExternal(RELEASES_URL));
+  });
+  autoUpdater.on('update-downloaded', info => {
+    shellUpdate = { version: info.version, ready: true };
+    buildMenu();
+    notify(`Version ${info.version} is ready. It installs when you quit, or choose Restart to update in the tray menu.`);
+  });
+  autoUpdater.on('error', err => console.warn('Update check failed:', err.message));
+  const check = () => autoUpdater.checkForUpdates().catch(err => console.warn('Update check failed:', err.message));
+  check();
+  setInterval(check, UPDATE_EVERY_MS);
+}
+function buildMenu(){
+  const items = [
+    { label: hotkeyOk ? 'Show / Hide (Ctrl/Cmd+Shift+T)' : 'Show / Hide (tray icon only — hotkey taken)', click: toggle },
+    { label: 'Reload game', click: loadGame },
+  ];
+  if (shellUpdate) items.push({ type: 'separator' }, shellUpdate.ready
+    ? { label: `Restart to update to v${shellUpdate.version}`, click: () => autoUpdater.quitAndInstall() }
+    : SELF_INSTALL ? { label: `Downloading v${shellUpdate.version}…`, enabled: false }
+    : { label: `Download v${shellUpdate.version}…`, click: () => shell.openExternal(RELEASES_URL) });
+  items.push({ type: 'separator' }, { label: 'Quit', click: () => app.quit() });
+  menu = Menu.buildFromTemplate(items);
+}
 let triedLocal = false, errorShown = false;
 
 if (!app.requestSingleInstanceLock()) app.quit();
@@ -119,7 +167,7 @@ app.whenReady().then(async () => {
   win.on('closed', () => { win = null; });
 
   ipcMain.on('fit', (_e, w, h, ax, ay) => fitTo(w, h, ax, ay));
-  const hotkeyOk = globalShortcut.register(HOTKEY, toggle);
+  hotkeyOk = globalShortcut.register(HOTKEY, toggle);
   if (!hotkeyOk) console.warn('Global hotkey unavailable; use the tray icon:', HOTKEY);
 
   tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'build', 'icon.png')).resize({ width: 16, height: 16 }));
@@ -127,14 +175,10 @@ app.whenReady().then(async () => {
   // Left-click toggles, right-click opens the menu. setContextMenu would ALSO pop the menu on
   // every left-click on macOS (and then double-toggle if its Show/Hide item is used), which is
   // why the menu is shown manually instead.
-  const menu = Menu.buildFromTemplate([
-    { label: hotkeyOk ? 'Show / Hide (Ctrl/Cmd+Shift+T)' : 'Show / Hide (tray icon only — hotkey taken)', click: toggle },
-    { label: 'Reload game', click: loadGame },
-    { type: 'separator' },
-    { label: 'Quit', click: () => app.quit() },
-  ]);
+  buildMenu();
   tray.on('click', toggle);
   tray.on('right-click', () => tray.popUpContextMenu(menu));
+  setupShellUpdates();
 });
 
 app.on('before-quit', () => { clearTimeout(saveTimer); writePos(); });
