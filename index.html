@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.5.1">
+<meta name="app-version" content="2.5.2">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -164,7 +164,7 @@ html.overlay .handle{-webkit-app-region:drag}
 #home{position:absolute;inset:0;z-index:20;background:var(--paper);display:flex;flex-direction:column;padding:9px 10px 7px;gap:6px}
 .hm-head{display:flex;align-items:center;gap:8px;padding-bottom:6px;border-bottom:var(--rule)}
 .hm-logo{width:30px;height:30px;border:var(--rule);border-radius:50%;display:grid;place-items:center;background:var(--ochre);font-size:14px}
-.hm-ttl{flex:1}.hm-t{font-weight:900;font-size:13px;letter-spacing:4px}.hm-s{font-size:9px;color:var(--ink2);font-family:var(--mono)}
+.hm-ttl{flex:1}.hm-head .handle{cursor:grab}.hm-t{font-weight:900;font-size:13px;letter-spacing:4px}.hm-s{font-size:9px;color:var(--ink2);font-family:var(--mono)}
 .hm-cont{height:30px;flex:none;border:var(--rule);border-radius:4px;background:var(--ember);color:var(--paper);font-weight:800;font-size:11px;box-shadow:var(--shadow-sm)}
 .hm-cont:hover{background:#f04f28}.hm-cont:active{transform:translate(2px,2px);box-shadow:none}
 .hm-slots{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding:0 2px 2px 0}
@@ -281,10 +281,11 @@ html.overlay .handle{-webkit-app-region:drag}
 
 /* ---------- Resize handles on every edge and corner ---------- */
 /* Resize from any side or corner: the opposite side stays fixed while dragging */
-.rz{position:absolute;z-index:12;-webkit-app-region:no-drag}
-.rz-n,.rz-s{left:12px;right:12px;height:6px;cursor:ns-resize}.rz-n{top:0}.rz-s{bottom:0}
-.rz-e,.rz-w{top:12px;bottom:12px;width:6px;cursor:ew-resize}.rz-e{right:0}.rz-w{left:0}
-.rz-ne,.rz-nw,.rz-se,.rz-sw{width:12px;height:12px}
+.rz{position:absolute;z-index:25;-webkit-app-region:no-drag} /* siblings of #w in #wrap: unscaled, cover the border; above the home screen (20), below the update box (30) */
+#w.min ~ .rz{display:none}
+.rz-n,.rz-s{left:14px;right:14px;height:7px;cursor:ns-resize}.rz-n{top:0}.rz-s{bottom:0}
+.rz-e,.rz-w{top:14px;bottom:14px;width:7px;cursor:ew-resize}.rz-e{right:0}.rz-w{left:0}
+.rz-ne,.rz-nw,.rz-se,.rz-sw{width:14px;height:14px}
 .rz-ne{top:0;right:0;cursor:nesw-resize}.rz-sw{bottom:0;left:0;cursor:nesw-resize}
 .rz-nw{top:0;left:0;cursor:nwse-resize}.rz-se{bottom:0;right:0;cursor:nwse-resize}
 #w.resizing .rz{background:transparent}
@@ -386,8 +387,8 @@ html.overlay .handle{-webkit-app-region:drag}
   <div id="tip" class="glass hidden"><div class="tn"><span id="tName"></span><b id="tCost"></b></div><div id="tRole" class="tr"></div><div id="tDesc" class="td"></div></div>
   <div id="home" class="hidden">
     <div class="hm-head">
-      <div class="hm-logo">🏁</div>
-      <div class="hm-ttl"><div class="hm-t">F1 PADDOCK</div><div class="hm-s">Neon Siege TD · v<span id="hmVer"></span></div></div>
+      <div class="hm-logo handle">🏁</div>
+      <div class="hm-ttl handle"><div class="hm-t">F1 PADDOCK</div><div class="hm-s">Neon Siege TD · v<span id="hmVer"></span></div></div>
       <button id="hmClose" class="x" title="Back to the race">×</button>
     </div>
     <button id="hmContinue" class="hm-cont"></button>
@@ -407,8 +408,8 @@ html.overlay .handle{-webkit-app-region:drag}
     <div class="upd-n">Your 5 save slots are kept.</div>
     <div class="prow"><button id="updLater" class="btn sm">Later</button><button id="updGo" class="btn asc">Update &amp; Reload Now</button></div>
   </div></div>
-  <div class="rz rz-n full" data-dir="n" title="Drag to resize · double-click to reset"></div><div class="rz rz-s full" data-dir="s" title="Drag to resize · double-click to reset"></div><div class="rz rz-e full" data-dir="e" title="Drag to resize · double-click to reset"></div><div class="rz rz-w full" data-dir="w" title="Drag to resize · double-click to reset"></div><div class="rz rz-ne full" data-dir="ne" title="Drag to resize · double-click to reset"></div><div class="rz rz-nw full" data-dir="nw" title="Drag to resize · double-click to reset"></div><div class="rz rz-se full" data-dir="se" title="Drag to resize · double-click to reset"></div><div class="rz rz-sw full" data-dir="sw" title="Drag to resize · double-click to reset"></div>
 </div>
+<div class="rz rz-n" data-dir="n" title="Drag to resize · double-click to reset"></div><div class="rz rz-s" data-dir="s" title="Drag to resize · double-click to reset"></div><div class="rz rz-e" data-dir="e" title="Drag to resize · double-click to reset"></div><div class="rz rz-w" data-dir="w" title="Drag to resize · double-click to reset"></div><div class="rz rz-ne" data-dir="ne" title="Drag to resize · double-click to reset"></div><div class="rz rz-nw" data-dir="nw" title="Drag to resize · double-click to reset"></div><div class="rz rz-se" data-dir="se" title="Drag to resize · double-click to reset"></div><div class="rz rz-sw" data-dir="sw" title="Drag to resize · double-click to reset"></div>
 </div>
 <script type="text/plain" id="game-src">
 'use strict';

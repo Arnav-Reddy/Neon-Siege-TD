@@ -19,7 +19,7 @@ Go to [**Releases**](https://github.com/Arnav-Reddy/Neon-Siege-TD/releases/lates
 - The game opens as a borderless widget in the bottom-right corner. There's no taskbar or Dock entry.
 - **Move it:** drag the stat bar (or the ⋮⋮ grip) to put it anywhere. It doesn't snap into place: after you drag it, the nearest screen corner becomes its anchor, so minimizing or resizing keeps that corner fixed.
 - **Resize it:** drag any edge or corner to scale it from 60% to 250%; the opposite side stays where it is. Double-click an edge to reset to 100%. Size and position are remembered.
-- **Show or hide:** press `Ctrl+Shift+Alt+T` (`Cmd+Shift+Alt+T` on macOS) from any app. Left-click the tray / menu-bar icon to toggle the widget; right-click the icon to open its menu.
+- **Show or hide:** press `Ctrl+Shift+T` (`Cmd+Shift+T` on macOS) from any app. Left-click the tray / menu-bar icon to toggle the widget; right-click the icon to open its menu.
 - **Quit:** right-click the tray icon and choose **Quit**.
 - **Shrink:** the `⌄` button shrinks the widget to a small pill. The window shrinks with it, so it covers nothing else.
 

@@ -1,7 +1,7 @@
 {
   "name": "neon-siege-td",
   "productName": "Neon Siege TD",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Incremental tower defense that floats as an always-on-top desktop overlay.",
   "author": "Arnav V",
   "license": "UNLICENSED",

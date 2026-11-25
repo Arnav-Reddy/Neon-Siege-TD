@@ -4,7 +4,7 @@ const { app, BrowserWindow, screen, ipcMain, globalShortcut, Tray, Menu, nativeI
 const path = require('path');
 const fs = require('fs');
 
-const WIDTH = 440, HEIGHT = 344, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+Alt+T';
+const WIDTH = 440, HEIGHT = 344, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+T';
 // The game is loaded live from GitHub Pages, so every push to main reaches the installed app
 // on its next launch without a new download. Only changes to this shell need a new release.
 // Draft mode: `npm start -- --local` (or TDM_LOCAL=1) loads the in-repo index.html instead.
@@ -128,7 +128,7 @@ app.whenReady().then(async () => {
   // every left-click on macOS (and then double-toggle if its Show/Hide item is used), which is
   // why the menu is shown manually instead.
   const menu = Menu.buildFromTemplate([
-    { label: hotkeyOk ? 'Show / Hide (Ctrl/Cmd+Shift+Alt+T)' : 'Show / Hide (tray icon only — hotkey taken)', click: toggle },
+    { label: hotkeyOk ? 'Show / Hide (Ctrl/Cmd+Shift+T)' : 'Show / Hide (tray icon only — hotkey taken)', click: toggle },
     { label: 'Reload game', click: loadGame },
     { type: 'separator' },
     { label: 'Quit', click: () => app.quit() },

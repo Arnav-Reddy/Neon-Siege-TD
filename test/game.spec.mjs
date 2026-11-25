@@ -146,3 +146,18 @@ test('selecting any economy tower keeps the race running', async () => {
     await page.waitForFunction(t0 => S.time > t0 + 0.2, t0);
   }
 });
+
+test('home screen can be moved and resized from every edge, at any zoom', async () => {
+  await page.setViewportSize({ width:1400, height:1100 }); // room for the widget at 2.5x
+  for (const scale of [1, 2.5]) {
+    await page.evaluate(s => { applyScale(s); setAnchor('l', 't'); ui.pos = { dx:10, dy:10 }; placeInPage(); }, scale);
+    const bb = await page.locator('#w').boundingBox();
+    const hits = await page.evaluate(({ x, y, w, h }) => {
+      const at = (px, py) => { const e = document.elementFromPoint(px, py); return e.closest('.rz') ? e.closest('.rz').dataset.dir : e.closest('.handle') ? 'drag' : 'none'; };
+      const L = x + .5, R = x + w - .5, T = y + .5, B = y + h - .5, cx = x + w / 2, cy = y + h / 2;
+      return { w:at(L, cy), e:at(R, cy), n:at(cx, T), s:at(cx, B), nw:at(L, T), ne:at(R, T), sw:at(L, B), se:at(R, B) };
+    }, { x:bb.x, y:bb.y, w:bb.width, h:bb.height });
+    expect(hits).toEqual({ w:'w', e:'e', n:'n', s:'s', nw:'nw', ne:'ne', sw:'sw', se:'se' });
+    await expect(page.locator('#home .hm-ttl.handle')).toBeVisible();
+  }
+});
