@@ -59,7 +59,7 @@ test('new save starts a run', async () => {
 test('place tower through dock and canvas mouse input', async () => {
   await newSave();
   const goldBefore = await page.evaluate(() => S.gold);
-  await page.locator('.tw').first().click();
+  await page.locator('#bar .tw:not(.money)').first().click();
   const tile = await freeTile();
   const point = await page.evaluate(({ x, y }) => {
     const rect = document.getElementById('cv').getBoundingClientRect();

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="3.0.0">
+<meta name="app-version" content="3.1.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -284,6 +284,11 @@ html.overlay .handle{-webkit-app-region:drag}
 /* ---------- Dock ---------- */
 #dock{flex:1;min-height:0;display:flex;align-items:center}
 #bar{width:100%;display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:3px 8px 5px 8px;scrollbar-width:none}
+.sec{flex:none;width:16px;height:60px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border-radius:3px;background:var(--ink);color:var(--paper)}
+.sec b{writing-mode:vertical-rl;transform:rotate(180deg);font-size:7.5px;letter-spacing:1.5px}.sec i{font-style:normal;font-family:var(--mono);font-size:7px}
+.sec.money{background:var(--ochre);color:var(--ink)}
+.tw.money{background:linear-gradient(180deg,#fff1c9,#ffe39a);border-style:dashed}.tw.money .c{color:#8a5a00}
+.tw.money.sel{background:var(--ochre);color:var(--ink)}
 #bar::-webkit-scrollbar{display:none}
 .tw{--rc:#8c8577;position:relative;flex:none;width:56px;height:60px;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
   background:var(--paper);border:var(--rule);box-shadow:var(--shadow-sm);transition:transform .1s}
@@ -828,7 +833,11 @@ function importCareer(json){
 // ================= Stats =================
 function mc(t, id){ let n = 0; for (const m of t.muts) if (m === id) n++; return n; }
 const hq = id => S.hq[id] || 0;
-const towerCap = () => BASE_CAP + S.prestige + hq('garage') + S.boons.slot;
+const towerCap = () => BASE_CAP + S.prestige + hq('garage') + S.boons.slot;   // combat towers only
+const MONEY_CAP = 3;                                                            // money makers have their own limit
+const combatCount = () => S.towers.filter(t => !isMint(t)).length;
+const moneyCount = () => S.towers.filter(isMint).length;
+const capFull = type => TOWERS[type].kind === 'econ' ? moneyCount() >= MONEY_CAP : combatCount() >= towerCap();
 const tileMult = () => 1 + .25 * hq('tile');
 const isMint = t => TOWERS[t.type].kind === 'econ';   // economy towers
 const weather = () => ['sun', 'rain', 'night'][Math.floor(Math.max(0, S.wave - 1) / 5) % 3];
@@ -1821,13 +1830,13 @@ function place(type, x, y){
   const d = TOWERS[type], c = costOf(type);
   if (isPath(x, y) || towerAt(x, y)) return;          // only free build pads
   if (d.pr > S.prestige) { S.banner = { s:`LOCKED · REACH PRESTIGE ${d.pr}`, c:'#ff653f', t:1.6 }; return; }
-  if (S.towers.length >= towerCap()) { S.banner = { s:`TOWER CAP ${towerCap()} REACHED`, c:'#ff653f', t:1.6 }; return; }
+  if (capFull(type)) { S.banner = { s:d.kind === 'econ' ? `MONEY MAKERS ${MONEY_CAP}/${MONEY_CAP} BUILT` : `TOWER CAP ${towerCap()} REACHED`, c:'#ff653f', t:1.6 }; return; }
   if (S.gold < c) return;
   S.gold -= c;
   S.towers.push(makeTower(type, x, y, c));
   addFx({ k:'ring', x:x + .5, y:y + .5, r:.9, c:d.color, t:.4, life:.4, w:2 });
   burst(x + .5, y + .5, d.color, 10, 2);
-  if (S.gold < c || S.towers.length >= towerCap()) ui.build = null;
+  if (S.gold < c || capFull(type)) ui.build = null;
   save();
 }
 // One level: +30% power, a shockwave, and a mutation draft every 5th level.
@@ -2693,12 +2702,20 @@ function iconCanvas(cvs, type, size, tier){
   drawTower(g, type, size / 2, size * .66, size * .7, -Math.PI / 4, tier, .6, 0, 1);
 }
 const bar = $('bar'), tip = $('tip'), hot = [];
-TOWERS.forEach((d, i) => {
+const DOCK_ORDER = [...TOWERS.keys()].filter(i => TOWERS[i].kind === 'econ').concat([...TOWERS.keys()].filter(i => TOWERS[i].kind !== 'econ'));
+const secMoney = document.createElement('div'), secTowers = document.createElement('div');
+secMoney.className = 'sec money'; secTowers.className = 'sec';
+secMoney.innerHTML = '<b>MONEY</b><i id="secMoneyN"></i>'; secTowers.innerHTML = '<b>TOWERS</b><i id="secTowersN"></i>';
+DOCK_ORDER.forEach((i, pos) => {
+  const d = TOWERS[i];
+  if (pos === 0) bar.append(secMoney);
+  if (d.kind !== 'econ' && TOWERS[DOCK_ORDER[pos - 1]].kind === 'econ') bar.append(secTowers);
   const b = document.createElement('button');
-  b.className = 'tw';
+  b.className = d.kind === 'econ' ? 'tw money' : 'tw';
   b.style.setProperty('--rc', RARITY[d.rarity].c);
+  b._type = i;
   const tag = document.createElement('span'); tag.className = 'tag';
-  const key = document.createElement('span'); key.className = 'k'; key.textContent = HOTKEYS[i] || '';
+  const key = document.createElement('span'); key.className = 'k'; key.textContent = HOTKEYS[pos] || '';
   const lock = document.createElement('span'); lock.className = 'lock'; lock.textContent = 'P' + d.pr; b._lock = lock;
   const c = document.createElement('canvas'); iconCanvas(c, i, 28, 0); b._icon = c;
   const n = document.createElement('span'); n.className = 'n'; n.textContent = d.short;
@@ -3040,7 +3057,7 @@ function updateUI(){
   setText($('sGold'), fmt(S.gold));
   setText($('sRate'), `+${fmt(incomeRate())}/s`);
   setText($('sLives'), String(Math.max(0, S.lives)));
-  setText($('sTowers'), `${S.towers.length}/${towerCap()}`);
+  setText($('sTowers'), `${combatCount()}/${towerCap()}`);
   const bw = $('bWave');
   bw.disabled = S.waveActive || S.over || !!ui.season;
   bw.title = (S.waveActive ? `Lap ${S.wave} in progress` : `Start lap ${S.wave + 1} (Space)`) + ' · P pauses';
@@ -3056,9 +3073,9 @@ function updateUI(){
   bp.title = `Prestige · P${S.prestige} ${rankName(S.prestige)} · ${S.cp} CP${ready ? '\nReady: prestige to P' + (S.prestige + 1) : '\nClear lap ' + prestigeTarget() + ' to prestige'}`;
   if (ui.pres) refreshPrestige();
   $('bMinPath').setAttribute('d', ui.min ? 'm4 10 4-4 4 4' : 'm4 6 4 4 4-4');
-  const full = S.towers.length >= towerCap();
-  hot.forEach((b, i) => {
-    const d = TOWERS[i], locked = d.pr > S.prestige;
+  setText($('secMoneyN'), `${moneyCount()}/${MONEY_CAP}`); setText($('secTowersN'), `${combatCount()}/${towerCap()}`);
+  hot.forEach(b => {
+    const i = b._type, d = TOWERS[i], locked = d.pr > S.prestige, full = capFull(i);
     b.classList.toggle('sel', ui.build === i);
     b.classList.toggle('locked', locked);
     b._lock.classList.toggle('hidden', !locked);
@@ -3149,7 +3166,7 @@ document.addEventListener('keydown', ev => {
     if (k === 'm') { upgradeMax(ui.sel); return; }
     if (k === 's') { sell(ui.sel); return; }
   }
-  const i = HOTKEYS.indexOf(ev.key);
+  const pos = HOTKEYS.indexOf(ev.key), i = pos >= 0 ? DOCK_ORDER[pos] : -1;
   if (i >= 0 && !S.over && TOWERS[i].pr <= S.prestige) { ui.build = ui.build === i ? null : i; closePanel(); }
 });
 window.addEventListener('beforeunload', save);
@@ -3198,7 +3215,7 @@ function applyScale(s){
   RS = DPR * ui.scale;
   sizeCanvases();
   if (S) renderBackground();
-  hot.forEach((b, i) => iconCanvas(b._icon, i, 28, 0));
+  hot.forEach(b => iconCanvas(b._icon, b._type, 28, 0));
   $('pMuts')._k = null;
   fitWindow();
 }

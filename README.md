@@ -70,7 +70,7 @@ The game also updates itself. At start-up it compares its version with the `inde
   - P8: Spire $2.5B, Dyson $12B
 
   Locked towers show their rank on the dock.
-- **Tower cap:** you can field 5 towers, plus 1 per prestige rank and 1 per Pit Garage Expansion.
+- **Tower cap:** you can field 5 combat towers, plus 1 per prestige rank and 1 per Pit Garage Expansion. **Money makers** (Sponsor, Wind Tunnel, Pit Crew, Solar) have their own section at the left of the dock and their own limit of 3, so they never take a combat slot.
 - **Levels:** every level costs 1.6× the last and gives about +30% power, plus tower perks (extra barrels, more chain jumps, rail pierce, flak fragments and more). The inspector previews the next level's change. Lv3 unlocks target priority. Lv5 unlocks **Push Lap** (+60% fire rate for 4 s, 20 s cooldown) and the first **mutation draft**. You choose 1 of 3 mutations (4 with HQ), and a mutation can be stacked. Press **📌 Select** under a mutation to pin it: that tower then takes it automatically every time it mutates, until you unpin it in the inspector. `MAX` buys every level you can afford, then shows each earned draft one at a time (or applies the pinned mutation).
 - **Economy without car money:** kill and lap gold grow slowly (`13.5 × 1.08^lap`). Four towers make money:
   - **Sponsor Billboard:** earns gold every second of a lap, plus a lap-end bonus worth 25 seconds of income. Mutations: Title Sponsor, Prize Money, Merch Stand (+40% kill gold for towers in its radius).
