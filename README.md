@@ -47,7 +47,8 @@ The game also updates itself. At start-up it compares its version with the `inde
 | Target priority (Lv3+) | First · Strongest · Shielded · Support Vans |
 | Reboot a jammed tower | Click it |
 | Pit stop (Pit-Crew Gantry) | Click the tower while its PIT light is on |
-| Cancel | Right-click or `Esc` |
+| Pause / resume | `P` or `Esc` (Esc also closes the inspector and cancels building); `Cmd+Option+Shift+T` (`Ctrl+Alt+Shift+T`) from any app in the desktop app |
+| Cancel | Right-click |
 | Start the next lap | `▶` or `Space` |
 | Speed | `1x·2x·3x` |
 | Auto-lap | `AUTO` starts the next lap automatically |

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.9.0">
+<meta name="app-version" content="2.9.1">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -337,7 +337,7 @@ html.overlay .handle{-webkit-app-region:drag}
     <button id="bMin" class="ib" title="Minimize to pill / expand"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path id="bMinPath" d="m4 6 4 4 4-4"/></svg></button>
   </div>
   <div id="stage" class="full">
-    <div id="pausedTag" class="hidden">❚❚ PAUSED · press P</div>
+    <div id="pausedTag" class="hidden">❚❚ PAUSED · P or Esc to resume</div>
     <div id="away" class="hidden"><div id="awayHead"></div><div id="awayTxt"></div><button id="awayOk" class="btn sm">OK</button></div>
     <div id="hint" class="hidden"><span id="hintN"></span><span id="hintTxt"></span><button id="hintX" class="x" title="Skip the tips">×</button></div>
     <canvas id="cv"></canvas>
@@ -3000,16 +3000,22 @@ $('bMin').onclick = () => {
   ui.min = !ui.min; wEl.classList.toggle('min', ui.min); tip.classList.add('hidden');
   placeInPage(); fitWindow(); save();
 };
+function togglePause(){ if (!S || ui.home) return; ui.paused = !ui.paused; $('pausedTag').classList.toggle('hidden', !ui.paused); }
+// Cmd/Ctrl+Option/Alt+Shift+T from any app (desktop app v1.0.6+; older installed shells lack the hook)
+if (window.overlay && window.overlay.onPauseToggle) window.overlay.onPauseToggle(togglePause);
 document.addEventListener('keydown', ev => {
   if (!S || ui.home) return;
-  if (ev.key === 'Escape') { ui.build = null; closePanel(); closePrestige(); if (ui.hqMode) closeHQ(); return; }
+  if (ev.key === 'Escape') {
+    if (ui.pres || ui.hqMode) { closePrestige(); if (ui.hqMode) closeHQ(); return; }   // those sheets already pause
+    ui.build = null; closePanel(); togglePause(); return;
+  }
   if (ui.pres || ui.hqMode) return;         // the race is paused behind the prestige and HQ sheets
   if (ev.code === 'Space') {
     if (document.activeElement && document.activeElement.tagName === 'BUTTON') document.activeElement.blur();
     ev.preventDefault(); startWave(); return;
   }
   const k = ev.key.toLowerCase();
-  if (k === 'p') { ui.paused = !ui.paused; $('pausedTag').classList.toggle('hidden', !ui.paused); return; }
+  if (k === 'p') { togglePause(); return; }
   if (ui.sel && !ui.mutT && !S.over) {
     if (k === 'u') { upgrade(ui.sel); return; }
     if (k === 'm') { upgradeMax(ui.sel); return; }

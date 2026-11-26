@@ -5,7 +5,7 @@ const { autoUpdater } = require('electron-updater');
 const path = require('path');
 const fs = require('fs');
 
-const WIDTH = 440, HEIGHT = 344, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+T';
+const WIDTH = 440, HEIGHT = 344, MARGIN = 16, HOTKEY = 'CommandOrControl+Shift+T', PAUSE_HOTKEY = 'CommandOrControl+Alt+Shift+T';
 // The game is loaded live from GitHub Pages, so every push to main reaches the installed app
 // on its next launch without a new download. Only changes to this shell need a new release.
 // Draft mode: `npm start -- --local` (or TDM_LOCAL=1) loads the in-repo index.html instead.
@@ -168,6 +168,7 @@ app.whenReady().then(async () => {
 
   ipcMain.on('fit', (_e, w, h, ax, ay) => fitTo(w, h, ax, ay));
   hotkeyOk = globalShortcut.register(HOTKEY, toggle);
+  if (!globalShortcut.register(PAUSE_HOTKEY, () => win && win.webContents.send('pause-toggle'))) console.warn('Pause hotkey unavailable:', PAUSE_HOTKEY);
   if (!hotkeyOk) console.warn('Global hotkey unavailable; use the tray icon:', HOTKEY);
 
   tray = new Tray(nativeImage.createFromPath(path.join(__dirname, 'build', 'icon.png')).resize({ width: 16, height: 16 }));
