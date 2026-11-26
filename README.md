@@ -59,6 +59,14 @@ The game also updates itself. At start-up it compares its version with the `inde
 
 ## Features
 
+- **Start screen:** the game opens on an animated 3D circuit (cars racing, towers firing, a sunset sky) with **Story Mode** (seasons, finales, prestige), **Endless** (an endless run on a random named circuit with your team's unlocks; +1 CP every 3 laps; its own run per save, so it never touches your season) and **Settings**.
+- **Settings:** particles, screen shake, floating text, weather effects, start-screen animation, 30/60 fps, sharp rendering, pause or keep racing while hidden, confirm before selling Lv 5+ towers, next-lap preview, FPS counter, reduce motion, update checks, plus show tips again, reset size and position, export all saves and delete all autosaves.
+- **Named circuits:** Monza, Monaco, Silverstone, Spa and Suzuka rotate by season, each giving its favoured towers +20% damage.
+- **Synergies:** some towers boost each other side by side (Marshal + Mortar, Radar + Timing Beam, Wheel Gun + Tyres, ERS + Fuel Sprayer).
+- **Lap modifiers:** from lap 3 a lap can be Armoured, Nitro, Heavy, Swarm or Shielded, announced a lap ahead.
+- **Sponsor offers:** after laps 6, 12 and 18, choose one of three deals with a cost attached.
+- **Finale bosses** rotate a gimmick by season: shielding nearby cars, teleporting forward, or splitting in two.
+- **Overkill and grades:** surplus damage pays up to +50% of a bounty; every lap is graded S/A/B/C and an S pays +25%.
 - **Five save slots:** the home screen lists five garage slots. Each has a name, season, lap, best lap, CP and gold. You can rename, export or delete a slot (deleting asks twice) and import a save into the first empty slot. **Continue Last Session** reopens the slot you played last. Old single saves move into Slot 1 as "Legacy Team".
 - **Random circuits:** every run gets a new winding 12×7 Grand Prix layout with kerbs, gravel traps, a starting grid under a five-light gantry and a chequered finish. Two or three **hot-zone tiles** sit next to the track: **DRS** (+40% attack speed), **Grandstand** (+50% range, +25% crit chance) and **VIP** (+100% kill payout).
 - **20 trackside towers, unlocked by prestige rank:**

@@ -9,6 +9,8 @@ let pageErrors;
 
 async function openGame(targetPage) {
   await targetPage.goto('/');
+  await expect(targetPage.locator('#title')).toBeVisible();   // the start screen
+  await targetPage.locator('#tStory').click();
   await expect(targetPage.locator('#home')).toBeVisible();
 }
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="3.1.0">
+<meta name="app-version" content="3.2.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -120,6 +120,31 @@ html.overlay .handle{-webkit-app-region:drag}
 #errBar{position:absolute;z-index:40;left:6px;right:6px;top:6px;display:flex;align-items:center;gap:7px;padding:6px 8px;border:1.5px solid var(--ember);border-radius:5px;background:#fff1e6;box-shadow:var(--shadow);font-size:10px}
 #errBar b{flex:none;color:var(--ember)}#errMsg{flex:1;min-width:0;color:var(--ink2);font-family:var(--mono);font-size:9px;overflow-wrap:anywhere}
 #errBar .btn{flex:none;width:auto;height:22px;margin:0;padding:0 10px;background:var(--ember);color:var(--paper)}
+#title{position:absolute;inset:0;z-index:22;overflow:hidden;background:#0d0a3a}
+#t3d{position:absolute;inset:0;width:100%;height:100%}
+.tt-ui{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:16px 18px 14px;pointer-events:none}
+.tt-logo{align-self:flex-start;pointer-events:auto;cursor:grab;color:#fff4dc;text-shadow:0 2px 0 #16115e}
+.tt-kicker{font-weight:900;letter-spacing:6px;font-size:11px;color:var(--ochre)}
+.tt-name{font-weight:900;letter-spacing:2px;font-size:25px;line-height:1;font-style:italic}
+.tt-sub{font-size:9px;opacity:.8;margin-top:3px;font-family:var(--mono)}
+.tt-menu{display:flex;flex-direction:column;gap:6px;width:200px;pointer-events:auto}
+.tt-btn{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 11px;border-radius:5px;border:1.5px solid #fff4dc;background:rgba(22,17,94,.72);color:#fff4dc;text-align:left;backdrop-filter:blur(2px);transition:transform .1s,background .1s}
+.tt-btn b{font-size:12px;font-weight:900;letter-spacing:.5px}.tt-btn span{font-size:8.5px;opacity:.8}
+.tt-btn:hover{transform:translateX(3px);background:rgba(55,48,170,.9)}
+.tt-btn.hot{background:var(--ember);border-color:#fff4dc}.tt-btn.hot:hover{background:#f04f28}
+#settings{position:absolute;inset:0;z-index:23;background:var(--paper);display:flex;flex-direction:column;padding:9px 10px 7px;gap:5px}
+.st-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:5px;border-bottom:var(--rule)}
+.st-head b{font-weight:900;letter-spacing:3px;font-size:11px}
+.st-list{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:3px;padding-right:3px}
+.st-group{margin-top:4px;font-size:8px;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--ink3)}
+.st-row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:10px}
+.st-seg{display:flex;flex:none;border:var(--rule);border-radius:3px;overflow:hidden}
+.st-seg button{padding:2px 7px;font-size:8.5px;font-weight:700;background:var(--paper);color:var(--ink2)}
+.st-seg button+button{border-left:var(--rule)}.st-seg button.on{background:var(--ink);color:var(--paper)}
+.st-btns{display:grid;grid-template-columns:1fr 1fr;gap:4px}.st-btns .btn{height:21px;margin:0;font-size:9px}
+.st-msg{font-size:9px;color:var(--moss);min-height:11px}
+#fpsTag{position:absolute;z-index:26;right:6px;bottom:4px;font-family:var(--mono);font-size:9px;padding:1px 4px;border-radius:2px;background:var(--ink);color:var(--paper);pointer-events:none}
+.calm *,.calm *::before{animation:none!important;transition:none!important}
 #pausedTag{position:absolute;z-index:6;left:50%;top:76%;transform:translate(-50%,-50%);padding:6px 12px;border:var(--rule);border-radius:4px;background:var(--paper);font-weight:900;letter-spacing:2px;font-size:11px;pointer-events:none}
 @keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 
@@ -341,7 +366,7 @@ html.overlay .handle{-webkit-app-region:drag}
     </div>
     <button id="bSC" class="ib sc full" title="Deploy Safety Car: 75% global slow for 6s (45s cooldown)">SC</button>
     <button id="bPres" class="ib pres full" title="Prestige"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 1.5h7v1.6h2.6v1.6a3 3 0 0 1-2.9 3A4 4 0 0 1 9 10v1.6h2.2v2.9H4.8v-2.9H7V10a4 4 0 0 1-2.2-2.3 3 3 0 0 1-2.9-3V3.1h2.6zM3.4 4.6v.1c0 .7.5 1.3 1.1 1.4V4.6zm9.2 0h-1.1v1.5c.6-.1 1.1-.7 1.1-1.4z"/></svg><span>Prestige</span></button>
-    <button id="bMenu" class="ib full" title="Menu: F1 Paddock (save slots)"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 4h10M3 8h10M3 12h10"/></svg></button>
+    <button id="bMenu" class="ib full" title="Main menu"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 4h10M3 8h10M3 12h10"/></svg></button>
     <button id="bMin" class="ib" title="Minimize to pill / expand"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path id="bMinPath" d="m4 6 4 4 4-4"/></svg></button>
   </div>
   <div id="stage" class="full">
@@ -424,10 +449,35 @@ html.overlay .handle{-webkit-app-region:drag}
   </div>
   <div id="dock" class="full"><div id="bar"></div></div>
   <div id="tip" class="glass hidden"><div class="tn"><span id="tName"></span><b id="tCost"></b></div><div id="tRole" class="tr"></div><div id="tDesc" class="td"></div></div>
+  <div id="title" class="hidden">
+    <canvas id="t3d"></canvas>
+    <div class="tt-ui">
+      <div class="tt-logo handle"><div class="tt-kicker">NEON SIEGE</div><div class="tt-name">GRAND PRIX TD</div><div class="tt-sub">Trackside tower defense · v<span id="ttVer"></span></div></div>
+      <div class="tt-menu">
+        <button id="tResume" class="tt-btn hidden"><b>▶ Resume race</b><span id="tResumeSub"></span></button>
+        <button id="tStory" class="tt-btn hot"><b>🏁 Story Mode</b><span>Seasons, finales, prestige</span></button>
+        <button id="tEndless" class="tt-btn"><b>∞ Endless</b><span>How far can your team go?</span></button>
+        <button id="tSettings" class="tt-btn"><b>⚙ Settings</b><span>Graphics, gameplay, updates</span></button>
+      </div>
+    </div>
+  </div>
+  <div id="settings" class="hidden">
+    <div class="st-head"><b>⚙ SETTINGS</b><button id="stClose" class="x" title="Close">×</button></div>
+    <div id="stList" class="st-list"></div>
+    <div class="st-btns">
+      <button id="stTips" class="btn sm">Show tips again</button>
+      <button id="stResetUi" class="btn sm">Reset size and position</button>
+      <button id="stExport" class="btn sm">Export all saves</button>
+      <button id="stAutos" class="btn sm sell">Delete all autosaves</button>
+    </div>
+    <div id="stMsg" class="st-msg"></div>
+  </div>
+  <div id="fpsTag" class="hidden"></div>
   <div id="home" class="hidden">
     <div class="hm-head">
       <div class="hm-logo handle">🏁</div>
-      <div class="hm-ttl handle"><div class="hm-t">F1 PADDOCK</div><div class="hm-s">Neon Siege TD · v<span id="hmVer"></span></div></div>
+      <div class="hm-ttl handle"><div class="hm-t">F1 PADDOCK</div><div class="hm-s"><span id="hmMode"></span> · v<span id="hmVer"></span></div></div>
+      <button id="hmBack" class="x" title="Main menu">‹</button>
       <button id="hmClose" class="x" title="Back to the race">×</button>
     </div>
     <button id="hmContinue" class="hm-cont"></button>
@@ -461,6 +511,32 @@ function showCrash(msg){
   document.getElementById('errBar').classList.remove('hidden');
 }
 window.addEventListener('error', e => showCrash(e.message || String(e.error)));
+// ================= Settings (saved per device) =================
+const SETTINGS_KEY = 'f1_td_settings';
+const SETTINGS_DEF = [
+  { id:'particles',    group:'Graphics',  label:'Particle effects',                      opts:[['high', 'High'], ['low', 'Low'], ['off', 'Off']], def:'high' },
+  { id:'shake',        group:'Graphics',  label:'Screen shake',                          opts:[[true, 'On'], [false, 'Off']], def:true },
+  { id:'floaters',     group:'Graphics',  label:'Floating gold and damage text',         opts:[[true, 'On'], [false, 'Off']], def:true },
+  { id:'weatherFx',    group:'Graphics',  label:'Rain and night effects',                opts:[[true, 'On'], [false, 'Off']], def:true },
+  { id:'titleFx',      group:'Graphics',  label:'Animated start screen',                 opts:[[true, 'On'], [false, 'Off']], def:true },
+  { id:'fps',          group:'Graphics',  label:'Frame rate',                            opts:[[60, '60 fps'], [30, '30 fps · saves battery']], def:60 },
+  { id:'sharp',        group:'Graphics',  label:'Sharp rendering on high-DPI screens',   opts:[[true, 'On'], [false, 'Off · faster']], def:true },
+  { id:'pauseHidden',  group:'Gameplay',  label:'While the widget is hidden',            opts:[[false, 'Keep racing'], [true, 'Pause']], def:false },
+  { id:'confirmSell',  group:'Gameplay',  label:'Confirm before selling Lv 5+ towers',   opts:[[true, 'On'], [false, 'Off']], def:true },
+  { id:'preview',      group:'Gameplay',  label:'Next-lap preview',                      opts:[[true, 'On'], [false, 'Off']], def:true },
+  { id:'showFps',      group:'Interface', label:'FPS counter',                           opts:[[false, 'Off'], [true, 'On']], def:false },
+  { id:'reduceMotion', group:'Interface', label:'Reduce motion (no pop-in animations)',  opts:[[false, 'Off'], [true, 'On']], def:false },
+  { id:'autoUpdate',   group:'Updates',   label:'Check for game updates at start',       opts:[[true, 'On'], [false, 'Off']], def:true },
+];
+const CFG = Object.fromEntries(SETTINGS_DEF.map(o => [o.id, o.def]));
+(function loadSettings(){
+  const raw = localStorage.getItem(SETTINGS_KEY);
+  if (!raw) return;
+  try { const v = JSON.parse(raw); for (const o of SETTINGS_DEF) if (o.id in v && o.opts.some(([x]) => x === v[o.id])) CFG[o.id] = v[o.id]; }
+  catch { localStorage.removeItem(SETTINGS_KEY); }
+})();
+const saveSettings = () => localStorage.setItem(SETTINGS_KEY, JSON.stringify(CFG));
+const PARTICLE_MUL = { high:1, low:.35, off:0 };
 window.addEventListener('unhandledrejection', e => showCrash(e.reason && e.reason.message ? e.reason.message : String(e.reason)));
 // ================= Constants =================
 const COLS = 12, ROWS = 7, TS = 32, W = COLS * TS, H = ROWS * TS;
@@ -715,13 +791,14 @@ function makeTower(type, x, y, paid){
   return { type, x, y, lv:1, kills:0, earned:0, muts:[], invested:paid, cd:0, buff:1, aura:0, haste:0, lock:0, target:null, extra:[], beams:[],
     harvest:0, pulses:0, vscT:15, fieldR:0, prio:'first', odT:0, odCD:0, jamT:0, shots:0, charge:0, pays:0, pitCycle:0, pitWin:0, pitStop:0, pitFull:false, pitsDone:0, mutSel:null, dmg:0, ang:-Math.PI / 2, recoil:0, flash:0 };
 }
-function makeState(d){
-  const r = d.run;
+function makeState(d, mode = 'story'){
+  const r = mode === 'endless' ? d.endlessRun : d.run;
   return {
+    mode, endlessBest:d.endlessBest || 0,
     slot:d.slot, name:d.name, created:d.created, season:d.season, prestige:d.prestige, cp:d.cp, hq:{ ...d.hq }, best:d.best,
     speed:d.speed, auto:d.auto, tips:d.tips ?? 3,       // saves from before the tips skip them
     stats:d.stats ?? { playSec:0, kills:0, byTower:{} }, milestones:d.milestones ?? [], backupSince:d.backupSince ?? 0,
-    seed:r.seed, gold:r.gold, lives:r.lives, wave:r.wave, endless:r.endless, rerolls:r.rerolls, bossKills:r.bossKills, carKills:r.carKills, runEarned:r.runEarned, resist:r.resist,
+    seed:r.seed, gold:r.gold, lives:r.lives, wave:r.wave, endless:mode === 'endless' || r.endless, rerolls:r.rerolls, bossKills:r.bossKills, carKills:r.carKills, runEarned:r.runEarned, resist:r.resist,
     towers:r.towers.filter(t => Object.hasOwn(TOWER_INDEX, t.id)).map(t => ({ ...makeTower(TOWER_INDEX[t.id], t.x, t.y, t.invested), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), prio:t.prio, mutSel:t.mutSel || null, dmg:t.dmg || 0 })),
     waveActive:false, enemies:[], projs:[], hazards:[], fx:[], parts:[], drones:[], detQ:[], q:[], nextQ:null, waveTotal:0, lightsT:0, goT:0, spawnT:0, autoT:1.5, time:0,
     inc:new Array(10).fill(0), incI:0, incT:0, dmgCat:{}, scT:0, scCD:0, boss:null, lap:null,
@@ -733,6 +810,9 @@ function freshRun(career){
   return { seed:randSeed(), gold:startGoldFor(career.hq.gold || 0), lives:BASE_LIVES, wave:0, endless:false, rerolls:career.hq.reroll || 0,
     bossKills:0, carKills:0, runEarned:0, resist:null, towers:[], leaks:{}, circuit:circuitForSeason(career.season), boons:{ gold:1, hp:1, dmg:1, spd:1, slot:0 } };
 }
+function freshEndless(career){
+  return { ...freshRun(career), endless:true, circuit:CIRCUITS[Math.floor(Math.random() * CIRCUITS.length)].id };
+}
 function newCareer(slot, name){
   const c = { v:3, slot, name:name || `Team ${slot}`, created:Date.now(), season:1, prestige:0, cp:0, hq:{}, best:0, speed:1, auto:false, tips:0, stats:{ playSec:0, kills:0, byTower:{} }, milestones:[], backupSince:0 };
   c.run = freshRun(c);
@@ -741,15 +821,19 @@ function newCareer(slot, name){
 function serialize(){
   // Mid-lap, save the run as it was when the lap started (minus what was earned since); spending stays spent.
   const L = S.waveActive ? S.lap : { gold:0, cp:0, lives:S.lives, bossKills:S.bossKills, carKills:S.carKills };
-  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp - L.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto, tips:S.tips, stats:S.stats, milestones:S.milestones, backupSince:S.backupSince,
+  return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp - L.cp, hq:S.hq, best:S.best, endlessBest:S.endlessBest, speed:S.speed, auto:S.auto, tips:S.tips, stats:S.stats, milestones:S.milestones, backupSince:S.backupSince,
     run:{ seed:S.seed, gold:S.gold - L.gold, lives:L.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:L.bossKills, carKills:L.carKills, runEarned:S.runEarned - L.gold, resist:S.resist, leaks:S.leaks, circuit:S.circuit, boons:S.boons,
       towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested, prio:t.prio, mutSel:t.mutSel, dmg:t.dmg })) } };
 }
 function save(){
   savePrefs();
   if (!S) return;
-  localStorage.setItem(SLOT_KEY(S.slot), JSON.stringify(serialize()));
-  localStorage.setItem(LAST_KEY, String(S.slot));
+  // A save holds a Story run and an Endless run; write the active one and keep the other.
+  const d = serialize(), prev = readSlot(S.slot) || {};
+  if (S.mode === 'endless') { d.endlessRun = d.run; d.run = prev.run; }
+  else d.endlessRun = prev.endlessRun;
+  localStorage.setItem(SLOT_KEY(S.slot), JSON.stringify(d));
+  localStorage.setItem(LAST_KEY, String(S.slot)); localStorage.setItem(LAST_MODE_KEY, S.mode);
 }
 function savePrefs(){
   localStorage.setItem(PREFS_KEY, JSON.stringify({ min:ui.min, scale:ui.scale, place:{ ax:ui.ax, ay:ui.ay, dx:ui.pos.dx, dy:ui.pos.dy } }));
@@ -781,13 +865,16 @@ function migrateLegacy(){
   localStorage.setItem(LAST_KEY, '1');
   localStorage.removeItem('neonSiegeTD.v2');
 }
-function openSlot(n){
+const LAST_MODE_KEY = 'f1_td_last_mode';
+function openSlot(n, mode = 'story'){
   const d = readSlot(n);
   if (!d) throw new Error(`Slot ${n} is empty`);
-  S = makeState(d);
+  if (mode === 'endless' && !d.endlessRun) d.endlessRun = freshEndless(d);
+  S = makeState(d, mode);
   setMap(S.seed);
   for (const t of S.towers) while (t.muts.length < Math.floor(t.lv / 5)) t.muts.push(t.mutSel || autoPick(t));
   clearDraft();
+  ui.title = false; $("title").classList.add("hidden");   // opening a save enters the race
   ui.home = false; ui.build = null; ui.sel = null;
   if (S.over) gameOver();
   save();
@@ -808,9 +895,9 @@ function restoreAutosave(n, i){
   if (S && S.slot === n) S = null;                // drop the in-memory run so it cannot save over the restore
   localStorage.setItem(SLOT_KEY(n), JSON.stringify(e.data));
 }
-function createSlot(n, name){
+function createSlot(n, name, mode = 'story'){
   localStorage.setItem(SLOT_KEY(n), JSON.stringify(newCareer(n, name)));
-  openSlot(n);
+  openSlot(n, mode);
 }
 function deleteSlot(n){
   localStorage.removeItem(SLOT_KEY(n));
@@ -1043,8 +1130,9 @@ function endWave(){
     if (d.id === 'dyson' && mc(t, 'dy_ascend')) { S.cp += 2 * mc(t, 'dy_ascend'); addText(t.x + .5, t.y - .3, `+${2 * mc(t, 'dy_ascend')} CP`, '#ffc85c', true); }
   }
   S.best = Math.max(S.best, S.wave);
-  if (S.wave % 5 === 0) autosave(`Season ${S.season} · lap ${S.wave}`);
-  if (S.endless && (S.wave - SEASON_LEN) % 3 === 0) { S.cp += 1; addText(W / TS / 2, 1, '+1 CP · endless', '#ffc85c', true); }
+  if (S.mode === 'story' && S.wave % 5 === 0) autosave(`Season ${S.season} · lap ${S.wave}`);
+  if (S.mode === 'endless') S.endlessBest = Math.max(S.endlessBest, S.wave);
+  if (S.endless && S.wave % 3 === 0) { S.cp += 1; addText(W / TS / 2, 1, '+1 CP · endless', '#ffc85c', true); }
   prepNextLap();
   S.banner = { s:`LAP ${S.wave} · GRADE ${grade}  +$${fmt(clear + paid)}`, c:grade === 'S' ? '#ffc85c' : '#7fd18b', t:2 };
   S.stats.grades = S.stats.grades || {}; S.stats.grades[grade] = (S.stats.grades[grade] || 0) + 1;
@@ -1085,16 +1173,18 @@ function earn(g){ g *= S.boons.gold; S.gold += g; S.runEarned += g; S.inc[S.incI
 function earnCP(n){ S.cp += n; if (S.waveActive) S.lap.cp += n; }
 function addFx(f){ if (S.fx.length < 260) S.fx.push(f); }
 function addText(x, y, s, c, big){
+  if (!big && !CFG.floaters) return;
   if (!big && S.fx.length > 150) return;
   S.fx.push({ k:'text', x, y, s, c, big:!!big, t:big ? 1.2 : .8, life:big ? 1.2 : .8 });
 }
 function burst(x, y, c, n, spd){
+  n = Math.round(n * PARTICLE_MUL[CFG.particles]);
   for (let i = 0; i < n && S.parts.length < 320; i++) {
     const a = Math.random() * Math.PI * 2, v = spd * (.4 + Math.random() * .8);
     S.parts.push({ x, y, vx:Math.cos(a) * v, vy:Math.sin(a) * v, c, s:1 + Math.random() * 1.6, t:.5 + Math.random() * .3, life:.8 });
   }
 }
-function shake(m){ ui.shake = Math.max(ui.shake, m); }
+function shake(m){ if (CFG.shake) ui.shake = Math.max(ui.shake, m); }
 
 // ================= Combat =================
 // mode 'true' ignores armour; 'pierce' ignores armour and shields. Returns damage dealt.
@@ -1750,8 +1840,8 @@ function gameOver(){
   S.over = true;
   closePanel(); closePrestige();
   $('mut').classList.add('hidden');
-  $('oTxt').innerHTML = `Crashed out on lap <b>${S.wave}</b> of Season <b>${S.season}</b><br><span style="color:#8783b6">Your Championship Points, rank and HQ upgrades are safe.</span>${crashSummary()}`;
-  setText($('oNew'), prestigeReady() ? `🏆 Prestige to P${S.prestige + 1}` : `Restart Season ${S.season}`);
+  $('oTxt').innerHTML = `Crashed out on lap <b>${S.wave}</b> of ${S.mode === 'endless' ? `Endless · best lap <b>${S.endlessBest}</b>` : `Season <b>${S.season}</b>`}<br><span style="color:#8783b6">Your Championship Points, rank and HQ upgrades are safe.</span>${crashSummary()}`;
+  setText($('oNew'), prestigeReady() ? `🏆 Prestige to P${S.prestige + 1}` : S.mode === 'endless' ? 'New Endless run' : `Restart Season ${S.season}`);
   $('oNew').classList.toggle('asc', prestigeReady());
   $('over').classList.remove('hidden');
   save();
@@ -1760,7 +1850,7 @@ function gameOver(){
 // ================= Seasons, Prestige & Constructors' HQ =================
 const clearedWaves = () => S.waveActive ? S.wave - 1 : S.wave;
 const prestigeTarget = () => SEASON_LEN + 6 * S.prestige;     // P0: beat the lap-24 finale; each rank needs 6 more laps
-const prestigeReady = () => clearedWaves() >= prestigeTarget();
+const prestigeReady = () => S.mode === 'story' && clearedWaves() >= prestigeTarget();   // prestige happens in Story Mode
 const prestigeCP = () => 5 + 3 * S.prestige;
 const seasonCP = () => 4 + 2 * (S.season - 1);
 const nextUnlocks = () => TOWERS.filter(d => d.pr === S.prestige + 1).map(d => d.name);
@@ -1775,11 +1865,11 @@ function seasonFinale(){
 function clearDraft(){ ui.mutT = null; ui.mutQueue = 0; $('mut').classList.add('hidden'); }
 function newRun(){
   clearDraft(); ui.offer = null; $('offer').classList.add('hidden');
-  const d = serialize();
-  d.run = freshRun(d);
-  S = makeState(d);
+  const d = serialize(), mode = S.mode;
+  if (mode === 'endless') d.endlessRun = freshEndless(d); else d.run = freshRun(d);
+  S = makeState(d, mode);
   S.auto = false; S.speed = 1;                // a new run never starts laps by itself
-  autosave(`Season ${S.season} · start`);
+  if (S.mode === 'story') autosave(`Season ${S.season} · start`);
   setMap(S.seed);
   ui.build = null; ui.sel = null; ui.season = null;
   closePanel(); closePrestige(); closeSeasonEnd();
@@ -1788,7 +1878,7 @@ function newRun(){
 }
 function nextSeason(){ S.season++; newRun(); S.banner = { s:`SEASON ${S.season} · ENEMIES +35% HP`, c:'#ffc85c', t:2.4 }; }
 function keepRacing(){ S.endless = true; ui.season = null; closeSeasonEnd(); S.banner = { s:'ENDLESS · +1 CP EVERY 3 LAPS', c:'#ffc85c', t:2.4 }; save(); }
-function restartSeason(){ newRun(); S.banner = { s:`SEASON ${S.season} · RESTART`, c:'#ffc85c', t:2 }; }
+function restartSeason(){ newRun(); S.banner = { s:S.mode === 'endless' ? 'ENDLESS · NEW RUN' : `SEASON ${S.season} · RESTART`, c:'#ffc85c', t:2 }; }
 function doPrestige(){
   if (!prestigeReady()) throw new Error('Prestige requirements not met');
   const cp = prestigeCP(), unlocked = nextUnlocks();
@@ -1867,6 +1957,11 @@ function queueMutations(t, n){
   ui.mutQueue += n;
   if (!ui.mutT) openMut(t);
 }
+function requestSell(t){
+  const b = $('pSell');
+  if (CFG.confirmSell && t.lv >= 5 && !b._armed) { b._armed = true; setText(b, 'Sell? Click again'); setTimeout(() => { b._armed = false; }, 2500); return; }
+  b._armed = false; sell(t);
+}
 function sell(t){
   S.gold += sellValue(t);
   burst(t.x + .5, t.y + .5, '#ffc85c', 12, 2);
@@ -1893,7 +1988,7 @@ function applyMut(t, id){
 
 // ================= Rendering =================
 const cv = $('cv'), ctx = cv.getContext('2d');
-const DPR = Math.min(3, window.devicePixelRatio || 1);
+let DPR = CFG.sharp ? Math.min(3, window.devicePixelRatio || 1) : 1;
 let RS = DPR; // device pixels per CSS pixel of game art: DPR × widget zoom
 const bg = document.createElement('canvas');
 const bctx = bg.getContext('2d');
@@ -2581,7 +2676,7 @@ function render(now){
     ctx.globalAlpha = 1;
   }
   // weather: rain streaks, or night with pools of floodlight
-  const wth = weather();
+  const wth = CFG.weatherFx ? weather() : 'sun';
   if (wth === 'rain') {
     ctx.strokeStyle = 'rgba(200,220,255,.28)'; ctx.lineWidth = 1;
     ctx.beginPath();
@@ -2667,7 +2762,7 @@ function drawLapHud(){
     ctx.textAlign = 'right'; ctx.fillStyle = '#16115e'; ctx.fillText(`${left} left`, x + w - 5, y + 6.5);
     return;
   }
-  if (!S.nextQ || S.over) return;
+  if (!S.nextQ || S.over || !CFG.preview) return;
   const counts = {};
   for (const it of S.nextQ) counts[it.ty] = (counts[it.ty] || 0) + 1;
   const types = Object.keys(counts), modTxt = S.nextMod ? LAP_MODS[S.nextMod].name : '', w = 52 + types.length * 27 + (modTxt ? 50 : 0), x = W / 2 - w / 2;
@@ -2801,7 +2896,7 @@ function refreshPanel(){
   up.classList.toggle('mut', mutNext);
   up.disabled = S.gold < c;
   $('pMax').disabled = S.gold < c;
-  setText($('pSell'), `Sell $${fmt(sellValue(t))}`);
+  if (!$('pSell')._armed) setText($('pSell'), `Sell $${fmt(sellValue(t))}`);
   const od = $('pOD');
   od.classList.toggle('hidden', econ);
   od.disabled = t.lv < 5 || t.odCD > 0;
@@ -2899,7 +2994,208 @@ function refreshHQ(){
   $('hqClose').classList.remove('hidden');
 }
 // ---------------- F1 Paddock homescreen: 5 save slots ----------------
-function openHome(){
+// ---------------- Title screen: 3D circuit (plain canvas, painter's algorithm) ----------------
+const T3 = (() => {
+  const N = 140, HW = .85;                                     // track samples, half width
+  const centre = t => [9.5 * Math.cos(t) + 2.2 * Math.cos(2 * t), 0, 5.6 * Math.sin(t) - 1.6 * Math.sin(3 * t) + .8 * Math.sin(2 * t)];
+  const pts = [], lefts = [], rights = [], curv = [];
+  for (let i = 0; i < N; i++) pts.push(centre(i / N * Math.PI * 2));
+  for (let i = 0; i < N; i++) {
+    const a = pts[(i - 1 + N) % N], b = pts[(i + 1) % N], dx = b[0] - a[0], dz = b[2] - a[2], l = Math.hypot(dx, dz);
+    const nx = -dz / l, nz = dx / l;
+    lefts.push([pts[i][0] + nx * HW, 0, pts[i][2] + nz * HW]); rights.push([pts[i][0] - nx * HW, 0, pts[i][2] - nz * HW]);
+  }
+  for (let i = 0; i < N; i++) {
+    const a = pts[(i - 2 + N) % N], b = pts[i], c = pts[(i + 2) % N];
+    const a1 = Math.atan2(b[2] - a[2], b[0] - a[0]), a2 = Math.atan2(c[2] - b[2], c[0] - b[0]);
+    let d = a2 - a1; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+    curv.push(Math.abs(d));
+  }
+  const at = u => { const f = ((u % 1) + 1) % 1 * N, i = Math.floor(f), k = f - i, a = pts[i], b = pts[(i + 1) % N];
+    return { p:[a[0] + (b[0] - a[0]) * k, 0, a[2] + (b[2] - a[2]) * k], yaw:Math.atan2(b[2] - a[2], b[0] - a[0]) }; };
+  // trackside towers: [sample index, side (+1 left / -1 right), colour, height]
+  const towers = [[8, 1, '#ff653f', 1.1], [30, -1, '#ffc85c', .9], [52, 1, '#7fd18b', 1.3], [74, -1, '#3730aa', 1.0], [96, 1, '#5ef0ff', .8], [118, -1, '#ff9bc0', 1.2]]
+    .map(([i, side, c, h]) => { const e = side > 0 ? lefts[i] : rights[i], p0 = pts[i]; return { x:p0[0] + (e[0] - p0[0]) * 2.1, z:p0[2] + (e[2] - p0[2]) * 2.1, c, h }; });
+  const lights = [20, 63, 105].map(i => { const e = lefts[i], p0 = pts[i]; return { x:p0[0] + (e[0] - p0[0]) * 1.6, z:p0[2] + (e[2] - p0[2]) * 1.6 }; });
+  const cars = [['#d40000', '#ffe24a', 0, .072], ['#00d2be', '#16115e', .25, .069], ['#ff8700', '#16115e', .5, .066], ['#3730aa', '#ffc85c', .75, .074]];
+  const stars = Array.from({ length:40 }, (_, i) => [(i * 97 % 100) / 100, (i * 53 % 37) / 37 * .42]);
+  return { N, pts, lefts, rights, curv, at, towers, lights, cars, stars };
+})();
+let t3Running = false;
+function startTitle3D(){ if (t3Running) return; t3Running = true; requestAnimationFrame(t3Frame); }
+function t3Frame(now){
+  if (!ui.title) { t3Running = false; return; }
+  drawTitle3D(CFG.titleFx ? now / 1000 : 4);
+  if (CFG.titleFx) requestAnimationFrame(t3Frame); else t3Running = false;
+}
+function drawTitle3D(time){
+  const cv3 = $('t3d'), dpr = DPR * ui.scale, Wc = cv3.clientWidth, Hc = cv3.clientHeight;
+  if (!Wc) return;
+  if (cv3.width !== Math.round(Wc * dpr)) { cv3.width = Math.round(Wc * dpr); cv3.height = Math.round(Hc * dpr); }
+  const c = cv3.getContext('2d'); c.setTransform(dpr, 0, 0, dpr, 0, 0);
+  // camera orbiting the circuit
+  const ang = time * .07, cam = [Math.cos(ang) * 17, 6.4 + Math.sin(time * .13) * .6, Math.sin(ang) * 13], tgt = [0, .6, 0];
+  const fwd = norm(sub(tgt, cam)), right = norm(cross(fwd, [0, 1, 0])), up = cross(right, fwd);
+  const f = Hc * 1.15, cx = Wc * .62, cy = Hc * .5;
+  const NEAR = .4;
+  const toCam = q => { const d = sub(q, cam); return [dot(d, right), dot(d, up), dot(d, fwd)]; };
+  const persp = v => [cx + f * v[0] / v[2], cy - f * v[1] / v[2], v[2]];
+  const proj = q => { const v = toCam(q); return v[2] < NEAR ? null : persp(v); };
+  // Clip a flat polygon against the near plane (Sutherland-Hodgman) so ground and track never vanish near the camera.
+  const clipNear = vs => { const out = []; for (let i = 0; i < vs.length; i++) { const A = vs[i], B = vs[(i + 1) % vs.length], ina = A[2] >= NEAR, inb = B[2] >= NEAR;
+    if (ina) out.push(A); if (ina !== inb) { const k = (NEAR - A[2]) / (B[2] - A[2]); out.push([A[0] + (B[0] - A[0]) * k, A[1] + (B[1] - A[1]) * k, NEAR]); } } return out; };
+  const fog = (col, z) => mixHex(col, '#1b1560', Math.min(.75, Math.max(0, (z - 12) / 26)));
+  // sky + sun + stars
+  const sky = c.createLinearGradient(0, 0, 0, Hc);
+  sky.addColorStop(0, '#0d0a3a'); sky.addColorStop(.22, '#2a2390'); sky.addColorStop(.36, '#ff653f'); sky.addColorStop(.5, '#1b1560');
+  c.fillStyle = sky; c.fillRect(0, 0, Wc, Hc);
+  c.fillStyle = 'rgba(255,244,220,.75)';
+  for (const [sx, sy] of T3.stars) c.fillRect(((sx + time * .004) % 1) * Wc, sy * Hc, 1.2, 1.2);
+  const sun = c.createRadialGradient(Wc * .7, Hc * .3, 2, Wc * .7, Hc * .3, Hc * .42);   // sunset glow on the horizon
+  sun.addColorStop(0, 'rgba(255,200,92,.95)'); sun.addColorStop(.25, 'rgba(255,101,63,.55)'); sun.addColorStop(1, 'rgba(255,101,63,0)');
+  c.fillStyle = sun; c.fillRect(0, 0, Wc, Hc);
+  // ground
+  const polys = [];
+  const quad = (ps, col, layer) => { const cl = clipNear(ps.map(toCam)); if (cl.length < 3) return; const pr = cl.map(persp); polys.push({ pr, col, layer, z:pr.reduce((a, v) => a + v[2], 0) / pr.length }); };
+  quad([[-19, 0, -15], [19, 0, -15], [19, 0, 15], [-19, 0, 15]], '#0e3b26', 100);   // the venue: an island of grass under the sunset sky
+  for (let g = -16; g <= 16; g += 4) { quad([[g - .03, 0, -14], [g + .03, 0, -14], [g + .03, 0, 14], [g - .03, 0, 14]], '#145233', 50); if (Math.abs(g) <= 12) quad([[-18, 0, g - .03], [18, 0, g - .03], [18, 0, g + .03], [-18, 0, g + .03]], '#145233', 50); }
+  // track, kerbs, centre line
+  const { N, pts, lefts, rights, curv } = T3;
+  for (let i = 0; i < N; i++) {
+    const j = (i + 1) % N;
+    quad([lefts[i], lefts[j], rights[j], rights[i]], '#2b2a36', 10);
+    if (curv[i] > .07) {
+      const kc = i % 2 ? '#ffffff' : '#e8202a';
+      const out = (e, p0, k) => [p0[0] + (e[0] - p0[0]) * k, 0, p0[2] + (e[2] - p0[2]) * k];
+      quad([lefts[i], lefts[j], out(lefts[j], pts[j], 1.22), out(lefts[i], pts[i], 1.22)], kc, 9);
+      quad([rights[i], rights[j], out(rights[j], pts[j], 1.22), out(rights[i], pts[i], 1.22)], kc, 9);
+    }
+    if (i % 4 < 2) { const a = pts[i], b = pts[j]; quad([[a[0] - .04, 0, a[2] - .04], [b[0] - .04, 0, b[2] - .04], [b[0] + .04, 0, b[2] + .04], [a[0] + .04, 0, a[2] + .04]], '#fff4dc', 8); }
+  }
+  polys.sort((a, b) => b.layer - a.layer || b.z - a.z);   // flat layers paint in order: grass, grid, asphalt, kerbs, centre line
+  for (const q of polys) { c.beginPath(); q.pr.forEach((v, k) => k ? c.lineTo(v[0], v[1]) : c.moveTo(v[0], v[1])); c.closePath(); c.fillStyle = fog(q.col, q.z); c.fill(); }
+  // vertical objects: boxes (towers, cars, gantry, floodlights) sorted far to near
+  const objs = [];
+  const box = (x, y, z, w, h, d, yaw, col, top) => {
+    const cs = Math.cos(yaw), sn = Math.sin(yaw), corner = (dx, dy, dz) => [x + dx * cs - dz * sn, y + dy, z + dx * sn + dz * cs];
+    const v = [[-w, 0, -d], [w, 0, -d], [w, 0, d], [-w, 0, d], [-w, h, -d], [w, h, -d], [w, h, d], [-w, h, d]].map(([a, b2, e]) => corner(a, b2, e));
+    const faces = [[4, 5, 6, 7, top || lighten(col, .25)], [0, 1, 5, 4, col], [1, 2, 6, 5, darken(col, .15)], [2, 3, 7, 6, col], [3, 0, 4, 7, darken(col, .25)]];
+    const pr = v.map(proj); if (pr.some(q => !q)) return;
+    objs.push({ z:dot(sub([x, y + h / 2, z], cam), fwd), draw:() => {
+      for (const [a, b2, e, g, fc] of faces) {
+        const A = pr[a], B = pr[b2], C = pr[e];
+        if ((B[0] - A[0]) * (C[1] - A[1]) - (B[1] - A[1]) * (C[0] - A[0]) > 0) continue;   // back face
+        c.beginPath(); c.moveTo(A[0], A[1]); c.lineTo(B[0], B[1]); c.lineTo(C[0], C[1]); c.lineTo(pr[g][0], pr[g][1]); c.closePath();
+        c.fillStyle = fog(fc, A[2]); c.fill();
+      }
+    } });
+  };
+  const carPos = [];
+  for (const [body, accent, off, spd] of T3.cars) {
+    const u = off + time * spd, here = T3.at(u), yaw = here.yaw;
+    carPos.push(here.p);
+    box(here.p[0], .05, here.p[2], .42, .16, .17, yaw, body, accent);       // body
+    box(here.p[0] - Math.cos(yaw) * .38, .05, here.p[2] - Math.sin(yaw) * .38, .06, .26, .24, yaw, '#16115e');  // rear wing
+    for (let k = 1; k <= 6; k++) {                                             // light trail
+      const tr = T3.at(u - k * .006), a = proj([tr.p[0], .12, tr.p[2]]), b = proj([T3.at(u - (k - 1) * .006).p[0], .12, T3.at(u - (k - 1) * .006).p[2]]);
+      if (a && b) objs.push({ z:a[2] + .05, draw:() => { c.strokeStyle = `rgba(255,200,92,${.5 - k * .07})`; c.lineWidth = Math.max(1, 5 / a[2] * 3); c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); } });
+    }
+  }
+  for (const t of T3.towers) {
+    box(t.x, 0, t.z, .32, t.h, .32, 0, '#3a3466');
+    box(t.x, t.h, t.z, .24, .22, .24, time * .6, t.c);
+    const near = carPos.reduce((best, q) => Math.hypot(q[0] - t.x, q[2] - t.z) < Math.hypot(best[0] - t.x, best[2] - t.z) ? q : best, carPos[0]);
+    if (Math.hypot(near[0] - t.x, near[2] - t.z) < 4.5 && Math.sin(time * 9 + t.x) > .2) {
+      const a = proj([t.x, t.h + .15, t.z]), b = proj([near[0], .18, near[2]]);
+      if (a && b) objs.push({ z:Math.min(a[2], b[2]) - .1, draw:() => { c.strokeStyle = t.c; c.lineWidth = 1.6; c.shadowColor = t.c; c.shadowBlur = 6; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke(); c.shadowBlur = 0; } });
+    }
+  }
+  for (const l of T3.lights) { box(l.x, 0, l.z, .06, 2.4, .06, 0, '#4b4580'); box(l.x, 2.4, l.z, .22, .1, .22, 0, '#fff4dc', '#fff4dc'); }
+  // start gantry with five lights that go out in sequence
+  const g0 = T3.lefts[0], g1 = T3.rights[0];
+  box(g0[0], 0, g0[2], .06, 1.5, .06, 0, '#4b4580'); box(g1[0], 0, g1[2], .06, 1.5, .06, 0, '#4b4580');
+  const mid = [(g0[0] + g1[0]) / 2, 1.5, (g0[2] + g1[2]) / 2], beamYaw = Math.atan2(g1[2] - g0[2], g1[0] - g0[0]);
+  box(mid[0], mid[1], mid[2], Math.hypot(g1[0] - g0[0], g1[2] - g0[2]) / 2, .14, .08, beamYaw, '#16115e');
+  const lit = Math.floor((time % 6) / .7);
+  for (let k = 0; k < 5; k++) { const o = (k - 2) * .28; box(mid[0] + Math.cos(beamYaw) * o, 1.66, mid[2] + Math.sin(beamYaw) * o, .07, .1, .07, beamYaw, k < lit && lit <= 5 ? '#ff2a2a' : '#3a1a1a'); }
+  objs.sort((a, b) => b.z - a.z);
+  for (const o of objs) o.draw();
+  // vignette so the menu reads cleanly
+  const vg = c.createLinearGradient(0, 0, Wc * .55, 0);
+  vg.addColorStop(0, 'rgba(13,10,58,.78)'); vg.addColorStop(1, 'rgba(13,10,58,0)');
+  c.fillStyle = vg; c.fillRect(0, 0, Wc, Hc);
+}
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const norm = a => { const l = Math.hypot(a[0], a[1], a[2]); return [a[0] / l, a[1] / l, a[2] / l]; };
+const hexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+const mixHex = (a, b, k) => { const x = hexRgb(a), y = hexRgb(b); return '#' + x.map((v, i) => Math.round(v + (y[i] - v) * k).toString(16).padStart(2, '0')).join(''); };   // hex in, hex out
+const lighten = (h, k) => mixHex(h, '#ffffff', k), darken = (h, k) => mixHex(h, '#000000', k);
+// ---------------- Title screen ----------------
+function openTitle(){
+  if (S) save();
+  ui.home = true; ui.title = true; closePanel(); closePrestige(); closeHQ(); tip.classList.add('hidden');
+  if (ui.min) { ui.min = false; wEl.classList.remove('min'); placeInPage(); fitWindow(); }
+  setText($('ttVer'), APP_VERSION);
+  $('tResume').classList.toggle('hidden', !S);
+  if (S) setText($('tResumeSub'), `${S.name} · ${S.mode === 'endless' ? 'Endless' : 'Season ' + S.season} · Lap ${S.wave}`);
+  $('title').classList.remove('hidden');
+  startTitle3D();
+}
+function closeTitle(keepHome){
+  ui.title = false; $('title').classList.add('hidden');
+  if (!keepHome && S) ui.home = false;
+}
+$('tResume').onclick = () => closeTitle(false);
+$('tStory').onclick = () => openHome('story');
+$('tEndless').onclick = () => openHome('endless');
+$('tSettings').onclick = openSettings;
+// ---------------- Settings sheet ----------------
+function openSettings(){ renderSettings(); setText($('stMsg'), ''); $('settings').classList.remove('hidden'); }
+function renderSettings(){
+  const box = $('stList'); box.innerHTML = '';
+  let group = '';
+  for (const o of SETTINGS_DEF) {
+    if (o.group !== group) { group = o.group; const h = document.createElement('div'); h.className = 'st-group'; h.textContent = group; box.append(h); }
+    const row = document.createElement('div'); row.className = 'st-row';
+    const l = document.createElement('span'); l.textContent = o.label;
+    const seg = document.createElement('div'); seg.className = 'st-seg';
+    for (const [v, name] of o.opts) {
+      const b = document.createElement('button'); b.textContent = name; b.classList.toggle('on', CFG[o.id] === v);
+      b.onclick = () => { CFG[o.id] = v; saveSettings(); applySetting(o.id); renderSettings(); };
+      seg.append(b);
+    }
+    row.append(l, seg); box.append(row);
+  }
+}
+function applySettingsToPage(){ for (const o of SETTINGS_DEF) applySetting(o.id); }
+function applySetting(id){
+  if (id === 'reduceMotion') document.documentElement.classList.toggle('calm', CFG.reduceMotion);
+  if (id === 'showFps') $('fpsTag').classList.toggle('hidden', !CFG.showFps);
+  if (id === 'sharp') { DPR = CFG.sharp ? Math.min(3, window.devicePixelRatio || 1) : 1; applyScale(ui.scale); }
+  if (id === 'titleFx' && ui.title) startTitle3D();
+}
+$('stClose').onclick = () => $('settings').classList.add('hidden');
+$('stTips').onclick = () => { if (S) { S.tips = 0; save(); setText($('stMsg'), 'Tips will show again in this run.'); } else setText($('stMsg'), 'Open a save first, then the tips start again.'); };
+$('stResetUi').onclick = () => { applyScale(1); setAnchor('r', 'b'); ui.pos = { dx:16, dy:16 }; placeInPage(); fitWindow(); savePrefs(); setText($('stMsg'), 'Size and position reset.'); };
+$('stExport').onclick = () => {
+  const all = {}; for (let n = 1; n <= SLOTS; n++) { const d = readSlot(n); if (d) all[n] = d; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(all, null, 1)], { type:'application/json' }));
+  a.download = 'neon-siege-all-saves.json'; document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  setText($('stMsg'), `Exported ${Object.keys(all).length} save(s).`);
+};
+$('stAutos').onclick = () => {
+  const b = $('stAutos');
+  if (!b._armed) { b._armed = true; setText(b, 'Delete? Click again'); setTimeout(() => { b._armed = false; setText(b, 'Delete all autosaves'); }, 3000); return; }
+  for (let n = 1; n <= SLOTS; n++) localStorage.removeItem(AUTO_KEY(n));
+  b._armed = false; setText(b, 'Delete all autosaves'); setText($('stMsg'), 'All autosaves deleted.');
+};
+function openHome(mode = ui.homeMode || 'story'){
+  ui.homeMode = mode;
+  closeTitle(true);
   if (S) save();
   ui.home = true; closePanel(); closePrestige(); closeHQ(); tip.classList.add('hidden');
   if (ui.min) { ui.min = false; wEl.classList.remove('min'); placeInPage(); fitWindow(); }
@@ -2911,9 +3207,12 @@ function homeMsg(m){ setText($('hmMsg'), m); }
 function renderHome(){
   setText($('hmVer'), APP_VERSION);
   $('hmClose').classList.toggle('hidden', !S);
+  const mode = ui.homeMode, endless = mode === 'endless';
+  setText($('hmMode'), endless ? '∞ ENDLESS · pick a team' : '🏁 STORY MODE · pick a team');
   const last = Number(localStorage.getItem(LAST_KEY)), ld = last ? readSlot(last) : null, cont = $('hmContinue');
-  cont.classList.toggle('hidden', !ld);
-  if (ld) { setText(cont, `▶ Continue Last Session · ${ld.name} · S${ld.season} · Lap ${ld.run.wave}`); cont.onclick = () => openSlot(last) || closeHome(); }
+  const lr = ld && (endless ? ld.endlessRun : ld.run);
+  cont.classList.toggle('hidden', !lr);
+  if (lr) { setText(cont, `▶ Continue · ${ld.name} · ${endless ? 'Endless' : 'S' + ld.season} · Lap ${lr.wave}`); cont.onclick = () => { openSlot(last, mode); closeHome(); }; }
   const box = $('hmSlots');
   box.innerHTML = '';
   for (let n = 1; n <= SLOTS; n++) {
@@ -2921,13 +3220,13 @@ function renderHome(){
     if (d) {
       el.className = 'slot';
       el.innerHTML = `<div class="sl-top"><span class="sl-n">${n}</span><span class="sl-name fit"></span><button class="sl-ren" title="Rename">✎</button><span class="sl-rank" title="${rankName(d.prestige)}">P${d.prestige}</span></div>
-        <div class="sl-meta fit">Season ${d.season} · Lap ${d.run.wave}/${SEASON_LEN} · Best ${d.best} · ${d.cp} CP · $${fmt(d.run.gold)}</div>
+        <div class="sl-meta fit">${ui.homeMode === 'endless' ? `Endless · ${d.endlessRun ? 'Lap ' + d.endlessRun.wave : 'not started'} · Best lap ${d.endlessBest || 0} · ${d.cp} CP` : `Season ${d.season} · Lap ${d.run.wave}/${SEASON_LEN} · Best ${d.best} · ${d.cp} CP · $${fmt(d.run.gold)}`}</div>
         <div class="sl-meta sl-stats fit">${careerLine(d)}</div>
         ${(d.backupSince || 0) >= BACKUP_EVERY ? `<div class="nudge">💾 ${d.backupSince} seasons since your last backup: press ⇪ to export</div>` : ''}
         <div class="sl-autos hidden"></div>
         <div class="sl-btns"><button class="btn up sl-go">▶ Continue</button><button class="btn sm sl-exp" title="Export this save">⇪</button><button class="btn sm sl-auto" title="Autosaves: restore an earlier snapshot">↺</button><button class="btn sell sl-del">Delete</button></div>`;
       el.querySelector('.sl-name').textContent = d.name;
-      el.querySelector('.sl-go').onclick = () => { openSlot(n); closeHome(); };
+      el.querySelector('.sl-go').onclick = () => { openSlot(n, ui.homeMode); closeHome(); };
       el.querySelector('.sl-exp').onclick = () => { exportSlot(n); renderHome(); };
       el.querySelector('.sl-auto').onclick = () => {
         const box = el.querySelector('.sl-autos'), list = readAutos(n);
@@ -2962,7 +3261,7 @@ function renderHome(){
       el.innerHTML = `<div class="sl-empty">[ Empty Garage Slot ${n} ]</div><div class="sl-new"><input maxlength="24" placeholder="Team name (optional)"><button class="btn up">+ New Save</button></div>`;
       const inp = el.querySelector('input');
       inp.onkeydown = e => { e.stopPropagation(); if (e.key === 'Enter') el.querySelector('button').click(); };
-      el.querySelector('button').onclick = () => { createSlot(n, inp.value.trim()); closeHome(); };
+      el.querySelector('button').onclick = () => { createSlot(n, inp.value.trim(), ui.homeMode); closeHome(); };
     }
     box.append(el);
   }
@@ -2995,6 +3294,7 @@ $('hmFile').onchange = async () => {
   $('hmFile').value = '';
 };
 $('hmClose').onclick = closeHome;
+$('hmBack').onclick = () => { $('home').classList.add('hidden'); openTitle(); };
 $('hmUrlBtn').onclick = () => { $('hmUrl').value = updateUrl(); $('hmUrlRow').classList.toggle('hidden'); };
 $('hmUrlSave').onclick = () => { const v = $('hmUrl').value.trim(); if (v) localStorage.setItem(URL_KEY, v); else localStorage.removeItem(URL_KEY); $('hmUrlRow').classList.add('hidden'); homeMsg('Update source saved'); };
 $('hmUrl').onkeydown = e => e.stopPropagation();
@@ -3120,7 +3420,7 @@ $('pClose').onclick = closePanel;
 $('pUp').onclick = () => upgrade(ui.sel);
 $('pMax').onclick = () => upgradeMax(ui.sel);
 $('pOD').onclick = () => pushLap(ui.sel);
-$('pSell').onclick = () => sell(ui.sel);
+$('pSell').onclick = () => requestSell(ui.sel);
 $('pSel').onclick = () => { ui.sel.mutSel = null; save(); };
 $('hintX').onclick = () => { S.tips = TIPS.length; save(); };
 $('awayOk').onclick = () => $('away').classList.add('hidden');
@@ -3130,7 +3430,7 @@ $('bWave').onclick = startWave;
 $('bSpeed').onclick = () => { S.speed = S.speed % 3 + 1; save(); };
 $('bAuto').onclick = () => { S.auto = !S.auto; S.autoT = 1; save(); };
 $('bSC').onclick = deploySafetyCar;
-$('bMenu').onclick = openHome;
+$('bMenu').onclick = openTitle;
 $('bPres').onclick = () => ui.pres ? closePrestige() : openPrestige();
 $('prClose').onclick = closePrestige;
 $('prGo').onclick = doPrestige;
@@ -3164,7 +3464,7 @@ document.addEventListener('keydown', ev => {
   if (ui.sel && !ui.mutT && !S.over) {
     if (k === 'u') { upgrade(ui.sel); return; }
     if (k === 'm') { upgradeMax(ui.sel); return; }
-    if (k === 's') { sell(ui.sel); return; }
+    if (k === 's') { requestSell(ui.sel); return; }
   }
   const pos = HOTKEYS.indexOf(ev.key), i = pos >= 0 ? DOCK_ORDER[pos] : -1;
   if (i >= 0 && !S.over && TOWERS[i].pr <= S.prestige) { ui.build = ui.build === i ? null : i; closePanel(); }
@@ -3283,8 +3583,9 @@ wEl.classList.toggle('min', ui.min);
 if (OVERLAY) computeAnchor(); else setAnchor(ui.ax, ui.ay);
 applyScale(ui.scale);
 placeInPage();
-openHome();
-checkUpdates(false);
+applySettingsToPage();
+openTitle();
+if (CFG.autoUpdate) checkUpdates(false);
 let last = performance.now(), acc = 0, lastSave = 0;
 const CATCHUP_MAX = 300, CATCHUP_PER_FRAME = 2, AWAY_MIN = 10;  // seconds
 function fmtDur(sec){ sec = Math.round(sec); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s2 = sec % 60; return h ? `${h}h ${m}m` : m ? `${m}m ${s2}s` : `${s2}s`; }
@@ -3300,7 +3601,7 @@ function frame(now){
   last = now;
   ui.shake *= Math.exp(-dt * 12);
   if (S && !ui.home && !S.over && !ui.mutT && !ui.season && !ui.pres && !ui.hqMode && !ui.paused && !ui.offer) {
-    const gap = raw - dt;
+    const gap = CFG.pauseHidden ? 0 : raw - dt;          // 'Pause' setting: no catch-up after a hide
     if (gap > AWAY_MIN) { ui.away = ui.away || { sec:0, gold:S.runEarned, wave:S.wave, kills:S.carKills, lives:S.lives }; ui.away.sec += gap; }
     ui.catchup = Math.min(CATCHUP_MAX, (ui.catchup || 0) + gap);
     const extra = Math.min(ui.catchup, CATCHUP_PER_FRAME);
@@ -3310,7 +3611,9 @@ function frame(now){
     if (ui.away && ui.catchup === 0) showAway();
     while (acc >= STEP) { for (let i = 0; i < S.speed; i++) update(STEP); acc -= STEP; }
   } else acc = 0;
-  if (S && !ui.min) render(now / 1000);
+  ui.frameN = (ui.frameN || 0) + 1;
+  if (S && !ui.min && (CFG.fps === 60 || ui.frameN % 2 === 0)) render(now / 1000);
+  if (CFG.showFps) { ui.fpsAcc = (ui.fpsAcc || 0) + raw; ui.fpsN = (ui.fpsN || 0) + 1; if (ui.fpsAcc >= .5) { setText($('fpsTag'), `${Math.round(ui.fpsN / ui.fpsAcc / (CFG.fps === 30 ? 2 : 1))} fps`); ui.fpsAcc = ui.fpsN = 0; } }
   updateUI();
   if (S && now - lastSave > 10000) { lastSave = now; save(); }
   requestAnimationFrame(frame);
