@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="2.9.1">
+<meta name="app-version" content="3.0.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -13,6 +13,8 @@ function cmpVer(a, b){
   return 0;
 }
 (function(){
+  // The swapped-in copy runs this script too: it must run normally and keep the cache (it is the cache).
+  if (window.__F1_SWAPPED) { window.__F1_SWAP = false; return; }
   window.__F1_SWAP = false;
   const local = document.querySelector('meta[name="app-version"]').content;
   const cached = localStorage.getItem('f1_td_cached_html');
@@ -20,7 +22,7 @@ function cmpVer(a, b){
   const m = cached.match(/<meta name="app-version" content="([^"]+)"/);
   if (!m || cmpVer(m[1], local) <= 0) { localStorage.removeItem('f1_td_cached_html'); return; } // this file is current
   window.__F1_SWAP = true;
-  document.addEventListener('DOMContentLoaded', () => { document.open(); document.write(cached); document.close(); });
+  document.addEventListener('DOMContentLoaded', () => { window.__F1_SWAPPED = true; document.open(); document.write(cached); document.close(); });
 })();
 </script>
 <meta name="color-scheme" content="dark">
@@ -157,8 +159,9 @@ html.overlay .handle{-webkit-app-region:drag}
 .prow{display:flex;gap:6px}
 
 /* ---------- Full-stage sheets: mutation, prestige, game over ---------- */
-#mut,#pres,#over,#season,#hq{inset:0;background:var(--paper);display:flex;flex-direction:column;padding:10px 11px;gap:7px}
-#mut,#over{align-items:center;justify-content:center}
+#offer,#mut,#pres,#over,#season,#hq{inset:0;background:var(--paper);display:flex;flex-direction:column;padding:10px 11px;gap:7px}
+#offer,#mut,#over{align-items:center;justify-content:center}
+#offer .mc{min-height:86px;justify-content:center}.of-up{color:var(--moss)!important;font-weight:700}.of-down{color:var(--ember)!important;font-weight:700}
 .mh{font-weight:900;font-size:12px;letter-spacing:3px;color:var(--plum)}
 .msub{font-size:9px;color:var(--ink2)}
 .mopts{display:flex;gap:7px;width:100%}
@@ -358,6 +361,11 @@ html.overlay .handle{-webkit-app-region:drag}
       </div>
       <div class="uprow"><button id="pUp" class="btn up fit" title="Upgrade (U)"></button><button id="pMax" class="btn up max fit" title="Buy every level you can afford (M)">MAX</button></div>
       <div class="prow"><button id="pSell" class="btn sell fit" title="Sell (S) · drag a tower to another pad to move it"></button><button id="pOD" class="btn sm od fit" title="Push Lap: +60% fire rate for 4s (20s cooldown, Lv 5+)">Push Lap</button><button id="pSel" class="btn sm fit" title="Pinned mutation: applied automatically on every mutation of this tower. Click to unpin."></button></div>
+    </div>
+    <div id="offer" class="ovl hidden">
+      <div id="ofTitle" class="mh"></div>
+      <div class="msub">Pick one deal for the rest of the season</div>
+      <div id="ofOpts" class="mopts"></div>
     </div>
     <div id="mut" class="ovl hidden">
       <div class="mh">✦ MUTATION <span id="mTitle"></span></div>
@@ -618,6 +626,27 @@ const dist2 = (ax, ay, bx, by) => (ax - bx) ** 2 + (ay - by) ** 2;
 
 // ================= Map =================
 let P; // { set, pts, cum, ang, len }
+// Hand-made circuits: the row the track turns to at each odd column (x = 1, 3, 5, 7, 9), from a start row.
+// Each favours some towers (+20% damage there). Story mode rotates them by season.
+const CIRCUITS = [
+  { id:'monza',  name:'Monza',       tag:'Temple of Speed: long straights',   start:1, turns:[1, 5, 5, 1, 1], favours:['rail', 'lance', 'bolt'] },
+  { id:'monaco', name:'Monaco',      tag:'Street circuit: hairpin after hairpin', start:0, turns:[6, 0, 6, 0, 6], favours:['frost', 'flak', 'hell'] },
+  { id:'silver', name:'Silverstone', tag:'Fast sweeping curves',              start:3, turns:[1, 5, 2, 6, 3], favours:['tesla', 'bolt', 'chrono'] },
+  { id:'spa',    name:'Spa',         tag:'Eau Rouge climb and long run',      start:5, turns:[5, 1, 1, 6, 2], favours:['venom', 'prism', 'orbital'] },
+  { id:'suzuka', name:'Suzuka',      tag:'Technical esses',                   start:2, turns:[6, 6, 0, 4, 4], favours:['emp', 'sing', 'anti'] },
+];
+const CIRCUIT_BY_ID = Object.fromEntries(CIRCUITS.map(c => [c.id, c]));
+const circuitForSeason = season => CIRCUITS[(season - 1) % CIRCUITS.length].id;
+function circuitPath(c){
+  let y = c.start; const tiles = [[0, y]];
+  for (let x = 0; x < COLS - 1; x++) {
+    if (x % 2 === 1) { const ty = c.turns[(x - 1) / 2], d = Math.sign(ty - y); while (y !== ty) { y += d; tiles.push([x, y]); } }
+    tiles.push([x + 1, y]);
+  }
+  return tiles;
+}
+const circuit = () => S && S.circuit ? CIRCUIT_BY_ID[S.circuit] : null;
+const circuitBonus = t => circuit() && circuit().favours.includes(TOWERS[t.type].id) ? 1.2 : 1;
 function genPath(seed){
   const r = mulberry32(seed), ri = (a, b) => a + Math.floor(r() * (b - a + 1));
   let y = ri(1, ROWS - 2);
@@ -633,7 +662,7 @@ function genPath(seed){
   return tiles;
 }
 function setMap(seed){
-  const tiles = genPath(seed);
+  const tiles = circuit() ? circuitPath(circuit()) : genPath(seed);   // runs saved before circuits keep their random layout
   const pts = tiles.map(([x, y]) => [x + .5, y + .5]);
   const cum = [0], ang = [];
   for (let i = 0; i < pts.length - 1; i++) {
@@ -692,11 +721,12 @@ function makeState(d){
     waveActive:false, enemies:[], projs:[], hazards:[], fx:[], parts:[], drones:[], detQ:[], q:[], nextQ:null, waveTotal:0, lightsT:0, goT:0, spawnT:0, autoT:1.5, time:0,
     inc:new Array(10).fill(0), incI:0, incT:0, dmgCat:{}, scT:0, scCD:0, boss:null, lap:null,
     over:r.lives <= 0, banner:null, coreFlash:0, hot:[], leaks:r.leaks || {},
+    circuit:r.circuit || null, boons:r.boons || { gold:1, hp:1, dmg:1, spd:1, slot:0 }, mod:null, nextMod:null, lapStats:{ lost:0, prog:0, kills:0 },
   };
 }
 function freshRun(career){
   return { seed:randSeed(), gold:startGoldFor(career.hq.gold || 0), lives:BASE_LIVES, wave:0, endless:false, rerolls:career.hq.reroll || 0,
-    bossKills:0, carKills:0, runEarned:0, resist:null, towers:[], leaks:{} };
+    bossKills:0, carKills:0, runEarned:0, resist:null, towers:[], leaks:{}, circuit:circuitForSeason(career.season), boons:{ gold:1, hp:1, dmg:1, spd:1, slot:0 } };
 }
 function newCareer(slot, name){
   const c = { v:3, slot, name:name || `Team ${slot}`, created:Date.now(), season:1, prestige:0, cp:0, hq:{}, best:0, speed:1, auto:false, tips:0, stats:{ playSec:0, kills:0, byTower:{} }, milestones:[], backupSince:0 };
@@ -707,7 +737,7 @@ function serialize(){
   // Mid-lap, save the run as it was when the lap started (minus what was earned since); spending stays spent.
   const L = S.waveActive ? S.lap : { gold:0, cp:0, lives:S.lives, bossKills:S.bossKills, carKills:S.carKills };
   return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp - L.cp, hq:S.hq, best:S.best, speed:S.speed, auto:S.auto, tips:S.tips, stats:S.stats, milestones:S.milestones, backupSince:S.backupSince,
-    run:{ seed:S.seed, gold:S.gold - L.gold, lives:L.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:L.bossKills, carKills:L.carKills, runEarned:S.runEarned - L.gold, resist:S.resist, leaks:S.leaks,
+    run:{ seed:S.seed, gold:S.gold - L.gold, lives:L.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:L.bossKills, carKills:L.carKills, runEarned:S.runEarned - L.gold, resist:S.resist, leaks:S.leaks, circuit:S.circuit, boons:S.boons,
       towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested, prio:t.prio, mutSel:t.mutSel, dmg:t.dmg })) } };
 }
 function save(){
@@ -798,7 +828,7 @@ function importCareer(json){
 // ================= Stats =================
 function mc(t, id){ let n = 0; for (const m of t.muts) if (m === id) n++; return n; }
 const hq = id => S.hq[id] || 0;
-const towerCap = () => BASE_CAP + S.prestige + hq('garage');
+const towerCap = () => BASE_CAP + S.prestige + hq('garage') + S.boons.slot;
 const tileMult = () => 1 + .25 * hq('tile');
 const isMint = t => TOWERS[t.type].kind === 'econ';   // economy towers
 const weather = () => ['sun', 'rain', 'night'][Math.floor(Math.max(0, S.wave - 1) / 5) % 3];
@@ -809,14 +839,28 @@ const lit = t => S.towers.some(o => TOWERS[o.type].light && dist2(o.x, o.y, t.x,
 function stats(t, lv = t.lv){
   const d = TOWERS[t.type], hz = hotAt(t), tm = tileMult();
   const own = d.id === 'dyson' ? 1 + .75 * mc(t, 'dy_ascend') : 1 + G.aura + t.aura;
-  const dmg = (d.dmg || 0) * Math.pow(LEVEL_POWER, lv - 1) * Math.pow(MUT_POWER, t.muts.length) * tuneMult(t) * (1 + .2 * hq('rnd')) * own;
+  const dmg = (d.dmg || 0) * Math.pow(LEVEL_POWER, lv - 1) * Math.pow(MUT_POWER, t.muts.length) * tuneMult(t) * (1 + .2 * hq('rnd')) * own
+    * circuitBonus(t) * S.boons.dmg * (d.id === 'rail' && hasSyn(t, 'Speed Trap') ? 1.35 : 1);
   let range = d.kind === 'rail' || d.range > 50 ? 99 : d.range * Math.min(1.8, 1 + (d.id === 'frost' ? .04 : .03) * (lv - 1)) * (1 + .3 * mc(t, 'frost_double'));
   if (range < 50 && hz === 'stand') range *= 1 + .5 * tm;
   if (range < 50 && S.waveActive && weather() === 'night' && !lit(t)) range *= .75;
   const haste = 1 + .5 * mc(t, 'bolt_wrench') + .45 * mc(t, 'tesla_deploy') + .45 * mc(t, 'sing_turb') + t.haste;
-  const rate = d.rate * (1 + .03 * (lv - 1)) * haste * t.buff * (hz === 'drs' ? 1 + .4 * tm : 1) * (t.odT > 0 ? 1.6 : 1);
+  const rate = d.rate * (1 + .03 * (lv - 1)) * haste * t.buff * (hz === 'drs' ? 1 + .4 * tm : 1) * (t.odT > 0 ? 1.6 : 1) * (hasSyn(t, 'Pit Wall') ? 1.15 : 1);
   return { dmg, range, rate, crit: hz === 'stand' ? .25 * tm : 0 };
 }
+// Tower pairs that work together when placed side by side (8 neighbours).
+const SYNERGIES = [
+  { a:'frost', b:'hell',  name:'Burning Brakes', desc:'Mortar +40% damage to slowed cars' },
+  { a:'rail',  b:'prism', name:'Speed Trap',     desc:'Radar Gun +35% damage' },
+  { a:'bolt',  b:'flak',  name:'Pit Wall',       desc:'Wheel Gun and Tyres +15% fire rate' },
+  { a:'tesla', b:'venom', name:'Electrolyte',    desc:'ERS +30% damage to poisoned cars' },
+];
+const adjacent = (t, u) => t !== u && Math.abs(t.x - u.x) <= 1 && Math.abs(t.y - u.y) <= 1;
+function synergiesOf(t){
+  const id = TOWERS[t.type].id;
+  return SYNERGIES.filter(sy => (sy.a === id || sy.b === id) && S.towers.some(u => adjacent(t, u) && TOWERS[u.type].id === (sy.a === id ? sy.b : sy.a)));
+}
+const hasSyn = (t, name) => synergiesOf(t).some(sy => sy.name === name);
 const chainJumps = (t, lv = t.lv) => TOWERS[t.type].jumps + Math.floor((lv - 1) / 2) + 2 * mc(t, 'tesla_boost');
 const chainFall = t => Math.min(.97, .8 + .07 * mc(t, 'tesla_harvest'));
 const railPierce = (t, lv = t.lv) => 1 + Math.floor((lv - 1) / 2);
@@ -901,7 +945,16 @@ function bossFor(w){
   if (w === 30) return 'boss_phantom';
   return 'boss_arrow';
 }
-function buildWave(w){
+const LAP_MODS = {
+  armoured: { name:'ARMOURED', desc:'cars +25% armour' },
+  nitro:    { name:'NITRO',    desc:'cars +30% speed' },
+  heavy:    { name:'HEAVY',    desc:'cars +45% HP, 15% slower' },
+  swarm:    { name:'SWARM',    desc:'50% more cars, 35% less HP each' },
+  shielded: { name:'SHIELDED', desc:'cars start with a 25% shield' },
+};
+const pickMod = w => w >= 3 && Math.random() < .45 ? Object.keys(LAP_MODS)[Math.floor(Math.random() * 5)] : null;
+function prepNextLap(){ S.nextMod = pickMod(S.wave + 1); S.nextQ = buildWave(S.wave + 1, S.nextMod); }
+function buildWave(w, mod){
   const pool = ['spec', 'junior'];
   if (w >= 4) pool.push('papaya');
   if (w >= 6) pool.push('gt');
@@ -911,7 +964,7 @@ function buildWave(w){
   if (w >= 55) pool.push('holo');
   const gap = { spec:.65, papaya:.5, gt:1, hybrid:.7, proto:.5, stealth:.6, holo:.8 };
   const q = [];
-  let budget = Math.min(40, 6 + Math.floor(w * .7));
+  let budget = Math.min(40, 6 + Math.floor(w * .7)) * (mod === 'swarm' ? 1.5 : 1);
   while (budget > 0) {
     let ty = pool[Math.floor(Math.random() * pool.length)];
     if (ty === 'junior') { for (let i = 0; i < ENEMIES.junior.pack; i++) q.push({ ty, gap: i ? .14 : .6 }); budget -= 2; continue; }
@@ -927,8 +980,10 @@ function buildWave(w){
 function startWave(){
   if (!S || S.waveActive || S.over) return;
   S.wave++;
-  S.q = S.nextQ || buildWave(S.wave);
-  S.nextQ = null;
+  S.mod = S.nextQ ? S.nextMod : null;
+  S.q = S.nextQ || buildWave(S.wave, null);
+  S.nextQ = null; S.nextMod = null;
+  S.lapStats = { lost:0, prog:0, kills:0 };
   S.waveTotal = S.q.length;
   S.lightsT = LIGHTS;
   S.spawnT = 0;
@@ -940,10 +995,36 @@ function startWave(){
   S.dmgCat = {};
   for (const t of S.towers) { t.harvest = 0; t.pays = 0; t.pitsDone = 0; t.pitCycle = 0; }
   if (S.resist) S.banner = { s:`ADAPTIVE CHASSIS · −40% ${S.resist.toUpperCase()}`, c:'#ff653f', t:2 };
+  else if (S.mod) S.banner = { s:`${LAP_MODS[S.mod].name} LAP · ${LAP_MODS[S.mod].desc.toUpperCase()}`, c:'#ff653f', t:2.2 };
+}
+const OFFERS = [
+  { id:'title',  name:'Title Sponsor',   up:'+20% gold this season',             down:'cars +10% HP',     take:() => { S.boons.gold *= 1.2; S.boons.hp *= 1.1; } },
+  { id:'aero',   name:'Aero Package',    up:'+15% tower damage',                 down:'cars +10% speed',  take:() => { S.boons.dmg *= 1.15; S.boons.spd *= 1.1; } },
+  { id:'mech',   name:'Works Mechanics', up:'every tower +2 levels',             down:'−1 life',          take:() => { S.lives--; for (const t of S.towers) { t.lv += 2; while (t.muts.length < Math.floor(t.lv / 5)) t.muts.push(t.mutSel || autoPick(t)); } } },
+  { id:'insure', name:'Insurance Deal',  up:'+2 lives',                          down:'−15% gold',        take:() => { S.lives += 2; S.boons.gold *= .85; } },
+  { id:'garage', name:'Extra Garage',    up:'+1 tower slot this season',         down:'cars +15% HP',     take:() => { S.boons.slot += 1; S.boons.hp *= 1.15; } },
+  { id:'cash',   name:'Cash Advance',    up:'gold now: 10 laps of lap bonus',    down:'−1 life',          take:() => { S.lives--; S.gold += goldScale(S.wave) * 50; } },
+];
+function openOffers(){
+  ui.offer = shuffle(OFFERS.slice()).slice(0, 3);
+  setText($('ofTitle'), `SPONSOR OFFERS · AFTER LAP ${S.wave}`);
+  const box = $('ofOpts'); box.innerHTML = '';
+  for (const o of ui.offer) {
+    const b = document.createElement('button'); b.className = 'mc glass';
+    b.innerHTML = `<span class="t">${o.name}</span><span class="d of-up">▲ ${o.up}</span><span class="d of-down">▼ ${o.down}</span>`;
+    b.onclick = () => { o.take(); ui.offer = null; $('offer').classList.add('hidden'); S.banner = { s:`DEAL SIGNED · ${o.name.toUpperCase()}`, c:'#ffc85c', t:2 }; if (S.lives <= 0) gameOver(); save(); };
+    box.append(b);
+  }
+  closePanel(); $('offer').classList.remove('hidden');
+}
+function lapGrade(){
+  const L = S.lapStats, avg = L.kills ? L.prog / L.kills : 1;
+  return L.lost === 0 && avg < .45 ? 'S' : L.lost === 0 ? 'A' : L.lost <= 2 ? 'B' : 'C';
 }
 function endWave(){
   S.waveActive = false;
-  const clear = goldScale(S.wave) * 5;
+  const grade = lapGrade();
+  const clear = goldScale(S.wave) * 5 * (grade === 'S' ? 1.25 : 1);   // S grade: +25% lap bonus
   earn(clear);
   let paid = 0;
   for (const t of S.towers) {
@@ -955,17 +1036,22 @@ function endWave(){
   S.best = Math.max(S.best, S.wave);
   if (S.wave % 5 === 0) autosave(`Season ${S.season} · lap ${S.wave}`);
   if (S.endless && (S.wave - SEASON_LEN) % 3 === 0) { S.cp += 1; addText(W / TS / 2, 1, '+1 CP · endless', '#ffc85c', true); }
-  S.nextQ = buildWave(S.wave + 1);
-  S.banner = { s:`LAP ${S.wave} COMPLETE  +$${fmt(clear + paid)}`, c:'#7fd18b', t:2 };
+  prepNextLap();
+  S.banner = { s:`LAP ${S.wave} · GRADE ${grade}  +$${fmt(clear + paid)}`, c:grade === 'S' ? '#ffc85c' : '#7fd18b', t:2 };
+  S.stats.grades = S.stats.grades || {}; S.stats.grades[grade] = (S.stats.grades[grade] || 0) + 1;
+  if (!S.endless && S.wave % 6 === 0 && S.wave < SEASON_LEN) openOffers();
   S.autoT = 1.5;
   if (S.wave === SEASON_LEN && !S.endless) seasonFinale();
   save();
 }
 function spawnEnemy(ty, at){
-  const d = ENEMIES[ty], w = S.wave, hp = hpScale(w) * d.hp, sh = d.shield ? hp * d.shield : 0;
+  const d = ENEMIES[ty], w = S.wave, md = d.boss ? null : S.mod;
+  const hp = hpScale(w) * d.hp * S.boons.hp * (md === 'heavy' ? 1.45 : md === 'swarm' ? .65 : 1);
+  const sh = d.shield ? hp * d.shield : md === 'shielded' ? hp * .25 : 0;
   const tire = d.boss || d.van ? 'medium' : ['soft', 'medium', 'hard'][Math.floor(Math.random() * 3)];
   const e = {
-    type:ty, hp, maxHp:hp, shield:sh, maxShield:sh, armor:d.armor, spd:d.spd * (1 + Math.min(w, 100) * .003),
+    type:ty, hp, maxHp:hp, shield:sh, maxShield:sh, armor:d.armor + (md === 'armoured' ? .25 : 0),
+    spd:d.spd * (1 + Math.min(w, 100) * .003) * S.boons.spd * (md === 'nitro' ? 1.3 : md === 'heavy' ? .85 : 1),
     dist:at || 0, x:0, y:0, ang:0, rot:P.ang[0], off:(Math.random() - .5) * (d.pack ? .28 : .12), age:0,
     tire, wet:w >= 70 && !d.boss && Math.random() < .5, resist:S.resist,
     drs:false, draft:false, odT:4, odOn:0, sphT:6, sphOn:0, stunT:0, vuln:0, vulnT:0, brittle:0, brittleT:0,
@@ -976,7 +1062,8 @@ function spawnEnemy(ty, at){
   };
   setPos(e);
   S.enemies.push(e);
-  if (e.boss) { S.boss = e; S.banner = { s:d.name.toUpperCase(), c:'#ff653f', t:2.2 }; }
+  if (e.boss && w === SEASON_LEN && !S.endless) { e.gimmick = FINALE_GIMMICKS[(S.season - 1) % FINALE_GIMMICKS.length]; e.gimT = 1; }
+  if (e.boss) { S.boss = e; S.banner = { s:d.name.toUpperCase() + (e.gimmick ? ' · ' + GIMMICK_INFO[e.gimmick] : ''), c:'#ff653f', t:2.6 }; }
   return e;
 }
 function setPos(e){
@@ -985,7 +1072,7 @@ function setPos(e){
 }
 
 // ================= Economy & feedback =================
-function earn(g){ S.gold += g; S.runEarned += g; S.inc[S.incI] += g; if (S.waveActive) S.lap.gold += g; }
+function earn(g){ g *= S.boons.gold; S.gold += g; S.runEarned += g; S.inc[S.incI] += g; if (S.waveActive) S.lap.gold += g; }
 function earnCP(n){ S.cp += n; if (S.waveActive) S.lap.cp += n; }
 function addFx(f){ if (S.fx.length < 260) S.fx.push(f); }
 function addText(x, y, s, c, big){
@@ -1010,6 +1097,8 @@ function hit(e, amt, src, mode){
   if (cat && e.resist === cat) m *= .6;                       // adaptive chassis
   if (d && d.fire) { if (weather() === 'rain') m *= .5; if (e.tire === 'hard') m *= .5; }
   if (d && (d.kind === 'chain' || d.kind === 'emp') && weather() === 'rain') m *= 2;
+  if (d && d.id === 'hell' && e.slowT > 0 && hasSyn(src, 'Burning Brakes')) m *= 1.4;
+  if (d && d.id === 'tesla' && e.pT > 0 && hasSyn(src, 'Electrolyte')) m *= 1.3;
   if (src && e.bossKind === 'jugg' && Math.cos(Math.atan2(src.y + .5 - e.y, src.x + .5 - e.x) - e.rot) > .5) m *= .3; // frontal armour
   const armor = mode ? 0 : Math.max(-.5, e.armor - e.shred - e.permShred);
   let dmg = amt * (1 - armor) * m;
@@ -1023,7 +1112,7 @@ function hit(e, amt, src, mode){
   if (cat) S.dmgCat[cat] = (S.dmgCat[cat] || 0) + dealt;
   if (e.holo && !e.split && e.hp > 0 && e.hp < e.maxHp * .5) holoSplit(e);
   if (e.boss && e.hp > 0) bossPhases(e);
-  if (e.hp <= 0) kill(e, src);
+  if (e.hp <= 0) kill(e, src, -e.hp);
   return dealt;
 }
 function merchMult(src){
@@ -1032,11 +1121,19 @@ function merchMult(src){
   for (const m of S.towers) if (TOWERS[m.type].id === 'mint' && Math.hypot(m.x - src.x, m.y - src.y) <= TOWERS[m.type].range) n += mc(m, 'mint_merch');
   return 1 + .4 * n;
 }
-function kill(e, src){
+function kill(e, src, overkill = 0){
   e.dead = true;
   const ed = ENEMIES[e.type];
   const vip = src && hotAt(src) === 'vip' ? 1 + tileMult() : 1, night = weather() === 'night' ? 1.5 : 1;
-  const g = e.gold * vip * night * merchMult(src);
+  const over = .5 * Math.min(1, overkill / e.maxHp);     // surplus damage pays up to +50% of the bounty
+  const g = e.gold * vip * night * merchMult(src) * (1 + over);
+  S.lapStats.kills++; S.lapStats.prog += e.dist / P.len;
+  if (e.gimmick === 'split') for (let i = 0; i < 2; i++) {
+    const h = spawnEnemy(e.type, Math.max(0, e.dist - .3 * i));
+    h.boss = false; h.gimmick = null; h.hp = h.maxHp = e.maxHp * .25; h.shield = h.maxShield = 0; h.leakMul = .4; h.gold = e.gold * .2;
+    if (S.boss === h) S.boss = null;
+    addText(e.x, e.y - .5, 'SPLIT!', '#ff653f', true);
+  }
   earn(g);
   S.carKills++;
   S.stats.kills++;
@@ -1441,7 +1538,8 @@ function updEnemy(e, dt){
   e.dist = Math.max(0, e.dist + e.spd * mult * dt);
   if (e.dist >= P.len) {
     e.dead = true;
-    const lost = Math.max(1, Math.ceil(d.leak * (.5 + .5 * Math.max(0, e.hp) / e.maxHp)));
+    const lost = Math.max(1, Math.ceil(d.leak * (e.leakMul || 1) * (.5 + .5 * Math.max(0, e.hp) / e.maxHp)));
+    S.lapStats.lost += lost;
     const lk = S.leaks[e.type] || (S.leaks[e.type] = { n:0, lives:0, lap:0 });
     lk.n++; lk.lives += lost; lk.lap = S.wave;
     S.lives -= lost;
@@ -1462,7 +1560,21 @@ function updEnemy(e, dt){
       c: flame ? '#ff8a3d' : '#8d8f96', s: e.boss ? 1.6 : .9, t:.35, life:.5 });
   }
 }
+const FINALE_GIMMICKS = ['shield', 'teleport', 'split'];
+const GIMMICK_INFO = { shield:'SHIELDS NEARBY CARS', teleport:'TELEPORTS FORWARD', split:'SPLITS IN TWO' };
+function finaleGimmick(e, dt){
+  e.gimT -= dt;
+  if (e.gimmick === 'shield' && e.gimT <= 0) {
+    e.gimT = 1;
+    for (const o of S.enemies) if (o !== e && !o.dead && Math.hypot(o.x - e.x, o.y - e.y) < 1.6) { o.maxShield = Math.max(o.maxShield, o.maxHp * .15); o.shield = Math.max(o.shield, o.maxHp * .15); }
+  }
+  if (e.gimmick === 'teleport' && e.gimT <= 0) {
+    e.gimT = 7;
+    if (e.dist + 1.6 < P.len * .85) { burst(e.x, e.y, '#b07cff', 14, 2); e.dist += 1.6; setPos(e); burst(e.x, e.y, '#b07cff', 14, 2); addText(e.x, e.y - .5, 'TELEPORT', '#b07cff', true); }
+  }
+}
 function bossAbilities(e, d, dt){
+  if (e.gimmick) finaleGimmick(e, dt);
   if (e.pitT > 0) {                                     // phase 2: heals until its shield is broken
     e.pitT -= dt;
     if (e.shield > 0) e.hp = Math.min(e.maxHp * .7, e.hp + e.maxHp * .08 * dt);
@@ -1572,7 +1684,7 @@ function update(dt){
   if (S.scCD > 0) S.scCD -= dt;
   if (S.lightsT > 0) { S.lightsT -= dt; if (S.lightsT <= 0) S.goT = 1.1; }
   if (S.goT > 0) S.goT -= dt;
-  if (!S.waveActive && !S.nextQ) S.nextQ = buildWave(S.wave + 1);
+  if (!S.waveActive && !S.nextQ) prepNextLap();
   // regular spawns pause while a boss is on track
   if (S.waveActive && S.lightsT <= 0 && S.q.length && !S.boss) {
     S.spawnT -= dt;
@@ -1653,7 +1765,7 @@ function seasonFinale(){
 // A new run on a fresh circuit; CP, rank, unlocks and HQ upgrades stay.
 function clearDraft(){ ui.mutT = null; ui.mutQueue = 0; $('mut').classList.add('hidden'); }
 function newRun(){
-  clearDraft();
+  clearDraft(); ui.offer = null; $('offer').classList.add('hidden');
   const d = serialize();
   d.run = freshRun(d);
   S = makeState(d);
@@ -2350,6 +2462,15 @@ function render(now){
       ctx.strokeStyle = 'rgba(255,200,92,.45)'; ctx.lineWidth = 1; ctx.stroke();
     }
   }
+  // synergy links between paired towers
+  ctx.setLineDash([3, 3]); ctx.strokeStyle = 'rgba(255,200,92,.85)'; ctx.lineWidth = 1.5;
+  for (const t of S.towers) for (const u of S.towers) {
+    if (t.type >= u.type || !adjacent(t, u)) continue;
+    const a = TOWERS[t.type].id, b = TOWERS[u.type].id;
+    if (!SYNERGIES.some(sy => (sy.a === a && sy.b === b) || (sy.a === b && sy.b === a))) continue;
+    ctx.beginPath(); ctx.moveTo((t.x + .5) * TS, (t.y + .5) * TS); ctx.lineTo((u.x + .5) * TS, (u.y + .5) * TS); ctx.stroke();
+  }
+  ctx.setLineDash([]);
   // inspected tower
   if (ui.sel) {
     const t = ui.sel, col = TOWERS[t.type].color, r = isMint(t) ? TOWERS[t.type].range : stats(t).range;
@@ -2480,7 +2601,7 @@ function drawLapHud(){
   // weather tag
   const wx = WEATHERS[weather()];
   ctx.font = "800 8px 'Titillium Web',sans-serif";
-  const wt = `${wx.icon} ${wx.name.toUpperCase()} · S${S.season}`, ww = ctx.measureText(wt).width + 10;
+  const wt = `${circuit() ? circuit().name.toUpperCase() + ' · ' : ''}${wx.icon} ${wx.name.toUpperCase()} · S${S.season}`, ww = ctx.measureText(wt).width + 10;
   paperTag(4, 4, ww, 12); ctx.fillStyle = '#16115e'; ctx.textAlign = 'left'; ctx.fillText(wt, 9, 10.5);
   // PIT lights and jammed towers
   for (const t of S.towers) {
@@ -2540,7 +2661,7 @@ function drawLapHud(){
   if (!S.nextQ || S.over) return;
   const counts = {};
   for (const it of S.nextQ) counts[it.ty] = (counts[it.ty] || 0) + 1;
-  const types = Object.keys(counts), w = 52 + types.length * 27, x = W / 2 - w / 2;
+  const types = Object.keys(counts), modTxt = S.nextMod ? LAP_MODS[S.nextMod].name : '', w = 52 + types.length * 27 + (modTxt ? 50 : 0), x = W / 2 - w / 2;
   paperTag(x, y, w, 12);
   ctx.font = "800 8px 'Titillium Web',sans-serif"; ctx.textAlign = 'left'; ctx.fillStyle = '#16115e';
   ctx.fillText(`NEXT · LAP ${S.wave + 1}`, x + 4, y + 6.5);
@@ -2550,6 +2671,7 @@ function drawLapHud(){
     ctx.fillStyle = d.accent; ctx.fillRect(cx + 1, y + 5.3, 7, 1.4);
     ctx.strokeStyle = '#16115e'; ctx.lineWidth = .7; ctx.strokeRect(cx, y + 3, 9, 6);
     ctx.fillStyle = d.boss ? '#ff653f' : '#16115e'; ctx.fillText(`×${counts[ty]}`, cx + 11, y + 6.5);
+    if (modTxt && i === types.length - 1) { ctx.fillStyle = '#ff653f'; ctx.fillText(modTxt, cx + 27, y + 6.5); }
   });
 }
 
@@ -2637,7 +2759,8 @@ function refreshPanel(){
   $('pBar').style.width = (t.lv % 5) * 20 + '%';
   const teamDmg = S.towers.reduce((a, x) => a + x.dmg, 0);
   $('pShare').classList.toggle('hidden', econ);
-  if (!econ) setText($('pShare'), teamDmg > 0 ? `Damage share: ${Math.round(t.dmg / teamDmg * 100)}% of the team · ${fmt(t.dmg)} dealt this run` : 'Damage share: no damage dealt yet this run');
+  const extras = [...synergiesOf(t).map(sy => `⚡ ${sy.name}: ${sy.desc}`), circuitBonus(t) > 1 ? `🏁 ${circuit().name} favours it: +20% damage` : ''].filter(Boolean).join(' · ');
+  if (!econ) setText($('pShare'), (extras ? extras + ' · ' : '') + (teamDmg > 0 ? `Damage share: ${Math.round(t.dmg / teamDmg * 100)}% of the team · ${fmt(t.dmg)} dealt this run` : 'Damage share: no damage dealt yet this run'));
   let delta;
   if (econ) {
     const now = d.id === 'solar' ? solarPay(t) : econPay(t), next = d.id === 'solar' ? solarPay(t, t.lv + 1) : econPay(t, t.lv + 1);
@@ -2874,7 +2997,12 @@ async function checkUpdates(manual){
 function showUpdate(v){ setText($('updFrom'), APP_VERSION); setText($('updTo'), v); $('upd').classList.remove('hidden'); }
 $('hmCheck').onclick = () => { homeMsg('Checking…'); checkUpdates(true); };
 $('updLater').onclick = () => { updDismissed = true; $('upd').classList.add('hidden'); };
-$('updGo').onclick = () => { save(); localStorage.setItem(CACHE_KEY, latestHtml); location.reload(); };
+$('updGo').onclick = () => {
+  save(); localStorage.setItem(CACHE_KEY, latestHtml); location.reload();
+  // Desktop app 1.0.3–1.0.5 blocks page reloads; if we are still here, say how to finish instead of doing nothing.
+  setTimeout(() => { setText($('updGo'), 'Restart the app to finish'); $('updGo').disabled = true;
+    homeMsg('Update downloaded. Quit and reopen the app (or tray menu → Reload game) to finish. Desktop app 1.0.6+ reloads by itself.'); }, 1500);
+};
 // First-run tips: each step finishes when the player does it.
 const TIPS = [
   { t:'Pick a tower in the dock, then click a free green pad to build it.', done:() => S.towers.length > 0 },
@@ -3154,7 +3282,7 @@ function frame(now){
   const raw = (now - last) / 1000, dt = Math.min(raw, .25);
   last = now;
   ui.shake *= Math.exp(-dt * 12);
-  if (S && !ui.home && !S.over && !ui.mutT && !ui.season && !ui.pres && !ui.hqMode && !ui.paused) {
+  if (S && !ui.home && !S.over && !ui.mutT && !ui.season && !ui.pres && !ui.hqMode && !ui.paused && !ui.offer) {
     const gap = raw - dt;
     if (gap > AWAY_MIN) { ui.away = ui.away || { sec:0, gold:S.runEarned, wave:S.wave, kills:S.carKills, lives:S.lives }; ui.away.sec += gap; }
     ui.catchup = Math.min(CATCHUP_MAX, (ui.catchup || 0) + gap);

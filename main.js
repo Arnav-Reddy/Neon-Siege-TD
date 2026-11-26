@@ -142,7 +142,8 @@ app.whenReady().then(async () => {
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true }); // no skip here: first call runs DockHide
   for (const ev of ['show', 'restore', 'focus']) win.on(ev, pin);    // re-assert topmost on every show path
   win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
-  win.webContents.on('will-navigate', e => e.preventDefault());
+  // Block navigation away from the game, but let the page reload itself (the in-game updater does that).
+  win.webContents.on('will-navigate', (e, url) => { if (url !== win.webContents.getURL()) e.preventDefault(); });
   win.webContents.session.setPermissionRequestHandler((_wc, _permission, callback) => callback(false));
   if (!LOCAL) {
     win.webContents.session.webRequest.onHeadersReceived({
