@@ -80,7 +80,7 @@ The game also updates itself. At start-up it compares its version with the `inde
   Locked towers show their rank on the dock.
 - **Tower cap:** you can field 5 combat towers, plus 1 per prestige rank and 1 per Pit Garage Expansion. **Money makers** (Sponsor, Wind Tunnel, Pit Crew, Solar) have their own section at the left of the dock and their own limit of 3, so they never take a combat slot.
 - **Levels:** every level costs 1.6× the last and gives about +30% power, plus tower perks (extra barrels, more chain jumps, rail pierce, flak fragments and more). The inspector previews the next level's change. Lv3 unlocks target priority. Lv5 unlocks **Push Lap** (+60% fire rate for 4 s, 20 s cooldown) and the first **mutation draft**. You choose 1 of 3 mutations (4 with HQ), and a mutation can be stacked. Press **📌 Select** under a mutation to pin it: that tower then takes it automatically every time it mutates, until you unpin it in the inspector. `MAX` buys every level you can afford, then shows each earned draft one at a time (or applies the pinned mutation).
-- **Economy without car money:** kill and lap gold grow slowly (`13.5 × 1.08^lap`). Four towers make money:
+- **Economy without car money:** kill and lap gold grow slowly (`15.5 × 1.08^lap`, ×1.08 per season). Four towers make money:
   - **Sponsor Billboard:** earns gold every second of a lap, plus a lap-end bonus worth 25 seconds of income. Mutations: Title Sponsor, Prize Money, Merch Stand (+40% kill gold for towers in its radius).
   - **Trackside Wind Tunnel:** charges from 30 shots by adjacent towers and pays out at most 3 times a lap.
   - **Pit-Crew Gantry:** every 18 s a 3.5 s PIT window opens. Click it for a full payout; a missed window pays 30%. At most 2 pit stops a lap.
@@ -98,10 +98,10 @@ The game also updates itself. At start-up it compares its version with the `inde
   - At 50%, the boss pits to heal behind a shield.
   - At 25%, four escorts join.
 - **Seasons:** a season is 24 laps and ends with a finale boss. You then choose:
-  - **Next Season:** cars get +35% HP per season and pay more CP.
+  - **Next Season:** every season is harder: cars +55% HP, +4% speed (up to +40%), 12% more cars per lap and more lap modifiers, while income grows 8% per season and CP rewards rise.
   - **Keep Racing:** endless laps, 1 CP every 3 laps.
   - **Prestige:** once you reach the rank's lap target, prestige raises your rank, unlocks towers and adds a tower slot.
-- **Constructors' HQ:** spend CP on Pit Garage Expansion, Mutation Rerolls, Starting Gold, Tile Buff Multipliers, 4-Choice Drafts and Power Unit R&D (+20% damage).
+- **Constructors' HQ:** spend CP on Pit Garage Expansion, Sponsorship Deal (+15% all gold per level), Starting Gold, Tile Buff Multipliers, 4-Choice Drafts and Power Unit R&D (+20% damage).
 - **Big numbers** stay compact: 1.25K, 10.0M, 2.50B, 15.4T, with fixed-width digits.
 
 ## Build it yourself

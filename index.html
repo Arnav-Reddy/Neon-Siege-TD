@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="3.2.0">
+<meta name="app-version" content="3.3.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -401,7 +401,6 @@ html.overlay .handle{-webkit-app-region:drag}
       <div class="mh">✦ MUTATION <span id="mTitle"></span></div>
       <div id="mSub" class="msub"></div>
       <div id="mOpts" class="mopts"></div>
-      <div class="prow"><button id="mReroll" class="btn sm" title="Reshuffle this draft (rerolls come from Constructors' HQ)"></button></div>
     </div>
     <div id="pres" class="ovl hidden">
       <div class="pr-head">
@@ -583,7 +582,7 @@ const HOTKEYS = ['1','2','3','4','5','6','7','8','9','0','-'];
 const isLongRange = d => d.range > 3;
 const PRIORITIES = [['first', 'First'], ['strong', 'Strongest'], ['shield', 'Shielded'], ['van', 'Support Vans']];
 
-// Each tower's own three signature mutations, plus the universal Factory Tuning (4-choice drafts / rerolls).
+// Each tower's own three signature mutations, plus the universal Factory Tuning (shown in 4-choice drafts).
 // All stacks add up linearly and respect their caps.
 const MUTS = {
   bolt:  [ { id:'bolt_wrench',   icon:'⚙', name:'Impact Wrench',      desc:'+50% fire rate per stack' },
@@ -654,13 +653,13 @@ const TIER_COL = ['#c9c4ef','#8f86ff','#ffc85c','#ff9b7a','#ff653f','#fff4dc'];
 // Constructors' HQ: permanent upgrades bought with Championship Points (per save slot).
 const HQ = [
   { id:'garage', name:'Pit Garage Expansion', icon:'▦', desc:l => `+${l} max tower${l === 1 ? '' : 's'}`,                   cost:l => 3 + 2 * l, max:10 },
-  { id:'reroll', name:'Mutation Rerolls',     icon:'↻', desc:l => `${l} draft reroll${l === 1 ? '' : 's'} per run`,       cost:l => 2 + l,     max:5 },
+  { id:'deal',   name:'Sponsorship Deal',     icon:'¤', desc:l => `+${15 * l}% all gold`,                                cost:l => 2 + l,     max:10 },
   { id:'gold',   name:'Higher Starting Gold', icon:'$', desc:l => `Start runs with $${fmt(startGoldFor(l))}`,              cost:l => 1 + l,     max:Infinity },
   { id:'tile',   name:'Tile Buff Multipliers',icon:'◈', desc:l => `Hot-zone bonuses ×${(1 + .25 * l).toFixed(2)}`,         cost:l => 2 + l,     max:8 },
   { id:'draft4', name:'4-Choice Drafts',      icon:'✦', desc:l => l ? 'Drafts show all 4 options' : 'Drafts show 3 of 4', cost:() => 8,      max:1 },
   { id:'rnd',    name:'Power Unit R&D',       icon:'⚡', desc:l => `+${20 * l}% global damage`,                             cost:l => 3 + 2 * l, max:Infinity },
 ];
-const startGoldFor = l => 200 * Math.pow(2, l);
+const startGoldFor = l => 300 * Math.pow(2, l);
 
 // Cars. size = half length in tiles; leak = lives lost at the finish (scaled by remaining HP).
 const ENEMIES = {
@@ -791,23 +790,32 @@ function makeTower(type, x, y, paid){
   return { type, x, y, lv:1, kills:0, earned:0, muts:[], invested:paid, cd:0, buff:1, aura:0, haste:0, lock:0, target:null, extra:[], beams:[],
     harvest:0, pulses:0, vscT:15, fieldR:0, prio:'first', odT:0, odCD:0, jamT:0, shots:0, charge:0, pays:0, pitCycle:0, pitWin:0, pitStop:0, pitFull:false, pitsDone:0, mutSel:null, dmg:0, ang:-Math.PI / 2, recoil:0, flash:0 };
 }
+// Mutation Rerolls left the HQ (replaced by Sponsorship Deal): refund what was spent on them.
+function refundRerolls(d){
+  const l = (d.hq && d.hq.reroll) || 0;
+  if (!l) return 0;
+  let cp = 0; for (let i = 0; i < l; i++) cp += 2 + i;
+  delete d.hq.reroll; d.cp += cp;
+  return cp;
+}
 function makeState(d, mode = 'story'){
+  const refunded = refundRerolls(d);
   const r = mode === 'endless' ? d.endlessRun : d.run;
   return {
     mode, endlessBest:d.endlessBest || 0,
     slot:d.slot, name:d.name, created:d.created, season:d.season, prestige:d.prestige, cp:d.cp, hq:{ ...d.hq }, best:d.best,
     speed:d.speed, auto:d.auto, tips:d.tips ?? 3,       // saves from before the tips skip them
     stats:d.stats ?? { playSec:0, kills:0, byTower:{} }, milestones:d.milestones ?? [], backupSince:d.backupSince ?? 0,
-    seed:r.seed, gold:r.gold, lives:r.lives, wave:r.wave, endless:mode === 'endless' || r.endless, rerolls:r.rerolls, bossKills:r.bossKills, carKills:r.carKills, runEarned:r.runEarned, resist:r.resist,
+    seed:r.seed, gold:r.gold, lives:r.lives, wave:r.wave, endless:mode === 'endless' || r.endless, bossKills:r.bossKills, carKills:r.carKills, runEarned:r.runEarned, resist:r.resist,
     towers:r.towers.filter(t => Object.hasOwn(TOWER_INDEX, t.id)).map(t => ({ ...makeTower(TOWER_INDEX[t.id], t.x, t.y, t.invested), lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts.slice(), prio:t.prio, mutSel:t.mutSel || null, dmg:t.dmg || 0 })),
     waveActive:false, enemies:[], projs:[], hazards:[], fx:[], parts:[], drones:[], detQ:[], q:[], nextQ:null, waveTotal:0, lightsT:0, goT:0, spawnT:0, autoT:1.5, time:0,
     inc:new Array(10).fill(0), incI:0, incT:0, dmgCat:{}, scT:0, scCD:0, boss:null, lap:null,
-    over:r.lives <= 0, banner:null, coreFlash:0, hot:[], leaks:r.leaks || {},
+    over:r.lives <= 0, banner:refunded ? { s:`MUTATION REROLLS REFUNDED · +${refunded} CP`, c:'#ffc85c', t:3 } : null, coreFlash:0, hot:[], leaks:r.leaks || {},
     circuit:r.circuit || null, boons:r.boons || { gold:1, hp:1, dmg:1, spd:1, slot:0 }, mod:null, nextMod:null, lapStats:{ lost:0, prog:0, kills:0 },
   };
 }
 function freshRun(career){
-  return { seed:randSeed(), gold:startGoldFor(career.hq.gold || 0), lives:BASE_LIVES, wave:0, endless:false, rerolls:career.hq.reroll || 0,
+  return { seed:randSeed(), gold:startGoldFor(career.hq.gold || 0), lives:BASE_LIVES, wave:0, endless:false,
     bossKills:0, carKills:0, runEarned:0, resist:null, towers:[], leaks:{}, circuit:circuitForSeason(career.season), boons:{ gold:1, hp:1, dmg:1, spd:1, slot:0 } };
 }
 function freshEndless(career){
@@ -822,7 +830,7 @@ function serialize(){
   // Mid-lap, save the run as it was when the lap started (minus what was earned since); spending stays spent.
   const L = S.waveActive ? S.lap : { gold:0, cp:0, lives:S.lives, bossKills:S.bossKills, carKills:S.carKills };
   return { v:3, slot:S.slot, name:S.name, created:S.created, season:S.season, prestige:S.prestige, cp:S.cp - L.cp, hq:S.hq, best:S.best, endlessBest:S.endlessBest, speed:S.speed, auto:S.auto, tips:S.tips, stats:S.stats, milestones:S.milestones, backupSince:S.backupSince,
-    run:{ seed:S.seed, gold:S.gold - L.gold, lives:L.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, rerolls:S.rerolls, bossKills:L.bossKills, carKills:L.carKills, runEarned:S.runEarned - L.gold, resist:S.resist, leaks:S.leaks, circuit:S.circuit, boons:S.boons,
+    run:{ seed:S.seed, gold:S.gold - L.gold, lives:L.lives, wave:S.waveActive ? S.wave - 1 : S.wave, endless:S.endless, bossKills:L.bossKills, carKills:L.carKills, runEarned:S.runEarned - L.gold, resist:S.resist, leaks:S.leaks, circuit:S.circuit, boons:S.boons,
       towers:S.towers.map(t => ({ id:TOWERS[t.type].id, x:t.x, y:t.y, lv:t.lv, kills:t.kills, earned:t.earned, muts:t.muts, invested:t.invested, prio:t.prio, mutSel:t.mutSel, dmg:t.dmg })) } };
 }
 function save(){
@@ -1031,9 +1039,12 @@ function nextPerk(t){
 }
 
 // ================= Waves =================
-const seasonMult = () => Math.pow(1.35, S.season - 1);
+const seasonMult = () => Math.pow(1.55, S.season - 1);                        // car HP
+const seasonSpeed = () => 1 + Math.min(.4, .04 * (S.season - 1));             // car speed, capped at +40%
+const seasonGrid = () => 1 + .12 * (S.season - 1);                            // cars per lap
+const seasonGold = () => Math.pow(1.08, S.season - 1);                        // income grows slower than HP (more cars also pay more)
 const hpScale = w => 15 * Math.pow(1.18, w - 1) * seasonMult();
-const goldScale = w => 13.5 * Math.pow(1.08, w - 1);   // slower growth than the old 5 * 1.115^w
+const goldScale = w => 15.5 * Math.pow(1.08, w - 1) * seasonGold();
 const isBossWave = w => w % 10 === 0 || w === SEASON_LEN;
 function bossFor(w){
   if (w === SEASON_LEN || w >= 50) return 'boss_levi';
@@ -1048,7 +1059,7 @@ const LAP_MODS = {
   swarm:    { name:'SWARM',    desc:'50% more cars, 35% less HP each' },
   shielded: { name:'SHIELDED', desc:'cars start with a 25% shield' },
 };
-const pickMod = w => w >= 3 && Math.random() < .45 ? Object.keys(LAP_MODS)[Math.floor(Math.random() * 5)] : null;
+const pickMod = w => w >= 3 && Math.random() < Math.min(.85, .45 + .07 * (S.season - 1)) ? Object.keys(LAP_MODS)[Math.floor(Math.random() * 5)] : null;
 function prepNextLap(){ S.nextMod = pickMod(S.wave + 1); S.nextQ = buildWave(S.wave + 1, S.nextMod); }
 function buildWave(w, mod){
   const pool = ['spec', 'junior'];
@@ -1060,7 +1071,7 @@ function buildWave(w, mod){
   if (w >= 55) pool.push('holo');
   const gap = { spec:.65, papaya:.5, gt:1, hybrid:.7, proto:.5, stealth:.6, holo:.8 };
   const q = [];
-  let budget = Math.min(40, 6 + Math.floor(w * .7)) * (mod === 'swarm' ? 1.5 : 1);
+  let budget = Math.min(40, 6 + Math.floor(w * .7)) * (mod === 'swarm' ? 1.5 : 1) * seasonGrid();
   while (budget > 0) {
     let ty = pool[Math.floor(Math.random() * pool.length)];
     if (ty === 'junior') { for (let i = 0; i < ENEMIES.junior.pack; i++) q.push({ ty, gap: i ? .14 : .6 }); budget -= 2; continue; }
@@ -1148,7 +1159,7 @@ function spawnEnemy(ty, at){
   const tire = d.boss || d.van ? 'medium' : ['soft', 'medium', 'hard'][Math.floor(Math.random() * 3)];
   const e = {
     type:ty, hp, maxHp:hp, shield:sh, maxShield:sh, armor:d.armor + (md === 'armoured' ? .25 : 0),
-    spd:d.spd * (1 + Math.min(w, 100) * .003) * S.boons.spd * (md === 'nitro' ? 1.3 : md === 'heavy' ? .85 : 1),
+    spd:d.spd * (1 + Math.min(w, 100) * .003) * seasonSpeed() * S.boons.spd * (md === 'nitro' ? 1.3 : md === 'heavy' ? .85 : 1),
     dist:at || 0, x:0, y:0, ang:0, rot:P.ang[0], off:(Math.random() - .5) * (d.pack ? .28 : .12), age:0,
     tire, wet:w >= 70 && !d.boss && Math.random() < .5, resist:S.resist,
     drs:false, draft:false, odT:4, odOn:0, sphT:6, sphOn:0, stunT:0, vuln:0, vulnT:0, brittle:0, brittleT:0,
@@ -1169,7 +1180,7 @@ function setPos(e){
 }
 
 // ================= Economy & feedback =================
-function earn(g){ g *= S.boons.gold; S.gold += g; S.runEarned += g; S.inc[S.incI] += g; if (S.waveActive) S.lap.gold += g; }
+function earn(g){ g *= S.boons.gold * (1 + .15 * hq('deal')); S.gold += g; S.runEarned += g; S.inc[S.incI] += g; if (S.waveActive) S.lap.gold += g; }
 function earnCP(n){ S.cp += n; if (S.waveActive) S.lap.cp += n; }
 function addFx(f){ if (S.fx.length < 260) S.fx.push(f); }
 function addText(x, y, s, c, big){
@@ -1876,7 +1887,7 @@ function newRun(){
   $('mut').classList.add('hidden'); $('over').classList.add('hidden');
   save();
 }
-function nextSeason(){ S.season++; newRun(); S.banner = { s:`SEASON ${S.season} · ENEMIES +35% HP`, c:'#ffc85c', t:2.4 }; }
+function nextSeason(){ S.season++; newRun(); S.banner = { s:`SEASON ${S.season} · CARS TOUGHER, FASTER, MORE OF THEM · GOLD +20%`, c:'#ffc85c', t:2.6 }; }
 function keepRacing(){ S.endless = true; ui.season = null; closeSeasonEnd(); S.banner = { s:'ENDLESS · +1 CP EVERY 3 LAPS', c:'#ffc85c', t:2.4 }; save(); }
 function restartSeason(){ newRun(); S.banner = { s:S.mode === 'endless' ? 'ENDLESS · NEW RUN' : `SEASON ${S.season} · RESTART`, c:'#ffc85c', t:2 }; }
 function doPrestige(){
@@ -1893,7 +1904,6 @@ function buyHQ(id){
   const u = HQ.find(h => h.id === id), l = hq(id), c = u.cost(l);
   if (l >= u.max || S.cp < c) return;
   S.cp -= c; S.hq[id] = l + 1;
-  if (id === 'reroll') S.rerolls++;
   burst(W / TS / 2, H / TS / 2, '#ffc85c', 14, 2.5);
   save();
 }
@@ -1970,7 +1980,7 @@ function sell(t){
   save();
 }
 const allMutOptions = t => [...MUTS[TOWERS[t.type].id], TUNE];
-// Drafts show 3 of the tower's 4 options (all 4 with the HQ upgrade); rerolls reshuffle.
+// Drafts show 3 of the tower's 4 options (all 4 with the HQ upgrade).
 function draftOptions(t){
   const all = allMutOptions(t);
   return hq('draft4') ? all : shuffle(all.slice()).slice(0, 3).sort((a, b) => all.indexOf(a) - all.indexOf(b));
@@ -2963,7 +2973,7 @@ function openSeasonEnd(){
   const r = ui.season;
   setText($('ssNum'), String(r.num)); setText($('ssCP'), String(r.cp));
   setText($('ssLaps'), String(r.laps)); setText($('ssCars'), fmt(r.cars)); setText($('ssBoss'), String(r.bosses)); setText($('ssGold'), fmt(r.gold));
-  $('ssBreak').innerHTML = `<div><span>Next season</span><b>enemies +35% HP, +2 CP</b></div><div><span>Keep racing</span><b>laps 25+, +1 CP / 3 laps</b></div><div><span>Prestige</span><b>${prestigeReady() ? 'ready: P' + (S.prestige + 1) : 'clear lap ' + prestigeTarget()}</b></div>`;
+  $('ssBreak').innerHTML = `<div><span>Next season</span><b>cars +35% HP, +4% speed, +12% cars · gold +20% · +2 CP</b></div><div><span>Keep racing</span><b>laps 25+, +1 CP / 3 laps</b></div><div><span>Prestige</span><b>${prestigeReady() ? 'ready: P' + (S.prestige + 1) : 'clear lap ' + prestigeTarget()}</b></div>`;
   setText($('ssNext'), `▶ Season ${r.num + 1}`);
   const pr = $('ssPres'); pr.disabled = !prestigeReady(); setText(pr, prestigeReady() ? `🏆 Prestige P${S.prestige + 1}` : `🔒 Lap ${prestigeTarget()}`);
   closePanel();
@@ -3384,8 +3394,6 @@ function updateUI(){
   if (ui.hqMode) refreshHQ();
   if (ui.sel) refreshPanel();
   if (ui.mutT) {
-    const r = $('mReroll'); r.classList.toggle('hidden', hq('draft4') > 0 || hq('reroll') === 0);
-    r.disabled = S.rerolls < 1; setText(r, `↻ Reroll (${S.rerolls})`);
   }
 }
 
@@ -3425,7 +3433,6 @@ $('pSel').onclick = () => { ui.sel.mutSel = null; save(); };
 $('hintX').onclick = () => { S.tips = TIPS.length; save(); };
 $('awayOk').onclick = () => $('away').classList.add('hidden');
 $('ssExport').onclick = () => { exportSlot(S.slot); $('ssBackup').classList.add('hidden'); };
-$('mReroll').onclick = () => { if (S.rerolls < 1) return; S.rerolls--; ui.mutOpts = draftOptions(ui.mutT); renderMutOpts(); save(); };
 $('bWave').onclick = startWave;
 $('bSpeed').onclick = () => { S.speed = S.speed % 3 + 1; save(); };
 $('bAuto').onclick = () => { S.auto = !S.auto; S.autoT = 1; save(); };

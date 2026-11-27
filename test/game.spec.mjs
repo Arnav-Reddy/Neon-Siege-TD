@@ -54,7 +54,7 @@ test('home screen loads clean with five empty slots', async () => {
 test('new save starts a run', async () => {
   await newSave('Scuderia Test');
   const run = await page.evaluate(() => ({ name:S.name, slot:S.slot, wave:S.wave, gold:S.gold, season:S.season }));
-  expect(run).toEqual({ name:'Scuderia Test', slot:1, wave:0, gold:200, season:1 });
+  expect(run).toEqual({ name:'Scuderia Test', slot:1, wave:0, gold:300, season:1 });
   await expect(page.locator('#home')).toBeHidden();
 });
 
