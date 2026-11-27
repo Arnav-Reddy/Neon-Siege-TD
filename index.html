@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="3.3.0">
+<meta name="app-version" content="3.4.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -675,10 +675,10 @@ const ENEMIES = {
   holo:     { name:'Hologram Decoy Racer', hp:2.2, spd:1.05, armor:.1, gold:2.5, leak:2, size:.22, body:'#5ef0ff', accent:'#ff9bc0', holo:true },
   decoy:    { name:'Hologram Decoy',      hp:.1,  spd:1.8,  armor:0,   gold:.3,  leak:1, size:.16, body:'#bdf7ff', accent:'#ffffff' },
   escort:   { name:'Armoured Interceptor', hp:1,  spd:.9,   armor:.5,  gold:.5,  leak:1, size:.21, body:'#4a4f58', accent:'#ff653f', heavy:true },
-  boss_arrow:   { name:'Silver Arrow V12',         hp:16, spd:.5,  armor:.25, gold:25, leak:5, size:.4,  body:'#c9ced6', accent:'#00d2be', boss:'arrow' },
-  boss_jugg:    { name:'Scuderia Juggernaut',      hp:22, spd:.38, armor:.3,  gold:30, leak:5, size:.42, body:'#d40000', accent:'#ffe24a', boss:'jugg' },
-  boss_phantom: { name:'Apex Phantom X',           hp:18, spd:.5,  armor:.25, gold:30, leak:5, size:.4,  body:'#22113d', accent:'#b07cff', boss:'phantom' },
-  boss_levi:    { name:'The Grand Prix Leviathan', hp:28, spd:.42, armor:.3,  gold:40, leak:5, size:.44, body:'#1c1c1e', accent:'#d4af37', boss:'levi' },
+  boss_arrow:   { name:'Silver Arrow V12',         hp:12, spd:.5,  armor:.25, gold:25, leak:5, size:.4,  body:'#c9ced6', accent:'#00d2be', boss:'arrow' },
+  boss_jugg:    { name:'Scuderia Juggernaut',      hp:16.5, spd:.38, armor:.3,  gold:30, leak:5, size:.42, body:'#d40000', accent:'#ffe24a', boss:'jugg' },
+  boss_phantom: { name:'Apex Phantom X',           hp:13.5, spd:.5,  armor:.25, gold:30, leak:5, size:.4,  body:'#22113d', accent:'#b07cff', boss:'phantom' },
+  boss_levi:    { name:'The Grand Prix Leviathan', hp:21, spd:.42, armor:.3,  gold:40, leak:5, size:.44, body:'#1c1c1e', accent:'#d4af37', boss:'levi' },
 };
 const WEATHERS = { sun:{ name:'Clear Sun', icon:'☀' }, rain:{ name:'Torrential Rain', icon:'☂' }, night:{ name:'Night Race', icon:'☾' } };
 const HOTZONES = { drs:{ name:'DRS Straight Pad', icon:'»', c:'#5ef0ff', desc:'+40% attack speed' }, stand:{ name:'Elevated Grandstand', icon:'▲', c:'#ffc85c', desc:'+50% range, +25% crit' }, vip:{ name:'VIP Paddock Tile', icon:'$', c:'#7fd18b', desc:'+100% payout' } };
@@ -1043,7 +1043,7 @@ const seasonMult = () => Math.pow(1.55, S.season - 1);                        //
 const seasonSpeed = () => 1 + Math.min(.4, .04 * (S.season - 1));             // car speed, capped at +40%
 const seasonGrid = () => 1 + .12 * (S.season - 1);                            // cars per lap
 const seasonGold = () => Math.pow(1.08, S.season - 1);                        // income grows slower than HP (more cars also pay more)
-const hpScale = w => 15 * Math.pow(1.18, w - 1) * seasonMult();
+const hpScale = w => 15 * Math.pow(1.16, w - 1) * seasonMult();
 const goldScale = w => 15.5 * Math.pow(1.08, w - 1) * seasonGold();
 const isBossWave = w => w % 10 === 0 || w === SEASON_LEN;
 function bossFor(w){
@@ -1074,7 +1074,7 @@ function buildWave(w, mod){
   let budget = Math.min(40, 6 + Math.floor(w * .7)) * (mod === 'swarm' ? 1.5 : 1) * seasonGrid();
   while (budget > 0) {
     let ty = pool[Math.floor(Math.random() * pool.length)];
-    if (ty === 'junior') { for (let i = 0; i < ENEMIES.junior.pack; i++) q.push({ ty, gap: i ? .14 : .6 }); budget -= 2; continue; }
+    if (ty === 'junior') { const pack = Math.min(ENEMIES.junior.pack, 2 + Math.floor(w / 3)); for (let i = 0; i < pack; i++) q.push({ ty, gap: i ? .14 : .6 }); budget -= 2; continue; }   // packs grow over the first laps
     const g = gap[ty];
     if (ty === 'proto') ty = Math.random() < .5 ? 'rosso' : 'midnight';
     q.push({ ty, gap:g }); budget -= 1;
