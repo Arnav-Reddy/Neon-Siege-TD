@@ -179,3 +179,17 @@ test('a new season, restart or prestige never starts laps by itself', async () =
     if (go.includes('doPrestige')) expect(s.time).toBe(0);   // paused behind the HQ sheet
   }
 });
+
+test('lives, wave and gold stay visible however big the numbers get', async () => {
+  await newSave();
+  for (const [gold, inc] of [[300, 0], [25400, 120], [1.2e6, 3560], [1.23e15, 4.5e11]]) {
+    await page.evaluate(([g, i]) => { S.gold = g; S.inc = new Array(10).fill(i); }, [gold, inc]);
+    await page.waitForTimeout(120);
+    const hidden = await page.evaluate(() => {
+      const box = document.querySelector('.stats').getBoundingClientRect();
+      return ['sWave', 'sGold', 'sLives'].filter(id => { const r = document.getElementById(id).getBoundingClientRect(); return !r.width || r.right > box.right + .5 || r.left < box.left - .5; });
+    });
+    expect(hidden).toEqual([]);
+  }
+  expect(await page.evaluate(() => S.lives)).toBe(20);
+});

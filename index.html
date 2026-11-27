@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="app-version" content="3.4.0">
+<meta name="app-version" content="3.5.0">
 <script>
 // Self-bootstrapping update cache. If an in-game update stored a newer version, run that instead of this file.
 // The game script below is inert until loaded at the end of <body>, so a swap never runs two copies of the game.
@@ -72,6 +72,8 @@ html.overlay .handle{-webkit-app-region:drag}
 #w.dragging .stats,#w.dragging .grip{cursor:grabbing}
 .st{display:flex;align-items:center;gap:3px;height:100%;padding:0 4px;font-family:var(--mono);font-weight:700;font-size:11px;color:var(--ink)}
 .st+.st{border-left:var(--rule)}
+/* Wave, lives and towers always keep their size; only the gold item shrinks (its income rate is trimmed first). */
+.stats .st,.stats .sep{flex:none}   /* every stat keeps its size; the income rate hides when the bar is full */
 .st svg{width:11px;height:11px;flex:none}
 .st-w svg{color:var(--steel)}.st-g svg{color:var(--ochre)}.st-l svg{color:var(--ember)}
 .st .rate{font-size:9.5px;font-weight:700;color:var(--moss)}
@@ -205,7 +207,6 @@ html.overlay .handle{-webkit-app-region:drag}
 #over .btn{width:160px}
 
 /* ---------- HUD extras ---------- */
-.st-t svg{color:var(--ink2)}
 .ib.sc{--p:0%;background:linear-gradient(90deg,var(--paper3) var(--p),var(--paper) var(--p));color:var(--ink)}
 .ib.sc.live{background:var(--ochre);animation:nudge 1s ease-in-out infinite}
 .ib.sc:disabled{cursor:default}
@@ -356,8 +357,6 @@ html.overlay .handle{-webkit-app-region:drag}
       <span class="st st-g" title="Gold · rolling 10s income per game-second"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="currentColor"/><circle cx="8" cy="8" r="4.2" fill="none" stroke="#7c4a03" stroke-width="1.2"/></svg><span id="sGold">0</span><span id="sRate" class="rate">+0/s</span></span>
       <i class="sep"></i>
       <span id="pLives" class="st st-l" title="Core lives"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M8 14.2 2.3 8.6a3.4 3.4 0 0 1 4.8-4.9L8 4.6l.9-.9a3.4 3.4 0 0 1 4.8 4.9z"/></svg><span id="sLives">0</span></span>
-      <i class="sep"></i>
-      <span class="st st-t" title="Towers placed / max towers"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M3 14h10v-2H11V6l1-2V2H4v2l1 2v6H3z"/></svg><span id="sTowers">0/5</span></span>
     </div>
     <button id="bWave" class="ib go" title="Start next lap (Space) · pause with P"><svg viewBox="0 0 16 16"><path fill="currentColor" d="M4.5 2.8v10.4L13 8z"/></svg></button>
     <div class="seg full">
@@ -544,7 +543,7 @@ const APP_VERSION = document.querySelector('meta[name="app-version"]').content;
 const SLOTS = 5, SLOT_KEY = n => `f1_td_slot_${n}`, LAST_KEY = 'f1_td_last', PREFS_KEY = 'f1_td_prefs';
 const CACHE_KEY = 'f1_td_cached_html', URL_KEY = 'f1_td_update_url';
 const DEFAULT_UPDATE_URL = 'https://raw.githubusercontent.com/Arnav-Reddy/Neon-Siege-TD/main/index.html';
-const BASE_LIVES = 10, BASE_CAP = 5, SEASON_LEN = 24, LIGHTS = 1.2;
+const BASE_LIVES = 20, BASE_CAP = 5, SEASON_LEN = 24, LIGHTS = 1.2;
 const LEVEL_POWER = 1.35; // every level: +35% power
 const UP_GROWTH = 1.6;    // upgrade cost = base × 1.6^level
 const MUT_POWER = 1.25;   // every mutation pick also multiplies damage/payout
@@ -3359,6 +3358,12 @@ function updateTips(){
   $('hint').classList.toggle('hidden', !show);
   if (show) { setText($('hintN'), `TIP ${S.tips + 1}/${TIPS.length}`); setText($('hintTxt'), TIPS[S.tips].t); }
 }
+// Lives, wave, gold and towers must always show: when the stat bar overflows, hide the income rate.
+function fitStats(){
+  const bar = document.querySelector('.stats'), rate = $('sRate');
+  rate.style.display = '';
+  if (bar.scrollWidth > bar.clientWidth + 1) rate.style.display = 'none';
+}
 function updateUI(){
   if (!S) return;
   updateTips();
@@ -3367,7 +3372,7 @@ function updateUI(){
   setText($('sGold'), fmt(S.gold));
   setText($('sRate'), `+${fmt(incomeRate())}/s`);
   setText($('sLives'), String(Math.max(0, S.lives)));
-  setText($('sTowers'), `${combatCount()}/${towerCap()}`);
+  fitStats();
   const bw = $('bWave');
   bw.disabled = S.waveActive || S.over || !!ui.season;
   bw.title = (S.waveActive ? `Lap ${S.wave} in progress` : `Start lap ${S.wave + 1} (Space)`) + ' · P pauses';
